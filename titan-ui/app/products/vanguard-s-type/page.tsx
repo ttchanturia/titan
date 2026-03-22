@@ -48,7 +48,7 @@ export default function VanguardSTypePage() {
           <div className="lg:col-span-5 sticky top-32">
             <div className="space-y-1">
               <span className="font-headline text-xs uppercase tracking-[0.2em] text-on-surface-variant font-semibold">
-                Sonic Gallery Signature Series
+                Titan Signature Series
               </span>
               <h1 className="font-headline text-5xl font-bold tracking-tight text-primary leading-tight">
                 Vanguard S-Type

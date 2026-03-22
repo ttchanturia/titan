@@ -42,7 +42,7 @@ export default function CartPage() {
                   </div>
                   <p className="text-on-surface-variant text-sm max-w-md leading-relaxed">
                     Hand-crafted in Berlin. Featuring discrete oscillators and
-                    the signature Sonic Gallery filter circuit.
+                    the signature Titan filter circuit.
                   </p>
                   <div className="mt-4 flex items-center space-x-6 text-xs tracking-widest uppercase text-secondary">
                     <span>Ref: SG-2024-V2</span>

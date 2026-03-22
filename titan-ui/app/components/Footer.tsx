@@ -6,7 +6,7 @@ export default function Footer() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-12 max-w-screen-2xl mx-auto">
         <div className="md:col-span-1">
           <div className="text-lg font-headline font-bold tracking-tighter uppercase mb-6">
-            Sonic Gallery
+            Titan
           </div>
           <p className="text-[#566067] leading-relaxed">
             Defining the future of sound through meticulous craftsmanship and
@@ -109,7 +109,7 @@ export default function Footer() {
         </div>
       </div>
       <div className="max-w-screen-2xl mx-auto mt-20 pt-8 border-t border-[#C8C5CB]/10 flex flex-col md:flex-row justify-between items-center text-[10px] text-[#9EA0A3] uppercase tracking-[0.2em]">
-        <span>© 2024 Sonic Gallery. Precision in Sound.</span>
+        <span>© 2024 Titan. Precision in Sound.</span>
         <div className="flex space-x-8 mt-4 md:mt-0">
           <Link className="hover:text-[#000000]" href="#">
             Cookies

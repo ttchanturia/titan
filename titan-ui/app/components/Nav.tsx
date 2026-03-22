@@ -20,7 +20,7 @@ export default function Nav() {
           href="/"
           className="text-xl font-bold tracking-tighter text-[#000000] uppercase"
         >
-          Sonic Gallery
+          Titan
         </Link>
         <div className="hidden md:flex items-center gap-12">
           {navLinks.map((link) => {

@@ -1,8 +1,9 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import { QueryProvider } from './providers';
 
 export const metadata: Metadata = {
-  title: 'Sonic Gallery',
+  title: 'Titan',
   description: 'Precision instruments for the modern artist.',
 };
 
@@ -30,7 +31,7 @@ export default function RootLayout({
         />
       </head>
       <body className="bg-surface text-on-surface font-body antialiased">
-        {children}
+        <QueryProvider>{children}</QueryProvider>
       </body>
     </html>
   );

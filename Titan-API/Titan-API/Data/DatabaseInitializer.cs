@@ -100,9 +100,9 @@ public class DatabaseInitializer
                 ('Keyboards', 'Pianos, synthesizers, and MIDI controllers');
 
             INSERT INTO products (name, description, price, category_id, image_url, stock_quantity) VALUES
-                ('Fender Stratocaster', 'Classic electric guitar with versatile tone', 1299.99, 1, NULL, 15),
-                ('Yamaha Stage Custom', 'Professional 5-piece drum kit', 849.00, 2, NULL, 8),
-                ('Roland FP-30X', 'Portable digital piano with weighted keys', 699.99, 3, NULL, 12);
+                ('Fender Stratocaster', 'Classic electric guitar with versatile tone', 1299.99, 1, 'https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=500&h=500&fit=crop&q=80', 15),
+                ('Yamaha Stage Custom', 'Professional 5-piece drum kit', 849.00, 2, 'https://images.unsplash.com/photo-1487180144351-b8472da7d491?w=500&h=500&fit=crop&q=80', 8),
+                ('Roland FP-30X', 'Portable digital piano with weighted keys', 699.99, 3, 'https://images.unsplash.com/photo-1520523839897-bd0b52aaf081?w=500&h=500&fit=crop&q=80', 12);
             """;
 
         await using var cmd = new NpgsqlCommand(sql, conn);

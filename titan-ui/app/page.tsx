@@ -43,14 +43,14 @@ export default function HomePage() {
               </div>
             </div>
             <div className="lg:col-span-7 relative">
-              <div className="aspect-[4/5] bg-surface-container-low relative overflow-hidden">
+              <div className="aspect-4/5 bg-surface-container-low relative overflow-hidden">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   alt="Premium Electric Guitar Close-up"
                   className="w-full h-full object-cover grayscale contrast-125"
                   src="https://lh3.googleusercontent.com/aida-public/AB6AXuCUOfoZX5UsVRuRD4lQMetGjmFPqvzysrlJ9Or8ASA7sf3pfs28i9AUtUsd7wm2S3UsZpC9nNQ4rPSuDGu6FrF1JijprXj2IkTjFQssJ-xXpdxgDDJ60afFYC-aPmp926kEeeil4C11xW9mZ3VmdotYONtjDaFx6cQPh4e6uPMY7swZbK6IcVCizFfdxQ7k1LjKnT8C1PoM6Uky20hS--PL7oDy56hq99d1cEW1x0dRIgL45UBUUqBUADSEkPP7YtWt8WhGC4ZSSF8"
                 />
-                <div className="absolute bottom-10 left-[-20px] bg-primary text-on-primary px-8 py-4 -rotate-90 origin-left text-[10px] tracking-[0.5em] font-bold uppercase">
+                <div className="absolute bottom-10 -left-5 bg-primary text-on-primary px-8 py-4 -rotate-90 origin-left text-[10px] tracking-[0.5em] font-bold uppercase">
                   Handcrafted in London
                 </div>
               </div>
@@ -78,8 +78,8 @@ export default function HomePage() {
           </div>
           <div className="flex gap-8 px-8 overflow-x-auto no-scrollbar snap-x snap-mandatory">
             {/* Card 1 */}
-            <div className="flex-none w-[300px] md:w-[450px] snap-center">
-              <div className="aspect-[3/4] bg-surface relative group mb-6 overflow-hidden">
+            <div className="flex-none w-75 md:w-112.5 snap-center">
+              <div className="aspect-3/4 bg-surface relative group mb-6 overflow-hidden">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
@@ -96,8 +96,8 @@ export default function HomePage() {
               </p>
             </div>
             {/* Card 2 */}
-            <div className="flex-none w-[300px] md:w-[450px] snap-center">
-              <div className="aspect-[3/4] bg-surface relative group mb-6 overflow-hidden">
+            <div className="flex-none w-75 md:w-112.5 snap-center">
+              <div className="aspect-3/4 bg-surface relative group mb-6 overflow-hidden">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
@@ -114,8 +114,8 @@ export default function HomePage() {
               </p>
             </div>
             {/* Card 3 */}
-            <div className="flex-none w-[300px] md:w-[450px] snap-center">
-              <div className="aspect-[3/4] bg-surface relative group mb-6 overflow-hidden">
+            <div className="flex-none w-75 md:w-112.5 snap-center">
+              <div className="aspect-3/4 bg-surface relative group mb-6 overflow-hidden">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
@@ -145,7 +145,7 @@ export default function HomePage() {
                 Engineered for the Uncompromising.
               </h2>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 h-auto md:h-[800px]">
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 h-auto md:h-200">
               {/* Large Feature */}
               <div className="md:col-span-7 bg-surface-container relative group overflow-hidden">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -154,7 +154,7 @@ export default function HomePage() {
                   alt="Professional studio monitors on a minimalist desk"
                   src="https://lh3.googleusercontent.com/aida-public/AB6AXuB5s0J6LvIwjgs6QFQjNotHWSB2fyIpstOTlKLQQM9w5zcobi6O35Q4PonYTl1jkWoZKXohd3Ccue-vmNsl6rwU1Di8V11J0xmVb5utFPhq3DVmm_TF8i1nkXjCXujp6Cw3c3HLi9iTMIBv7Z_BfMvr4E0xTwPre2gnKabM2UmnZHRXJBE5GftdlSZK6kRvrdFma2ZpKCKZoCu98V-OiPn4SxXIJfgTiKqhcCQCLNEK7lG1T184tLtEfTJTK-yR-L6S7FH523OI66o"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col justify-end p-12">
+                <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent flex flex-col justify-end p-12">
                   <h3 className="text-3xl text-white font-headline font-bold mb-4">
                     Carbon Studio Monit-X
                   </h3>
