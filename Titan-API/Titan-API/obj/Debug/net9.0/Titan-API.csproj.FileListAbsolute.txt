@@ -26,7 +26,6 @@ C:\Titan\titan\Titan-API\Titan-API\obj\Debug\net9.0\staticwebassets\msbuild.buil
 C:\Titan\titan\Titan-API\Titan-API\obj\Debug\net9.0\staticwebassets\msbuild.buildMultiTargeting.Titan-API.props
 C:\Titan\titan\Titan-API\Titan-API\obj\Debug\net9.0\staticwebassets\msbuild.buildTransitive.Titan-API.props
 C:\Titan\titan\Titan-API\Titan-API\obj\Debug\net9.0\staticwebassets.pack.json
-C:\Titan\titan\Titan-API\Titan-API\obj\Debug\net9.0\staticwebassets.upToDateCheck.txt
 C:\Titan\titan\Titan-API\Titan-API\obj\Debug\net9.0\Titan-API.csproj.Up2Date
 C:\Titan\titan\Titan-API\Titan-API\obj\Debug\net9.0\Titan-API.dll
 C:\Titan\titan\Titan-API\Titan-API\obj\Debug\net9.0\refint\Titan-API.dll
@@ -36,3 +35,4 @@ C:\Titan\titan\Titan-API\Titan-API\obj\Debug\net9.0\ref\Titan-API.dll
 C:\Titan\titan\Titan-API\Titan-API\bin\Debug\net9.0\Swashbuckle.AspNetCore.Swagger.dll
 C:\Titan\titan\Titan-API\Titan-API\bin\Debug\net9.0\Swashbuckle.AspNetCore.SwaggerGen.dll
 C:\Titan\titan\Titan-API\Titan-API\bin\Debug\net9.0\Swashbuckle.AspNetCore.SwaggerUI.dll
+C:\Titan\titan\Titan-API\Titan-API\bin\Debug\net9.0\Npgsql.dll
