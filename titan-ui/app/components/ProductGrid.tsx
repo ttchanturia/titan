@@ -1,40 +1,20 @@
 'use client';
 
 import Link from 'next/link';
-import { useProducts } from '@/lib/hooks';
 import { DEFAULT_PRODUCT_IMAGE } from '@/lib/constants';
+import type { Product } from '@/lib/types';
 
-export function ProductGrid() {
-  const { data: products, isLoading, error } = useProducts();
+interface ProductGridProps {
+  products: Product[];
+}
 
-  if (isLoading) {
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {[...Array(6)].map((_, i) => (
-          <div key={i} className="animate-pulse">
-            <div className="bg-surface-container-high h-80 mb-4 rounded" />
-            <div className="h-6 bg-surface-container-high rounded mb-2" />
-            <div className="h-4 bg-surface-container-high rounded w-2/3" />
-          </div>
-        ))}
-      </div>
-    );
-  }
-
-  if (error) {
+export function ProductGrid({ products }: ProductGridProps) {
+  if (products.length === 0) {
     return (
       <div className="text-center py-12">
         <p className="text-on-surface-variant">
-          Failed to load products: {error.message}
+          No products match your filters.
         </p>
-      </div>
-    );
-  }
-
-  if (!products || products.length === 0) {
-    return (
-      <div className="text-center py-12">
-        <p className="text-on-surface-variant">No products available.</p>
       </div>
     );
   }

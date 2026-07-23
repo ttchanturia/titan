@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { Product, Category } from './types';
+import { getStoredAuthHeader } from './auth';
 
 // Configure base URL - adjust based on your backend URL
 const API_BASE_URL =
@@ -8,6 +9,15 @@ const API_BASE_URL =
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
   timeout: 10000,
+});
+
+// Attach the logged-in admin's Basic auth header, if any, to every request
+axiosInstance.interceptors.request.use((config) => {
+  const authHeader = getStoredAuthHeader();
+  if (authHeader) {
+    config.headers.Authorization = authHeader;
+  }
+  return config;
 });
 
 // Product API calls
@@ -57,6 +67,15 @@ export const categoryApi = {
   getById: async (id: number): Promise<Category> => {
     const response = await axiosInstance.get<Category>(`/categories/${id}`);
     return response.data;
+  },
+};
+
+// Auth API calls
+export const authApi = {
+  verify: async (username: string, password: string): Promise<void> => {
+    await axiosInstance.get('/auth/verify', {
+      auth: { username, password },
+    });
   },
 };
 

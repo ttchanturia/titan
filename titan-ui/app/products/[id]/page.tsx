@@ -1,17 +1,28 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { useProduct } from '@/lib/hooks';
 import { DEFAULT_PRODUCT_IMAGE } from '@/lib/constants';
 import { useParams } from 'next/navigation';
 import Nav from '@/app/components/Nav';
 import Footer from '@/app/components/Footer';
+import { useCart } from '@/lib/cart-context';
 
 export default function ProductPage() {
   const params = useParams();
   const id = parseInt(params.id as string, 10);
 
   const { data: product, isLoading, error } = useProduct(id);
+  const { addItem } = useCart();
+  const [added, setAdded] = useState(false);
+
+  const handleAddToCart = () => {
+    if (!product) return;
+    addItem(product, 1);
+    setAdded(true);
+    setTimeout(() => setAdded(false), 1500);
+  };
 
   if (isLoading) {
     return (
@@ -187,6 +198,7 @@ export default function ProductPage() {
                 {/* CTA Buttons */}
                 <div className="flex flex-col sm:flex-row gap-4">
                   <button
+                    onClick={handleAddToCart}
                     className={`flex-1 px-8 py-4 font-semibold rounded text-center transition-colors ${
                       product.stockQuantity > 0
                         ? 'bg-primary text-on-primary hover:bg-primary/90'
@@ -194,7 +206,11 @@ export default function ProductPage() {
                     }`}
                     disabled={product.stockQuantity === 0}
                   >
-                    {product.stockQuantity > 0 ? 'Add to Cart' : 'Out of Stock'}
+                    {product.stockQuantity === 0
+                      ? 'Out of Stock'
+                      : added
+                        ? 'Added ✓'
+                        : 'Add to Cart'}
                   </button>
                   <Link
                     href="/products"

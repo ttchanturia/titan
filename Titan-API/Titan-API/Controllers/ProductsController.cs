@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Titan_API.Data;
 using Titan_API.Models;
@@ -34,6 +35,7 @@ public class ProductsController : ControllerBase
         return await _repo.GetByCategoryAsync(categoryId);
     }
 
+    [Authorize]
     [HttpPost]
     public async Task<ActionResult<Product>> Create(Product product)
     {
@@ -41,6 +43,7 @@ public class ProductsController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 
+    [Authorize]
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id, Product product)
     {
@@ -48,6 +51,7 @@ public class ProductsController : ControllerBase
         return updated ? NoContent() : NotFound();
     }
 
+    [Authorize]
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {

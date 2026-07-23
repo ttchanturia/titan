@@ -1,9 +1,17 @@
+using Titan_API.Auth;
 using Titan_API.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
+
+// Basic Authentication with hardcoded users (see Auth/BasicAuthenticationHandler.cs)
+builder.Services
+    .AddAuthentication(BasicAuthenticationHandler.SchemeName)
+    .AddScheme<Microsoft.AspNetCore.Authentication.AuthenticationSchemeOptions, BasicAuthenticationHandler>(
+        BasicAuthenticationHandler.SchemeName, null);
+builder.Services.AddAuthorization();
 
 // Add CORS policy for frontend
 builder.Services.AddCors(options =>
@@ -45,10 +53,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
-
 app.UseCors("AllowFrontend");
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

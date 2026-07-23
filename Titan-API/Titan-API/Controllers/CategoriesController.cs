@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Titan_API.Data;
 using Titan_API.Models;
@@ -28,6 +29,7 @@ public class CategoriesController : ControllerBase
         return category is null ? NotFound() : category;
     }
 
+    [Authorize]
     [HttpPost]
     public async Task<ActionResult<Category>> Create(Category category)
     {
@@ -35,6 +37,7 @@ public class CategoriesController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 
+    [Authorize]
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id, Category category)
     {
@@ -42,6 +45,7 @@ public class CategoriesController : ControllerBase
         return updated ? NoContent() : NotFound();
     }
 
+    [Authorize]
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {

@@ -1,6 +1,16 @@
+'use client';
+
 import Link from 'next/link';
+import { useCategories } from '@/lib/hooks';
 
 export default function Footer() {
+  const { data: categories } = useCategories();
+  const productLinks = categories?.length
+    ? categories
+        .slice(0, 4)
+        .map((c) => ({ label: c.name, href: `/products?category=${c.id}` }))
+    : [{ label: 'Shop All', href: '/products' }];
+
   return (
     <footer className="w-full border-t border-[#C8C5CB]/20 pt-20 pb-10 px-8 mt-24 bg-[#F5F4E8] font-body text-sm tracking-wide">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-12 max-w-screen-2xl mx-auto">
@@ -18,38 +28,16 @@ export default function Footer() {
             Products
           </h5>
           <ul className="space-y-4">
-            <li>
-              <Link
-                className="text-[#566067] hover:text-[#000000] underline underline-offset-4 transition-all"
-                href="#"
-              >
-                Guitars
-              </Link>
-            </li>
-            <li>
-              <Link
-                className="text-[#566067] hover:text-[#000000] underline underline-offset-4 transition-all"
-                href="#"
-              >
-                Studio Monitors
-              </Link>
-            </li>
-            <li>
-              <Link
-                className="text-[#566067] hover:text-[#000000] underline underline-offset-4 transition-all"
-                href="#"
-              >
-                Keyboards
-              </Link>
-            </li>
-            <li>
-              <Link
-                className="text-[#566067] hover:text-[#000000] underline underline-offset-4 transition-all"
-                href="#"
-              >
-                Pedalboard
-              </Link>
-            </li>
+            {productLinks.map((link) => (
+              <li key={link.href}>
+                <Link
+                  className="text-[#566067] hover:text-[#000000] underline underline-offset-4 transition-all"
+                  href={link.href}
+                >
+                  {link.label}
+                </Link>
+              </li>
+            ))}
           </ul>
         </div>
         <div>
