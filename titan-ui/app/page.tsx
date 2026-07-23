@@ -42,7 +42,7 @@ export default function HomePage() {
                   Explore Series
                 </Link>
                 <Link
-                  href="/products/sg-240"
+                  href={latestProduct ? `/products/${latestProduct.id}` : '/products'}
                   className="text-sm font-bold uppercase tracking-widest flex items-center group"
                 >
                   Technical Specs
