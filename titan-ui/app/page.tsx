@@ -15,7 +15,7 @@ export default function HomePage() {
               <span className="inline-block text-xs font-bold tracking-[0.3em] uppercase mb-6 text-on-surface-variant">
                 The 2024 Collection
               </span>
-              <h1 className="text-6xl md:text-8xl font-headline font-extrabold tracking-tighter leading-[0.9] mb-8">
+              <h1 className="text-5xl sm:text-6xl md:text-8xl font-headline font-extrabold tracking-tighter leading-[0.9] mb-8">
                 The Soul of <br />
                 <span className="text-outline">Precision.</span>
               </h1>
@@ -24,7 +24,7 @@ export default function HomePage() {
                 Crafted for those who hear the difference between a note and a
                 story.
               </p>
-              <div className="flex items-center space-x-8">
+              <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
                 <Link
                   href="/products"
                   className="bg-primary text-on-primary px-10 py-5 text-sm font-bold uppercase tracking-widest hover:bg-primary-container active:scale-95 transition-all duration-200"

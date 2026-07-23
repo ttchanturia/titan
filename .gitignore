@@ -38,6 +38,7 @@ next-env.d.ts
 # .NET build output
 bin/
 obj/
+publish-output/
 
 # Visual Studio
 .vs/
