@@ -1,9 +1,19 @@
+'use client';
+
 import Link from 'next/link';
 import Nav from './components/Nav';
 import Footer from './components/Footer';
 import NewsletterForm from './components/NewsletterForm';
+import { useProducts } from '@/lib/hooks';
+import { DEFAULT_PRODUCT_IMAGE } from '@/lib/constants';
 
 export default function HomePage() {
+  const { data: products } = useProducts();
+  const latestProduct = products?.reduce<(typeof products)[number] | undefined>(
+    (latest, p) => (!latest || p.id > latest.id ? p : latest),
+    undefined,
+  );
+
   return (
     <>
       <Nav />
@@ -46,9 +56,9 @@ export default function HomePage() {
               <div className="aspect-4/5 bg-surface-container-low relative overflow-hidden">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  alt="Premium Electric Guitar Close-up"
+                  alt={latestProduct?.name ?? 'Featured instrument'}
                   className="w-full h-full object-cover grayscale contrast-125"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuCUOfoZX5UsVRuRD4lQMetGjmFPqvzysrlJ9Or8ASA7sf3pfs28i9AUtUsd7wm2S3UsZpC9nNQ4rPSuDGu6FrF1JijprXj2IkTjFQssJ-xXpdxgDDJ60afFYC-aPmp926kEeeil4C11xW9mZ3VmdotYONtjDaFx6cQPh4e6uPMY7swZbK6IcVCizFfdxQ7k1LjKnT8C1PoM6Uky20hS--PL7oDy56hq99d1cEW1x0dRIgL45UBUUqBUADSEkPP7YtWt8WhGC4ZSSF8"
+                  src={latestProduct?.imageUrl || DEFAULT_PRODUCT_IMAGE}
                 />
                 <div className="absolute bottom-10 -left-5 bg-primary text-on-primary px-8 py-4 -rotate-90 origin-left text-[10px] tracking-[0.5em] font-bold uppercase">
                   Handcrafted in London
