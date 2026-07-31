@@ -7,8 +7,10 @@ import {
   getStoredAuthHeader,
   setStoredAuthHeader,
 } from '@/lib/auth';
+import { useTranslation } from '@/lib/i18n';
 
 export function AdminLoginGate({ children }: { children: ReactNode }) {
+  const { t } = useTranslation();
   const [authed, setAuthed] = useState(false);
   const [checked, setChecked] = useState(false);
   const [username, setUsername] = useState('');
@@ -30,7 +32,7 @@ export function AdminLoginGate({ children }: { children: ReactNode }) {
       setStoredAuthHeader(username, password);
       setAuthed(true);
     } catch {
-      setError('Invalid username or password.');
+      setError(t('admin_login_error'));
     } finally {
       setIsSubmitting(false);
     }
@@ -49,12 +51,12 @@ export function AdminLoginGate({ children }: { children: ReactNode }) {
     return (
       <main className="min-h-screen bg-surface px-8 py-16 max-w-sm mx-auto flex flex-col justify-center">
         <h1 className="font-headline text-2xl font-bold tracking-tighter text-primary mb-8">
-          Admin Login
+          {t('admin_login_heading')}
         </h1>
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
           <div>
             <label className="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2 block">
-              Username
+              {t('admin_username_label')}
             </label>
             <input
               required
@@ -67,7 +69,7 @@ export function AdminLoginGate({ children }: { children: ReactNode }) {
           </div>
           <div>
             <label className="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2 block">
-              Password
+              {t('admin_password_label')}
             </label>
             <input
               required
@@ -84,7 +86,7 @@ export function AdminLoginGate({ children }: { children: ReactNode }) {
             disabled={isSubmitting}
             className="bg-primary text-on-primary py-4 text-sm font-bold uppercase tracking-widest hover:bg-primary-container active:scale-95 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isSubmitting ? 'Signing in…' : 'Sign In'}
+            {isSubmitting ? t('admin_signing_in') : t('admin_sign_in')}
           </button>
         </form>
       </main>
@@ -99,7 +101,7 @@ export function AdminLoginGate({ children }: { children: ReactNode }) {
           onClick={handleLogout}
           className="text-xs font-semibold uppercase tracking-widest text-on-surface-variant hover:text-primary transition-colors"
         >
-          Log Out
+          {t('admin_logout')}
         </button>
       </div>
       {children}

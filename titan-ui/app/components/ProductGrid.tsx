@@ -3,18 +3,19 @@
 import Link from 'next/link';
 import { DEFAULT_PRODUCT_IMAGE } from '@/lib/constants';
 import type { Product } from '@/lib/types';
+import { useTranslation } from '@/lib/i18n';
 
 interface ProductGridProps {
   products: Product[];
 }
 
 export function ProductGrid({ products }: ProductGridProps) {
+  const { t } = useTranslation();
+
   if (products.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-on-surface-variant">
-          No products match your filters.
-        </p>
+        <p className="text-on-surface-variant">{t('grid_no_results')}</p>
       </div>
     );
   }
@@ -24,10 +25,10 @@ export function ProductGrid({ products }: ProductGridProps) {
       {products.map((product) => {
         const stockStatus =
           product.stockQuantity > 10
-            ? { label: 'Available', color: 'bg-emerald-500' }
+            ? { label: t('stock_available'), color: 'bg-emerald-500' }
             : product.stockQuantity > 0
-              ? { label: 'Low Stock', color: 'bg-amber-500' }
-              : { label: 'Out of Stock', color: 'bg-red-500' };
+              ? { label: t('stock_low'), color: 'bg-amber-500' }
+              : { label: t('stock_out'), color: 'bg-red-500' };
 
         return (
           <Link

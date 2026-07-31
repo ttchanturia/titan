@@ -11,6 +11,7 @@ import {
   useDeleteProduct,
 } from '@/lib/hooks';
 import type { Product } from '@/lib/types';
+import { useTranslation } from '@/lib/i18n';
 
 const emptyForm = {
   name: '',
@@ -38,6 +39,7 @@ export default function AdminPage() {
 }
 
 function AdminPageContent() {
+  const { t } = useTranslation();
   const { data: products, isLoading, error } = useProducts();
   const { data: categories } = useCategories();
   const createProduct = useCreateProduct();
@@ -86,7 +88,7 @@ function AdminPageContent() {
     const stockQuantity = form.stockQuantity ? parseInt(form.stockQuantity, 10) : 0;
 
     if (!form.name.trim() || !Number.isFinite(price) || !Number.isFinite(categoryId)) {
-      setFormError('Name, price, and category are required.');
+      setFormError(t('admin_required_error'));
       return;
     }
 
@@ -107,19 +109,19 @@ function AdminPageContent() {
             setForm(emptyForm);
             setEditingId(null);
           },
-          onError: () => setFormError('Failed to update product. Please try again.'),
+          onError: () => setFormError(t('admin_update_failed')),
         },
       );
     } else {
       createProduct.mutate(payload, {
         onSuccess: () => setForm(emptyForm),
-        onError: () => setFormError('Failed to create product. Please try again.'),
+        onError: () => setFormError(t('admin_create_failed')),
       });
     }
   };
 
   const handleDelete = (id: number, name: string) => {
-    if (window.confirm(`Delete "${name}"? This cannot be undone.`)) {
+    if (window.confirm(t('admin_delete_confirm', { name }))) {
       if (editingId === id) handleCancelEdit();
       deleteProduct.mutate(id);
     }
@@ -130,17 +132,17 @@ function AdminPageContent() {
       <div className="flex items-center justify-between mb-12">
         <div>
           <span className="font-label text-xs uppercase tracking-[0.3em] text-on-surface-variant mb-2 block">
-            Admin
+            {t('admin_badge')}
           </span>
           <h1 className="font-headline text-4xl font-bold tracking-tighter text-primary">
-            Manage Products
+            {t('admin_heading')}
           </h1>
         </div>
         <Link
           href="/products"
           className="text-sm font-semibold underline underline-offset-4"
         >
-          View Storefront
+          {t('admin_view_storefront')}
         </Link>
       </div>
 
@@ -149,12 +151,12 @@ function AdminPageContent() {
         className="bg-surface-container-low p-8 rounded-sm mb-16 grid grid-cols-1 md:grid-cols-2 gap-6"
       >
         <h2 className="md:col-span-2 font-headline text-xl font-bold">
-          {editingId !== null ? 'Edit Product' : 'Add Product'}
+          {editingId !== null ? t('admin_edit_product') : t('admin_add_product')}
         </h2>
 
         <div className="md:col-span-2">
           <label className="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2 block">
-            Name
+            {t('admin_name_label')}
           </label>
           <input
             required
@@ -167,7 +169,7 @@ function AdminPageContent() {
 
         <div className="md:col-span-2">
           <label className="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2 block">
-            Description
+            {t('admin_description_label')}
           </label>
           <textarea
             value={form.description}
@@ -179,7 +181,7 @@ function AdminPageContent() {
 
         <div>
           <label className="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2 block">
-            Price
+            {t('admin_price_label')}
           </label>
           <input
             required
@@ -194,7 +196,7 @@ function AdminPageContent() {
 
         <div>
           <label className="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2 block">
-            Stock Quantity
+            {t('admin_stock_label')}
           </label>
           <input
             type="number"
@@ -207,7 +209,7 @@ function AdminPageContent() {
 
         <div>
           <label className="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2 block">
-            Category
+            {t('admin_category_label')}
           </label>
           <select
             required
@@ -215,7 +217,7 @@ function AdminPageContent() {
             onChange={handleChange('categoryId')}
             className={selectClasses}
           >
-            <option value="">Select a category</option>
+            <option value="">{t('admin_select_category')}</option>
             {categories?.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.name}
@@ -226,7 +228,7 @@ function AdminPageContent() {
 
         <div>
           <label className="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2 block">
-            Image URL
+            {t('admin_image_url_label')}
           </label>
           <input
             type="text"
@@ -248,11 +250,11 @@ function AdminPageContent() {
           >
             {isSaving
               ? editingId !== null
-                ? 'Saving…'
-                : 'Adding…'
+                ? t('admin_saving')
+                : t('admin_adding')
               : editingId !== null
-                ? 'Save Changes'
-                : 'Add Product'}
+                ? t('admin_save_changes')
+                : t('admin_add_product')}
           </button>
           {editingId !== null && (
             <button
@@ -260,7 +262,7 @@ function AdminPageContent() {
               onClick={handleCancelEdit}
               className="px-8 text-sm font-bold uppercase tracking-widest text-on-surface-variant hover:text-primary transition-colors"
             >
-              Cancel
+              {t('admin_cancel')}
             </button>
           )}
         </div>
@@ -268,21 +270,21 @@ function AdminPageContent() {
 
       <section>
         <h2 className="font-headline text-xl font-bold mb-6">
-          Existing Products
+          {t('admin_existing_products')}
         </h2>
 
         {isLoading && (
-          <p className="text-on-surface-variant text-sm">Loading products…</p>
+          <p className="text-on-surface-variant text-sm">{t('admin_loading')}</p>
         )}
 
         {error && (
           <p className="text-on-surface-variant text-sm">
-            Failed to load products: {error.message}
+            {t('admin_load_failed')} {error.message}
           </p>
         )}
 
         {products && products.length === 0 && (
-          <p className="text-on-surface-variant text-sm">No products yet.</p>
+          <p className="text-on-surface-variant text-sm">{t('admin_no_products')}</p>
         )}
 
         {products && products.length > 0 && (
@@ -290,10 +292,10 @@ function AdminPageContent() {
             <table className="w-full text-sm text-left">
               <thead>
                 <tr className="text-on-surface-variant border-b border-outline-variant text-xs uppercase tracking-widest">
-                  <th className="py-3 pr-4">Name</th>
-                  <th className="py-3 pr-4">Category</th>
-                  <th className="py-3 pr-4">Price</th>
-                  <th className="py-3 pr-4">Stock</th>
+                  <th className="py-3 pr-4">{t('admin_table_name')}</th>
+                  <th className="py-3 pr-4">{t('admin_table_category')}</th>
+                  <th className="py-3 pr-4">{t('admin_table_price')}</th>
+                  <th className="py-3 pr-4">{t('admin_table_stock')}</th>
                   <th className="py-3"></th>
                 </tr>
               </thead>
@@ -317,7 +319,7 @@ function AdminPageContent() {
                         onClick={() => handleEditClick(p)}
                         className="text-primary hover:underline"
                       >
-                        Edit
+                        {t('admin_edit')}
                       </button>
                       <button
                         type="button"
@@ -325,7 +327,7 @@ function AdminPageContent() {
                         disabled={deleteProduct.isPending}
                         className="text-red-600 hover:underline disabled:opacity-50"
                       >
-                        Delete
+                        {t('admin_delete')}
                       </button>
                     </td>
                   </tr>

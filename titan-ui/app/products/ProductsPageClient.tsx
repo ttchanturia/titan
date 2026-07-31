@@ -8,6 +8,7 @@ import type { Product } from '@/lib/types';
 import { ProductFilters, type SortOption } from '../components/ProductFilters';
 import { ProductGrid } from '../components/ProductGrid';
 import { Pagination } from '../components/Pagination';
+import { useTranslation } from '@/lib/i18n';
 
 function parsePositiveInt(value: string | null, fallback: number): number {
   const n = value ? parseInt(value, 10) : NaN;
@@ -24,6 +25,7 @@ export function ProductsPageClient() {
   const searchParams = useSearchParams();
   const { data: products, isLoading, error } = useProducts();
   const { data: categories } = useCategories();
+  const { t } = useTranslation();
 
   // Instant local state for typing-driven inputs; synced to the URL on a
   // debounce so filtering doesn't lag behind keystrokes.
@@ -136,7 +138,7 @@ export function ProductsPageClient() {
     return (
       <div className="text-center py-12">
         <p className="text-on-surface-variant">
-          Failed to load products: {error.message}
+          {t('products_load_error')} {error.message}
         </p>
       </div>
     );

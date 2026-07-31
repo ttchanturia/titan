@@ -1,6 +1,7 @@
 'use client';
 
 import type { Category } from '@/lib/types';
+import { useTranslation } from '@/lib/i18n';
 
 export type SortOption = 'name-asc' | 'name-desc' | 'price-asc' | 'price-desc';
 
@@ -41,16 +42,18 @@ export function ProductFilters({
   sort,
   onSortChange,
 }: ProductFiltersProps) {
+  const { t } = useTranslation();
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6 mb-16 items-end">
       <div className="lg:col-span-2">
         <label className="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2 block">
-          Search
+          {t('filters_search_label')}
         </label>
         <input
           type="text"
           className={inputClasses}
-          placeholder="Search products..."
+          placeholder={t('filters_search_placeholder')}
           value={searchInput}
           onChange={(e) => onSearchInputChange(e.target.value)}
         />
@@ -58,14 +61,14 @@ export function ProductFilters({
 
       <div>
         <label className="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2 block">
-          Category
+          {t('filters_category_label')}
         </label>
         <select
           className={selectClasses}
           value={category}
           onChange={(e) => onCategoryChange(e.target.value)}
         >
-          <option value="">All Categories</option>
+          <option value="">{t('filters_all_categories')}</option>
           {categories?.map((c) => (
             <option key={c.id} value={String(c.id)}>
               {c.name}
@@ -77,7 +80,7 @@ export function ProductFilters({
       <div className="flex gap-3">
         <div className="flex-1">
           <label className="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2 block">
-            Min Price
+            {t('filters_min_price')}
           </label>
           <input
             type="number"
@@ -90,13 +93,13 @@ export function ProductFilters({
         </div>
         <div className="flex-1">
           <label className="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2 block">
-            Max Price
+            {t('filters_max_price')}
           </label>
           <input
             type="number"
             min="0"
             className={inputClasses}
-            placeholder="Any"
+            placeholder={t('filters_max_any')}
             value={maxPrice}
             onChange={(e) => onMaxPriceChange(e.target.value)}
           />
@@ -105,18 +108,18 @@ export function ProductFilters({
 
       <div>
         <label className="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2 block">
-          Sort By
+          {t('filters_sort_by')}
         </label>
         <select
           className={selectClasses}
           value={sort}
           onChange={(e) => onSortChange(e.target.value as SortOption | '')}
         >
-          <option value="">Default</option>
-          <option value="name-asc">Name (A-Z)</option>
-          <option value="name-desc">Name (Z-A)</option>
-          <option value="price-asc">Price (Low to High)</option>
-          <option value="price-desc">Price (High to Low)</option>
+          <option value="">{t('filters_sort_default')}</option>
+          <option value="name-asc">{t('filters_sort_name_asc')}</option>
+          <option value="name-desc">{t('filters_sort_name_desc')}</option>
+          <option value="price-asc">{t('filters_sort_price_asc')}</option>
+          <option value="price-desc">{t('filters_sort_price_desc')}</option>
         </select>
       </div>
 
@@ -128,7 +131,7 @@ export function ProductFilters({
           className="w-4 h-4 accent-primary"
         />
         <span className="text-sm font-body text-on-surface-variant">
-          In stock only
+          {t('filters_in_stock_only')}
         </span>
       </label>
     </div>

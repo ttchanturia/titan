@@ -6,9 +6,11 @@ import Footer from './components/Footer';
 import NewsletterForm from './components/NewsletterForm';
 import { useProducts } from '@/lib/hooks';
 import { DEFAULT_PRODUCT_IMAGE } from '@/lib/constants';
+import { useTranslation } from '@/lib/i18n';
 
 export default function HomePage() {
   const { data: products } = useProducts();
+  const { t } = useTranslation();
   const latestProduct = products?.reduce<(typeof products)[number] | undefined>(
     (latest, p) => (!latest || p.id > latest.id ? p : latest),
     undefined,
@@ -23,29 +25,27 @@ export default function HomePage() {
           <div className="max-w-screen-2xl mx-auto px-8 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center w-full">
             <div className="lg:col-span-5 z-10">
               <span className="inline-block text-xs font-bold tracking-[0.3em] uppercase mb-6 text-on-surface-variant">
-                The 2024 Collection
+                {t('home_collection_badge')}
               </span>
               <h1 className="text-5xl sm:text-6xl md:text-8xl font-headline font-extrabold tracking-tighter leading-[0.9] mb-8">
-                The Soul of <br />
-                <span className="text-outline">Precision.</span>
+                {t('home_hero_title_line1')} <br />
+                <span className="text-outline">{t('home_hero_title_line2')}</span>
               </h1>
               <p className="text-lg text-on-surface-variant max-w-md mb-12 font-light leading-relaxed">
-                Experience the resonant depth of the MK-II Signature Series.
-                Crafted for those who hear the difference between a note and a
-                story.
+                {t('home_hero_subtitle')}
               </p>
               <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
                 <Link
                   href="/products"
                   className="bg-primary text-on-primary px-10 py-5 text-sm font-bold uppercase tracking-widest hover:bg-primary-container active:scale-95 transition-all duration-200"
                 >
-                  Explore Series
+                  {t('home_explore_series')}
                 </Link>
                 <Link
                   href={latestProduct ? `/products/${latestProduct.id}` : '/products'}
                   className="text-sm font-bold uppercase tracking-widest flex items-center group"
                 >
-                  Technical Specs
+                  {t('home_technical_specs')}
                   <span className="material-symbols-outlined ml-2 group-hover:translate-x-1 transition-transform">
                     arrow_forward
                   </span>
@@ -61,7 +61,7 @@ export default function HomePage() {
                   src={latestProduct?.imageUrl || DEFAULT_PRODUCT_IMAGE}
                 />
                 <div className="absolute bottom-10 -left-5 bg-primary text-on-primary px-8 py-4 -rotate-90 origin-left text-[10px] tracking-[0.5em] font-bold uppercase">
-                  Handcrafted in London
+                  {t('home_handcrafted_badge')}
                 </div>
               </div>
             </div>
@@ -74,7 +74,7 @@ export default function HomePage() {
             <div className="flex justify-between items-end">
               <div>
                 <h2 className="text-4xl font-headline font-bold tracking-tight">
-                  Featured Instruments
+                  {t('home_featured_heading')}
                 </h2>
                 <div className="w-12 h-1 bg-primary mt-4"></div>
               </div>
@@ -82,7 +82,7 @@ export default function HomePage() {
                 href="/products"
                 className="text-sm font-semibold underline underline-offset-8 decoration-1"
               >
-                View Entire Gallery
+                {t('home_view_gallery')}
               </Link>
             </div>
           </div>
@@ -99,10 +99,10 @@ export default function HomePage() {
                 <div className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
               </div>
               <h3 className="text-lg font-headline font-bold mb-1">
-                Dreadnought Series
+                {t('home_card1_title')}
               </h3>
               <p className="text-sm text-on-surface-variant font-medium">
-                Acoustic Engineering
+                {t('home_card1_subtitle')}
               </p>
             </div>
             {/* Card 2 */}
@@ -117,10 +117,10 @@ export default function HomePage() {
                 <div className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
               </div>
               <h3 className="text-lg font-headline font-bold mb-1">
-                Deep Resonance Bass
+                {t('home_card2_title')}
               </h3>
               <p className="text-sm text-on-surface-variant font-medium">
-                Precision Low-End
+                {t('home_card2_subtitle')}
               </p>
             </div>
             {/* Card 3 */}
@@ -135,10 +135,10 @@ export default function HomePage() {
                 <div className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
               </div>
               <h3 className="text-lg font-headline font-bold mb-1">
-                Grand Concert Series
+                {t('home_card3_title')}
               </h3>
               <p className="text-sm text-on-surface-variant font-medium">
-                Studio Keys
+                {t('home_card3_subtitle')}
               </p>
             </div>
           </div>
@@ -149,10 +149,10 @@ export default function HomePage() {
           <div className="max-w-screen-2xl mx-auto px-8">
             <div className="mb-20 text-center max-w-2xl mx-auto">
               <span className="text-[10px] font-bold tracking-[0.4em] uppercase text-outline mb-4 block">
-                New Arrivals
+                {t('home_new_arrivals_badge')}
               </span>
               <h2 className="text-5xl font-headline font-extrabold tracking-tighter">
-                Engineered for the Uncompromising.
+                {t('home_new_arrivals_heading')}
               </h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-12 gap-6 h-auto md:h-200">
@@ -166,10 +166,10 @@ export default function HomePage() {
                 />
                 <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent flex flex-col justify-end p-12">
                   <h3 className="text-3xl text-white font-headline font-bold mb-4">
-                    Carbon Studio Monit-X
+                    {t('home_bento_feature_title')}
                   </h3>
                   <button className="w-fit text-white text-xs font-bold uppercase tracking-widest border-b border-white pb-2">
-                    Learn More
+                    {t('home_bento_learn_more')}
                   </button>
                 </div>
               </div>
@@ -178,10 +178,10 @@ export default function HomePage() {
                 <div className="bg-surface-container-high p-12 flex flex-col justify-between">
                   <div>
                     <h4 className="text-xl font-bold mb-2">
-                      Pedalboard Precision
+                      {t('home_bento_pedalboard_title')}
                     </h4>
                     <p className="text-sm text-on-surface-variant">
-                      The 2024 Analog Series
+                      {t('home_bento_pedalboard_subtitle')}
                     </p>
                   </div>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -203,11 +203,10 @@ export default function HomePage() {
                   </span>
                   <div>
                     <h4 className="text-xl font-bold mb-2">
-                      Artist Collaborations
+                      {t('home_bento_artist_title')}
                     </h4>
                     <p className="text-sm text-surface-dim">
-                      Limited edition artifacts designed with world-class
-                      engineers.
+                      {t('home_bento_artist_desc')}
                     </p>
                   </div>
                 </div>
@@ -220,11 +219,10 @@ export default function HomePage() {
         <section className="py-32 bg-surface-container-low border-t border-outline-variant/10">
           <div className="max-w-screen-2xl mx-auto px-8 text-center">
             <h2 className="text-3xl font-headline font-bold mb-8">
-              Join the Sonic Circle.
+              {t('home_newsletter_heading')}
             </h2>
             <p className="text-on-surface-variant max-w-xl mx-auto mb-12 font-light">
-              Gain exclusive access to limited instrument drops, technical
-              masterclasses, and gallery events.
+              {t('home_newsletter_subtitle')}
             </p>
             <NewsletterForm />
           </div>

@@ -4,6 +4,39 @@ import { useState, type FormEvent } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useCart } from '@/lib/cart-context';
+import { useTranslation } from '@/lib/i18n';
+import type { Locale } from '@/lib/translations';
+
+function LanguageToggle() {
+  const { locale, setLocale } = useTranslation();
+
+  const optionClasses = (option: Locale) =>
+    locale === option
+      ? 'text-[#000000] font-bold'
+      : 'text-[#566067] hover:text-[#000000] transition-colors';
+
+  return (
+    <div className="flex items-center gap-1 text-xs uppercase tracking-widest">
+      <button
+        type="button"
+        onClick={() => setLocale('en')}
+        className={optionClasses('en')}
+        aria-pressed={locale === 'en'}
+      >
+        En
+      </button>
+      <span className="text-[#C8C5CB]">/</span>
+      <button
+        type="button"
+        onClick={() => setLocale('ka')}
+        className={optionClasses('ka')}
+        aria-pressed={locale === 'ka'}
+      >
+        Ge
+      </button>
+    </div>
+  );
+}
 
 export default function Nav() {
   const pathname = usePathname();
@@ -11,10 +44,11 @@ export default function Nav() {
   const [searchTerm, setSearchTerm] = useState('');
   const [menuOpen, setMenuOpen] = useState(false);
   const { count } = useCart();
+  const { t } = useTranslation();
 
   const navLinks = [
-    { href: '/', label: 'Home' },
-    { href: '/products', label: 'Products' },
+    { href: '/', label: t('nav_home') },
+    { href: '/products', label: t('nav_products') },
   ];
 
   // Intentionally does not read useSearchParams(): Nav renders on every page
@@ -50,7 +84,7 @@ export default function Nav() {
         <div className="hidden md:flex items-center gap-12">
           {navLinks.map((link) => (
             <Link
-              key={link.label}
+              key={link.href}
               href={link.href}
               className={`text-sm ${
                 link.href !== '#' &&
@@ -66,6 +100,9 @@ export default function Nav() {
           ))}
         </div>
         <div className="flex items-center gap-4 sm:gap-6">
+          <div className="hidden sm:block">
+            <LanguageToggle />
+          </div>
           <form
             onSubmit={handleSearchSubmit}
             className="hidden lg:flex items-center bg-surface-container-low px-4 py-2 rounded-sm"
@@ -75,7 +112,7 @@ export default function Nav() {
             </span>
             <input
               className="bg-transparent border-none focus:ring-0 text-sm w-48 font-body outline-none"
-              placeholder="Search products..."
+              placeholder={t('nav_search_placeholder')}
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -120,7 +157,7 @@ export default function Nav() {
             </span>
             <input
               className="bg-transparent border-none focus:ring-0 text-sm w-full font-body outline-none"
-              placeholder="Search products..."
+              placeholder={t('nav_search_placeholder')}
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -129,7 +166,7 @@ export default function Nav() {
           <div className="flex flex-col gap-4">
             {navLinks.map((link) => (
               <Link
-                key={link.label}
+                key={link.href}
                 href={link.href}
                 onClick={() => setMenuOpen(false)}
                 className={`text-base ${linkClasses(link.href)}`}
@@ -138,6 +175,7 @@ export default function Nav() {
               </Link>
             ))}
           </div>
+          <LanguageToggle />
         </div>
       )}
     </nav>

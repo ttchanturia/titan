@@ -1,9 +1,14 @@
+'use client';
+
 import { Suspense } from 'react';
 import Nav from '../components/Nav';
 import Footer from '../components/Footer';
 import { ProductsPageClient } from './ProductsPageClient';
+import { useTranslation } from '@/lib/i18n';
 
 export default function ProductsPage() {
+  const { t } = useTranslation();
+
   return (
     <>
       <Nav />
@@ -13,15 +18,13 @@ export default function ProductsPage() {
           <div className="flex flex-col md:flex-row justify-between items-end gap-8">
             <div className="max-w-2xl">
               <span className="font-label text-xs uppercase tracking-[0.3em] text-on-surface-variant mb-4 block">
-                The Full Collection
+                {t('products_badge')}
               </span>
               <h1 className="font-headline text-5xl md:text-7xl font-bold tracking-tighter leading-none text-primary">
-                All Instruments
+                {t('products_heading')}
               </h1>
               <p className="mt-6 text-lg text-on-surface-variant font-light leading-relaxed">
-                From solid-body electrics to studio monitors and beyond,
-                explore the complete Titan catalogue, engineered for
-                precision at every price point.
+                {t('products_subtitle')}
               </p>
             </div>
           </div>

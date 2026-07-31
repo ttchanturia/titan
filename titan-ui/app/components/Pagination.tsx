@@ -1,5 +1,7 @@
 'use client';
 
+import { useTranslation } from '@/lib/i18n';
+
 interface PaginationProps {
   page: number;
   totalPages: number;
@@ -7,6 +9,8 @@ interface PaginationProps {
 }
 
 export function Pagination({ page, totalPages, onPageChange }: PaginationProps) {
+  const { t } = useTranslation();
+
   if (totalPages <= 1) {
     return null;
   }
@@ -20,7 +24,7 @@ export function Pagination({ page, totalPages, onPageChange }: PaginationProps) 
         onClick={() => onPageChange(page - 1)}
         disabled={page === 1}
         className="material-symbols-outlined text-on-surface-variant disabled:opacity-30 disabled:cursor-not-allowed hover:text-primary transition-colors"
-        aria-label="Previous page"
+        aria-label={t('pagination_prev')}
       >
         chevron_left
       </button>
@@ -43,7 +47,7 @@ export function Pagination({ page, totalPages, onPageChange }: PaginationProps) 
         onClick={() => onPageChange(page + 1)}
         disabled={page === totalPages}
         className="material-symbols-outlined text-on-surface-variant disabled:opacity-30 disabled:cursor-not-allowed hover:text-primary transition-colors"
-        aria-label="Next page"
+        aria-label={t('pagination_next')}
       >
         chevron_right
       </button>

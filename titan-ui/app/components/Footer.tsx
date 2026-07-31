@@ -2,14 +2,16 @@
 
 import Link from 'next/link';
 import { useCategories } from '@/lib/hooks';
+import { useTranslation } from '@/lib/i18n';
 
 export default function Footer() {
   const { data: categories } = useCategories();
+  const { t } = useTranslation();
   const productLinks = categories?.length
     ? categories
         .slice(0, 4)
         .map((c) => ({ label: c.name, href: `/products?category=${c.id}` }))
-    : [{ label: 'Shop All', href: '/products' }];
+    : [{ label: t('footer_shop_all'), href: '/products' }];
 
   return (
     <footer className="w-full border-t border-[#C8C5CB]/20 pt-20 pb-10 px-8 mt-24 bg-[#F5F4E8] font-body text-sm tracking-wide">
@@ -18,14 +20,11 @@ export default function Footer() {
           <div className="text-lg font-headline font-bold tracking-tighter uppercase mb-6">
             Titan
           </div>
-          <p className="text-[#566067] leading-relaxed">
-            Defining the future of sound through meticulous craftsmanship and
-            acoustic innovation.
-          </p>
+          <p className="text-[#566067] leading-relaxed">{t('footer_tagline')}</p>
         </div>
         <div>
           <h5 className="font-bold text-[#000000] mb-6 uppercase tracking-widest text-[10px]">
-            Products
+            {t('footer_products_heading')}
           </h5>
           <ul className="space-y-4">
             {productLinks.map((link) => (
@@ -42,7 +41,7 @@ export default function Footer() {
         </div>
         <div>
           <h5 className="font-bold text-[#000000] mb-6 uppercase tracking-widest text-[10px]">
-            Brand
+            {t('footer_brand_heading')}
           </h5>
           <ul className="space-y-4">
             <li>
@@ -50,7 +49,7 @@ export default function Footer() {
                 className="text-[#566067] hover:text-[#000000] underline underline-offset-4 transition-all"
                 href="#"
               >
-                Sustainability
+                {t('footer_sustainability')}
               </Link>
             </li>
             <li>
@@ -58,7 +57,7 @@ export default function Footer() {
                 className="text-[#566067] hover:text-[#000000] underline underline-offset-4 transition-all"
                 href="#"
               >
-                Technical Specs
+                {t('footer_technical_specs')}
               </Link>
             </li>
             <li>
@@ -66,7 +65,7 @@ export default function Footer() {
                 className="text-[#566067] hover:text-[#000000] underline underline-offset-4 transition-all"
                 href="#"
               >
-                Store Locator
+                {t('footer_store_locator')}
               </Link>
             </li>
             <li>
@@ -74,14 +73,14 @@ export default function Footer() {
                 className="text-[#566067] hover:text-[#000000] underline underline-offset-4 transition-all"
                 href="#"
               >
-                Privacy
+                {t('footer_privacy')}
               </Link>
             </li>
           </ul>
         </div>
         <div>
           <h5 className="font-bold text-[#000000] mb-6 uppercase tracking-widest text-[10px]">
-            Connect
+            {t('footer_connect_heading')}
           </h5>
           <div className="flex space-x-6">
             <Link className="hover:opacity-60 transition-opacity" href="#">
@@ -97,16 +96,16 @@ export default function Footer() {
         </div>
       </div>
       <div className="max-w-screen-2xl mx-auto mt-20 pt-8 border-t border-[#C8C5CB]/10 flex flex-col md:flex-row justify-between items-center text-[10px] text-[#9EA0A3] uppercase tracking-[0.2em]">
-        <span>© 2024 Titan. Precision in Sound.</span>
+        <span>{t('footer_copyright')}</span>
         <div className="flex space-x-8 mt-4 md:mt-0">
           <Link className="hover:text-[#000000]" href="#">
-            Cookies
+            {t('footer_cookies')}
           </Link>
           <Link className="hover:text-[#000000]" href="#">
-            Terms
+            {t('footer_terms')}
           </Link>
           <Link className="hover:text-[#000000]" href="#">
-            Accessibility
+            {t('footer_accessibility')}
           </Link>
         </div>
       </div>

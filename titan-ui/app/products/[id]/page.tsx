@@ -8,6 +8,7 @@ import { useParams } from 'next/navigation';
 import Nav from '@/app/components/Nav';
 import Footer from '@/app/components/Footer';
 import { useCart } from '@/lib/cart-context';
+import { useTranslation } from '@/lib/i18n';
 
 export default function ProductPage() {
   const params = useParams();
@@ -16,6 +17,7 @@ export default function ProductPage() {
   const { data: product, isLoading, error } = useProduct(id);
   const { addItem } = useCart();
   const [added, setAdded] = useState(false);
+  const { t, locale } = useTranslation();
 
   const handleAddToCart = () => {
     if (!product) return;
@@ -56,16 +58,16 @@ export default function ProductPage() {
           <div className="py-16 px-4">
             <div className="max-w-screen-2xl mx-auto text-center">
               <h1 className="text-2xl font-bold text-on-surface mb-4">
-                Product not found
+                {t('product_not_found')}
               </h1>
               <p className="text-on-surface-variant mb-8">
-                Failed to load product: {error.message}
+                {t('product_load_failed')} {error.message}
               </p>
               <Link
                 href="/products"
                 className="inline-block px-6 py-3 bg-primary text-on-primary font-semibold rounded hover:bg-primary/90 transition-colors"
               >
-                Back to Products
+                {t('product_back_to_products')}
               </Link>
             </div>
           </div>
@@ -83,13 +85,13 @@ export default function ProductPage() {
           <div className="py-16 px-4">
             <div className="max-w-screen-2xl mx-auto text-center">
               <h1 className="text-2xl font-bold text-on-surface mb-4">
-                Product not found
+                {t('product_not_found')}
               </h1>
               <Link
                 href="/products"
                 className="inline-block px-6 py-3 bg-primary text-on-primary font-semibold rounded hover:bg-primary/90 transition-colors"
               >
-                Back to Products
+                {t('product_back_to_products')}
               </Link>
             </div>
           </div>
@@ -101,10 +103,10 @@ export default function ProductPage() {
 
   const stockStatus =
     product.stockQuantity > 10
-      ? { label: 'In Stock', color: 'bg-emerald-500' }
+      ? { label: t('product_stock_in'), color: 'bg-emerald-500' }
       : product.stockQuantity > 0
-        ? { label: 'Low Stock', color: 'bg-amber-500' }
-        : { label: 'Out of Stock', color: 'bg-red-500' };
+        ? { label: t('product_stock_low'), color: 'bg-amber-500' }
+        : { label: t('product_stock_out'), color: 'bg-red-500' };
 
   return (
     <>
@@ -115,14 +117,14 @@ export default function ProductPage() {
             {/* Breadcrumb */}
             <div className="flex items-center gap-2 text-sm text-on-surface-variant mb-8">
               <Link href="/" className="hover:text-primary transition-colors">
-                Home
+                {t('product_breadcrumb_home')}
               </Link>
               <span>/</span>
               <Link
                 href="/products"
                 className="hover:text-primary transition-colors"
               >
-                Products
+                {t('product_breadcrumb_products')}
               </Link>
               <span>/</span>
               <span className="text-on-surface">{product.name}</span>
@@ -172,18 +174,18 @@ export default function ProductPage() {
                 <div className="mb-8 pb-8 border-b border-outline">
                   <div className="flex items-center gap-4 mb-4">
                     <span className="text-on-surface font-semibold">
-                      Stock Quantity:
+                      {t('product_stock_quantity_label')}
                     </span>
                     <span className="text-xl font-bold text-primary">
-                      {product.stockQuantity} units
+                      {product.stockQuantity} {t('product_units')}
                     </span>
                   </div>
                   {product.createdAt && (
                     <div className="flex items-center gap-4">
                       <span className="text-on-surface-variant text-sm">
-                        Added on:{' '}
+                        {t('product_added_on')}{' '}
                         {new Date(product.createdAt).toLocaleDateString(
-                          'en-US',
+                          locale === 'ka' ? 'ka-GE' : 'en-US',
                           {
                             year: 'numeric',
                             month: 'long',
@@ -207,16 +209,16 @@ export default function ProductPage() {
                     disabled={product.stockQuantity === 0}
                   >
                     {product.stockQuantity === 0
-                      ? 'Out of Stock'
+                      ? t('product_stock_out')
                       : added
-                        ? 'Added ✓'
-                        : 'Add to Cart'}
+                        ? t('product_added')
+                        : t('product_add_to_cart')}
                   </button>
                   <Link
                     href="/products"
                     className="px-8 py-4 font-semibold rounded text-center border border-outline text-on-surface hover:bg-surface-container transition-colors"
                   >
-                    Continue Shopping
+                    {t('product_continue_shopping')}
                   </Link>
                 </div>
               </div>
@@ -225,30 +227,32 @@ export default function ProductPage() {
             {/* Additional Info */}
             <div className="bg-surface-container p-8 rounded mb-16">
               <h2 className="text-2xl font-headline font-bold text-on-surface mb-4">
-                Product Information
+                {t('product_info_heading')}
               </h2>
               <ul className="space-y-3 text-on-surface-variant">
                 <li>
                   <span className="font-semibold text-on-surface">
-                    Product ID:
+                    {t('product_id_label')}
                   </span>{' '}
                   {product.id}
                 </li>
                 <li>
                   <span className="font-semibold text-on-surface">
-                    Category:
+                    {t('product_category_label')}
                   </span>{' '}
-                  {product.categoryName || 'Uncategorized'}
+                  {product.categoryName || t('product_uncategorized')}
                 </li>
                 <li>
-                  <span className="font-semibold text-on-surface">Price:</span>{' '}
+                  <span className="font-semibold text-on-surface">
+                    {t('product_price_label')}
+                  </span>{' '}
                   ${product.price.toFixed(2)}
                 </li>
                 <li>
                   <span className="font-semibold text-on-surface">
-                    Stock Quantity:
+                    {t('product_stock_quantity_label')}
                   </span>{' '}
-                  {product.stockQuantity} units
+                  {product.stockQuantity} {t('product_units')}
                 </li>
               </ul>
             </div>
