@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { CartProvider } from '@/lib/cart-context';
 import { I18nProvider } from '@/lib/i18n';
+import { TestModeWatermark } from './components/TestModeWatermark';
 
 // Create a client for the app
 const queryClient = new QueryClient({
@@ -28,6 +29,7 @@ export function QueryProvider({ children }: QueryProviderProps) {
       <I18nProvider>
         <CartProvider>
           {children}
+          <TestModeWatermark />
           {/* DevTools - helps debug queries in development */}
           <ReactQueryDevtools initialIsOpen={false} />
         </CartProvider>

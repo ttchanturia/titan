@@ -51,9 +51,9 @@
   --color-error: #ba1a1a;
 
   /* Typography */
-  --font-headline: 'Plus Jakarta Sans', sans-serif;
-  --font-body: 'Inter', sans-serif;
-  --font-label: 'Inter', sans-serif;
+  --font-headline: 'Plus Jakarta Sans', 'Noto Sans Georgian', sans-serif;
+  --font-body: 'Inter', 'Noto Sans Georgian', sans-serif;
+  --font-label: 'Inter', 'Noto Sans Georgian', sans-serif;
 
   /* Border Radius */
   --radius: 0.125rem;
@@ -82,4 +82,15 @@
 .glass-nav {
   background: rgba(251, 250, 238, 0.8);
   backdrop-filter: blur(12px);
+}
+
+/* Plus Jakarta Sans's tight tracking/leading is tuned for Latin glyphs;
+   applied to Georgian (Mkhedruli) it makes ascenders/descenders collide. */
+:lang(ka) .tracking-tighter,
+:lang(ka) .tracking-tight {
+  letter-spacing: normal;
+}
+
+:lang(ka) .leading-\[0\.9\] {
+  line-height: 1.2;
 }

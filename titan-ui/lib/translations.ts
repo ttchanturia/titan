@@ -2,6 +2,9 @@ export type Locale = 'en' | 'ka';
 
 export const translations = {
   en: {
+    // Global
+    test_mode_watermark: 'Test Mode',
+
     // Nav
     nav_home: 'Home',
     nav_products: 'Products',
@@ -18,6 +21,10 @@ export const translations = {
     footer_store_locator: 'Store Locator',
     footer_privacy: 'Privacy',
     footer_connect_heading: 'Connect',
+    footer_facebook_aria: 'Facebook',
+    footer_email_aria: 'Email',
+    footer_location_aria: 'Location',
+    footer_call_aria: 'Call',
     footer_copyright: '© 2024 Titan. Precision in Sound.',
     footer_cookies: 'Cookies',
     footer_terms: 'Terms',
@@ -167,6 +174,9 @@ export const translations = {
     admin_create_failed: 'Failed to create product. Please try again.',
   },
   ka: {
+    // Global
+    test_mode_watermark: 'სატესტო რეჟიმი',
+
     // Nav
     nav_home: 'მთავარი',
     nav_products: 'პროდუქტები',
@@ -183,6 +193,10 @@ export const translations = {
     footer_store_locator: 'მაღაზიის მოძებნა',
     footer_privacy: 'კონფიდენციალურობა',
     footer_connect_heading: 'კონტაქტი',
+    footer_facebook_aria: 'ფეისბუქი',
+    footer_email_aria: 'ელფოსტა',
+    footer_location_aria: 'მდებარეობა',
+    footer_call_aria: 'დარეკვა',
     footer_copyright: '© 2024 Titan. სიზუსტე ბგერაში.',
     footer_cookies: 'ქუქიები',
     footer_terms: 'წესები და პირობები',
