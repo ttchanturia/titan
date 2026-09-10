@@ -79,4 +79,17 @@ export const authApi = {
   },
 };
 
+// Image upload
+export const uploadApi = {
+  uploadImage: async (file: File): Promise<{ url: string }> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await axiosInstance.post<{ url: string }>(
+      '/uploads',
+      formData,
+    );
+    return response.data;
+  },
+};
+
 export default axiosInstance;

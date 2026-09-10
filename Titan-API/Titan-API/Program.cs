@@ -1,10 +1,22 @@
+using Microsoft.Extensions.FileProviders;
 using Titan_API.Auth;
 using Titan_API.Data;
+using Titan_API.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
+
+// Image upload storage (see Controllers/UploadsController.cs)
+var uploadSettings = builder.Configuration.GetSection("Uploads").Get<UploadSettings>()
+    ?? new UploadSettings();
+var uploadsPath = Path.IsPathRooted(uploadSettings.Directory)
+    ? uploadSettings.Directory
+    : Path.Combine(builder.Environment.ContentRootPath, uploadSettings.Directory);
+Directory.CreateDirectory(uploadsPath);
+uploadSettings.Directory = uploadsPath;
+builder.Services.AddSingleton(uploadSettings);
 
 // Basic Authentication with hardcoded users (see Auth/BasicAuthenticationHandler.cs)
 builder.Services
@@ -54,6 +66,14 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors("AllowFrontend");
+
+// Serve uploaded images at /uploads (in production Nginx serves this path
+// straight from disk; this keeps local dev working without Nginx).
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(uploadsPath),
+    RequestPath = "/uploads",
+});
 
 app.UseAuthentication();
 app.UseAuthorization();
