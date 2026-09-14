@@ -9,6 +9,7 @@ import {
   useCreateProduct,
   useUpdateProduct,
   useDeleteProduct,
+  useUploadImage,
 } from '@/lib/hooks';
 import type { Product } from '@/lib/types';
 import { useTranslation } from '@/lib/i18n';
@@ -45,6 +46,7 @@ function AdminPageContent() {
   const createProduct = useCreateProduct();
   const updateProduct = useUpdateProduct();
   const deleteProduct = useDeleteProduct();
+  const uploadImage = useUploadImage();
 
   const [form, setForm] = useState<FormState>(emptyForm);
   const [formError, setFormError] = useState<string | null>(null);
@@ -78,6 +80,19 @@ function AdminPageContent() {
     setFormError(null);
     setForm(emptyForm);
   };
+
+  const handleImageSelect = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = ''; // let the same file be re-picked after a failure
+    if (!file) return;
+    setFormError(null);
+    uploadImage.mutate(file, {
+      onSuccess: ({ url }) => setForm((f) => ({ ...f, imageUrl: url })),
+      onError: () => setFormError(t('admin_image_upload_failed')),
+    });
+  };
+
+  const handleImageRemove = () => setForm((f) => ({ ...f, imageUrl: '' }));
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -226,16 +241,47 @@ function AdminPageContent() {
           </select>
         </div>
 
-        <div>
+        <div className="md:col-span-2">
           <label className="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2 block">
-            {t('admin_image_url_label')}
+            {t('admin_image_label')}
           </label>
-          <input
-            type="text"
-            value={form.imageUrl}
-            onChange={handleChange('imageUrl')}
-            className={inputClasses}
-          />
+          <div className="flex items-center gap-4">
+            {form.imageUrl ? (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                src={form.imageUrl}
+                alt=""
+                className="w-20 h-20 object-cover rounded-sm border border-outline-variant"
+              />
+            ) : (
+              <div className="w-20 h-20 rounded-sm border border-dashed border-outline-variant flex items-center justify-center text-on-surface-variant">
+                <span className="material-symbols-outlined">image</span>
+              </div>
+            )}
+            <div className="flex flex-col gap-2">
+              <label className="cursor-pointer text-sm font-semibold underline underline-offset-4 w-fit">
+                {uploadImage.isPending
+                  ? t('admin_image_uploading')
+                  : t('admin_image_choose')}
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageSelect}
+                  disabled={uploadImage.isPending}
+                  className="hidden"
+                />
+              </label>
+              {form.imageUrl && (
+                <button
+                  type="button"
+                  onClick={handleImageRemove}
+                  className="text-xs uppercase tracking-widest text-secondary hover:text-error transition-colors w-fit"
+                >
+                  {t('admin_image_remove')}
+                </button>
+              )}
+            </div>
+          </div>
         </div>
 
         {formError && (
