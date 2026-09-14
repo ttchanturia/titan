@@ -18,16 +18,6 @@ Directory.CreateDirectory(uploadsPath);
 uploadSettings.Directory = uploadsPath;
 builder.Services.AddSingleton(uploadSettings);
 
-// Image upload storage (see Controllers/UploadsController.cs)
-var uploadSettings = builder.Configuration.GetSection("Uploads").Get<UploadSettings>()
-    ?? new UploadSettings();
-var uploadsPath = Path.IsPathRooted(uploadSettings.Directory)
-    ? uploadSettings.Directory
-    : Path.Combine(builder.Environment.ContentRootPath, uploadSettings.Directory);
-Directory.CreateDirectory(uploadsPath);
-uploadSettings.Directory = uploadsPath;
-builder.Services.AddSingleton(uploadSettings);
-
 // Basic Authentication with hardcoded users  (see Auth/BasicAuthenticationHandler.cs)
 builder.Services
     .AddAuthentication(BasicAuthenticationHandler.SchemeName)

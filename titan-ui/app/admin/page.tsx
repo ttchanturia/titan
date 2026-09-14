@@ -14,12 +14,14 @@ import {
 import type { Product } from '@/lib/types';
 import { useTranslation } from '@/lib/i18n';
 
+const MAX_IMAGES = 3;
+
 const emptyForm = {
   name: '',
   description: '',
   price: '',
   categoryId: '',
-  imageUrl: '',
+  imageUrls: [] as string[],
   stockQuantity: '',
 };
 
@@ -70,7 +72,11 @@ function AdminPageContent() {
       description: product.description ?? '',
       price: String(product.price),
       categoryId: String(product.categoryId),
-      imageUrl: product.imageUrl ?? '',
+      imageUrls: product.imageUrls?.length
+        ? product.imageUrls
+        : product.imageUrl
+          ? [product.imageUrl]
+          : [],
       stockQuantity: String(product.stockQuantity),
     });
   };
@@ -84,15 +90,20 @@ function AdminPageContent() {
   const handleImageSelect = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     e.target.value = ''; // let the same file be re-picked after a failure
-    if (!file) return;
+    if (!file || form.imageUrls.length >= MAX_IMAGES) return;
     setFormError(null);
     uploadImage.mutate(file, {
-      onSuccess: ({ url }) => setForm((f) => ({ ...f, imageUrl: url })),
+      onSuccess: ({ url }) =>
+        setForm((f) => ({ ...f, imageUrls: [...f.imageUrls, url] })),
       onError: () => setFormError(t('admin_image_upload_failed')),
     });
   };
 
-  const handleImageRemove = () => setForm((f) => ({ ...f, imageUrl: '' }));
+  const handleImageRemove = (index: number) =>
+    setForm((f) => ({
+      ...f,
+      imageUrls: f.imageUrls.filter((_, i) => i !== index),
+    }));
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -112,7 +123,7 @@ function AdminPageContent() {
       description: form.description.trim() || undefined,
       price,
       categoryId,
-      imageUrl: form.imageUrl.trim() || undefined,
+      imageUrls: form.imageUrls,
       stockQuantity: Number.isFinite(stockQuantity) ? stockQuantity : 0,
     };
 
@@ -246,23 +257,34 @@ function AdminPageContent() {
             {t('admin_image_label')}
           </label>
           <div className="flex items-center gap-4">
-            {form.imageUrl ? (
-              /* eslint-disable-next-line @next/next/no-img-element */
-              <img
-                src={form.imageUrl}
-                alt=""
-                className="w-20 h-20 object-cover rounded-sm border border-outline-variant"
-              />
-            ) : (
-              <div className="w-20 h-20 rounded-sm border border-dashed border-outline-variant flex items-center justify-center text-on-surface-variant">
-                <span className="material-symbols-outlined">image</span>
+            {form.imageUrls.map((url, index) => (
+              <div key={url} className="relative w-20 h-20">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={url}
+                  alt=""
+                  className="w-20 h-20 object-cover rounded-sm border border-outline-variant"
+                />
+                <button
+                  type="button"
+                  onClick={() => handleImageRemove(index)}
+                  aria-label={t('admin_image_remove')}
+                  className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-primary text-on-primary text-xs flex items-center justify-center"
+                >
+                  ×
+                </button>
               </div>
-            )}
-            <div className="flex flex-col gap-2">
-              <label className="cursor-pointer text-sm font-semibold underline underline-offset-4 w-fit">
-                {uploadImage.isPending
-                  ? t('admin_image_uploading')
-                  : t('admin_image_choose')}
+            ))}
+            {form.imageUrls.length < MAX_IMAGES && (
+              <label
+                aria-label={t('admin_image_choose')}
+                className={`w-20 h-20 rounded-sm border border-dashed border-outline-variant flex items-center justify-center text-on-surface-variant text-center text-[10px] leading-tight px-1 ${uploadImage.isPending ? 'cursor-wait' : 'cursor-pointer'}`}
+              >
+                {uploadImage.isPending ? (
+                  t('admin_image_uploading')
+                ) : (
+                  <span className="material-symbols-outlined">add_photo_alternate</span>
+                )}
                 <input
                   type="file"
                   accept="image/*"
@@ -271,17 +293,11 @@ function AdminPageContent() {
                   className="hidden"
                 />
               </label>
-              {form.imageUrl && (
-                <button
-                  type="button"
-                  onClick={handleImageRemove}
-                  className="text-xs uppercase tracking-widest text-secondary hover:text-error transition-colors w-fit"
-                >
-                  {t('admin_image_remove')}
-                </button>
-              )}
-            </div>
+            )}
           </div>
+          <p className="text-xs text-on-surface-variant mt-2">
+            {t('admin_image_hint', { count: form.imageUrls.length, max: MAX_IMAGES })}
+          </p>
         </div>
 
         {formError && (

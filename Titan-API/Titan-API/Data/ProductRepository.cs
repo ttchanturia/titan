@@ -20,7 +20,7 @@ public class ProductRepository
 
         var sql = """
             SELECT p.id, p.name, p.description, p.price, p.category_id,
-                   c.name AS category_name, p.image_url, p.stock_quantity, p.created_at
+                   c.name AS category_name, p.image_url, p.stock_quantity, p.created_at, p.image_urls
             FROM products p
             LEFT JOIN categories c ON c.id = p.category_id
             ORDER BY p.id
@@ -42,7 +42,7 @@ public class ProductRepository
 
         var sql = """
             SELECT p.id, p.name, p.description, p.price, p.category_id,
-                   c.name AS category_name, p.image_url, p.stock_quantity, p.created_at
+                   c.name AS category_name, p.image_url, p.stock_quantity, p.created_at, p.image_urls
             FROM products p
             LEFT JOIN categories c ON c.id = p.category_id
             WHERE p.id = @id
@@ -63,7 +63,7 @@ public class ProductRepository
 
         var sql = """
             SELECT p.id, p.name, p.description, p.price, p.category_id,
-                   c.name AS category_name, p.image_url, p.stock_quantity, p.created_at
+                   c.name AS category_name, p.image_url, p.stock_quantity, p.created_at, p.image_urls
             FROM products p
             LEFT JOIN categories c ON c.id = p.category_id
             WHERE p.category_id = @categoryId
@@ -86,9 +86,13 @@ public class ProductRepository
         await using var conn = new NpgsqlConnection(_connectionString);
         await conn.OpenAsync();
 
+        // image_url mirrors the first gallery entry regardless of what the caller sent.
+        var imageUrls = product.ImageUrls ?? new List<string>();
+        var primaryImageUrl = imageUrls.FirstOrDefault();
+
         var sql = """
-            INSERT INTO products (name, description, price, category_id, image_url, stock_quantity)
-            VALUES (@name, @desc, @price, @categoryId, @imageUrl, @stock)
+            INSERT INTO products (name, description, price, category_id, image_url, image_urls, stock_quantity)
+            VALUES (@name, @desc, @price, @categoryId, @imageUrl, @imageUrls, @stock)
             RETURNING id, created_at
             """;
 
@@ -97,7 +101,8 @@ public class ProductRepository
         cmd.Parameters.AddWithValue("desc", (object?)product.Description ?? DBNull.Value);
         cmd.Parameters.AddWithValue("price", product.Price);
         cmd.Parameters.AddWithValue("categoryId", product.CategoryId);
-        cmd.Parameters.AddWithValue("imageUrl", (object?)product.ImageUrl ?? DBNull.Value);
+        cmd.Parameters.AddWithValue("imageUrl", (object?)primaryImageUrl ?? DBNull.Value);
+        cmd.Parameters.AddWithValue("imageUrls", imageUrls.ToArray());
         cmd.Parameters.AddWithValue("stock", product.StockQuantity);
 
         await using var reader = await cmd.ExecuteReaderAsync();
@@ -106,6 +111,8 @@ public class ProductRepository
             product.Id = reader.GetInt32(0);
             product.CreatedAt = reader.GetDateTime(1);
         }
+        product.ImageUrl = primaryImageUrl;
+        product.ImageUrls = imageUrls;
         return product;
     }
 
@@ -114,10 +121,14 @@ public class ProductRepository
         await using var conn = new NpgsqlConnection(_connectionString);
         await conn.OpenAsync();
 
+        var imageUrls = product.ImageUrls ?? new List<string>();
+        var primaryImageUrl = imageUrls.FirstOrDefault();
+
         var sql = """
             UPDATE products
             SET name = @name, description = @desc, price = @price,
-                category_id = @categoryId, image_url = @imageUrl, stock_quantity = @stock
+                category_id = @categoryId, image_url = @imageUrl, image_urls = @imageUrls,
+                stock_quantity = @stock
             WHERE id = @id
             """;
 
@@ -127,7 +138,8 @@ public class ProductRepository
         cmd.Parameters.AddWithValue("desc", (object?)product.Description ?? DBNull.Value);
         cmd.Parameters.AddWithValue("price", product.Price);
         cmd.Parameters.AddWithValue("categoryId", product.CategoryId);
-        cmd.Parameters.AddWithValue("imageUrl", (object?)product.ImageUrl ?? DBNull.Value);
+        cmd.Parameters.AddWithValue("imageUrl", (object?)primaryImageUrl ?? DBNull.Value);
+        cmd.Parameters.AddWithValue("imageUrls", imageUrls.ToArray());
         cmd.Parameters.AddWithValue("stock", product.StockQuantity);
 
         return await cmd.ExecuteNonQueryAsync() > 0;
@@ -146,6 +158,13 @@ public class ProductRepository
 
     private static Product MapProduct(NpgsqlDataReader reader)
     {
+        var imageUrl = reader.IsDBNull(6) ? null : reader.GetString(6);
+        // image_urls may briefly lag image_url for rows written just before the
+        // startup backfill runs (see DatabaseInitializer) - fall back accordingly.
+        var imageUrls = reader.IsDBNull(9)
+            ? (imageUrl is null ? new List<string>() : new List<string> { imageUrl })
+            : reader.GetFieldValue<string[]>(9).ToList();
+
         return new Product
         {
             Id = reader.GetInt32(0),
@@ -154,7 +173,8 @@ public class ProductRepository
             Price = reader.GetDecimal(3),
             CategoryId = reader.GetInt32(4),
             CategoryName = reader.IsDBNull(5) ? null : reader.GetString(5),
-            ImageUrl = reader.IsDBNull(6) ? null : reader.GetString(6),
+            ImageUrl = imageUrls.Count > 0 ? imageUrls[0] : imageUrl,
+            ImageUrls = imageUrls,
             StockQuantity = reader.GetInt32(7),
             CreatedAt = reader.GetDateTime(8)
         };
