@@ -8,7 +8,7 @@ import { useParams } from 'next/navigation';
 import Nav from '@/app/components/Nav';
 import Footer from '@/app/components/Footer';
 import { useCart } from '@/lib/cart-context';
-import { useTranslation } from '@/lib/i18n';
+import { useTranslation, localizedText } from '@/lib/i18n';
 
 export default function ProductPage() {
   const params = useParams();
@@ -153,7 +153,7 @@ export default function ProductPage() {
               <div className="flex flex-col justify-start">
                 {product.categoryName && (
                   <p className="text-sm text-on-surface-variant mb-2 uppercase font-semibold tracking-wide">
-                    {product.categoryName}
+                    {localizedText(product.categoryName, product.categoryNameKa, locale)}
                   </p>
                 )}
 
@@ -167,7 +167,7 @@ export default function ProductPage() {
 
                 {product.description && (
                   <p className="text-lg text-on-surface-variant mb-8 leading-relaxed">
-                    {product.description}
+                    {localizedText(product.description, product.descriptionKa, locale)}
                   </p>
                 )}
 
@@ -240,7 +240,8 @@ export default function ProductPage() {
                   <span className="font-semibold text-on-surface">
                     {t('product_category_label')}
                   </span>{' '}
-                  {product.categoryName || t('product_uncategorized')}
+                  {localizedText(product.categoryName, product.categoryNameKa, locale) ||
+                    t('product_uncategorized')}
                 </li>
                 <li>
                   <span className="font-semibold text-on-surface">

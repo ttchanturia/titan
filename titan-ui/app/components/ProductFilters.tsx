@@ -1,7 +1,7 @@
 'use client';
 
 import type { Category } from '@/lib/types';
-import { useTranslation } from '@/lib/i18n';
+import { useTranslation, localizedText } from '@/lib/i18n';
 
 export type SortOption = 'name-asc' | 'name-desc' | 'price-asc' | 'price-desc';
 
@@ -42,7 +42,7 @@ export function ProductFilters({
   sort,
   onSortChange,
 }: ProductFiltersProps) {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6 mb-16 items-end">
@@ -71,7 +71,7 @@ export function ProductFilters({
           <option value="">{t('filters_all_categories')}</option>
           {categories?.map((c) => (
             <option key={c.id} value={String(c.id)}>
-              {c.name}
+              {localizedText(c.name, c.nameKa, locale)}
             </option>
           ))}
         </select>

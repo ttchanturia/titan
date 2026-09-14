@@ -19,8 +19,8 @@ public class ProductRepository
         await conn.OpenAsync();
 
         var sql = """
-            SELECT p.id, p.name, p.description, p.price, p.category_id,
-                   c.name AS category_name, p.image_url, p.stock_quantity, p.created_at
+            SELECT p.id, p.name, p.description, p.description_ka, p.price, p.category_id,
+                   c.name AS category_name, c.name_ka AS category_name_ka, p.image_url, p.stock_quantity, p.created_at
             FROM products p
             LEFT JOIN categories c ON c.id = p.category_id
             ORDER BY p.id
@@ -41,8 +41,8 @@ public class ProductRepository
         await conn.OpenAsync();
 
         var sql = """
-            SELECT p.id, p.name, p.description, p.price, p.category_id,
-                   c.name AS category_name, p.image_url, p.stock_quantity, p.created_at
+            SELECT p.id, p.name, p.description, p.description_ka, p.price, p.category_id,
+                   c.name AS category_name, c.name_ka AS category_name_ka, p.image_url, p.stock_quantity, p.created_at
             FROM products p
             LEFT JOIN categories c ON c.id = p.category_id
             WHERE p.id = @id
@@ -62,8 +62,8 @@ public class ProductRepository
         await conn.OpenAsync();
 
         var sql = """
-            SELECT p.id, p.name, p.description, p.price, p.category_id,
-                   c.name AS category_name, p.image_url, p.stock_quantity, p.created_at
+            SELECT p.id, p.name, p.description, p.description_ka, p.price, p.category_id,
+                   c.name AS category_name, c.name_ka AS category_name_ka, p.image_url, p.stock_quantity, p.created_at
             FROM products p
             LEFT JOIN categories c ON c.id = p.category_id
             WHERE p.category_id = @categoryId
@@ -87,14 +87,15 @@ public class ProductRepository
         await conn.OpenAsync();
 
         var sql = """
-            INSERT INTO products (name, description, price, category_id, image_url, stock_quantity)
-            VALUES (@name, @desc, @price, @categoryId, @imageUrl, @stock)
+            INSERT INTO products (name, description, description_ka, price, category_id, image_url, stock_quantity)
+            VALUES (@name, @desc, @descKa, @price, @categoryId, @imageUrl, @stock)
             RETURNING id, created_at
             """;
 
         await using var cmd = new NpgsqlCommand(sql, conn);
         cmd.Parameters.AddWithValue("name", product.Name);
         cmd.Parameters.AddWithValue("desc", (object?)product.Description ?? DBNull.Value);
+        cmd.Parameters.AddWithValue("descKa", (object?)product.DescriptionKa ?? DBNull.Value);
         cmd.Parameters.AddWithValue("price", product.Price);
         cmd.Parameters.AddWithValue("categoryId", product.CategoryId);
         cmd.Parameters.AddWithValue("imageUrl", (object?)product.ImageUrl ?? DBNull.Value);
@@ -116,7 +117,7 @@ public class ProductRepository
 
         var sql = """
             UPDATE products
-            SET name = @name, description = @desc, price = @price,
+            SET name = @name, description = @desc, description_ka = @descKa, price = @price,
                 category_id = @categoryId, image_url = @imageUrl, stock_quantity = @stock
             WHERE id = @id
             """;
@@ -125,6 +126,7 @@ public class ProductRepository
         cmd.Parameters.AddWithValue("id", id);
         cmd.Parameters.AddWithValue("name", product.Name);
         cmd.Parameters.AddWithValue("desc", (object?)product.Description ?? DBNull.Value);
+        cmd.Parameters.AddWithValue("descKa", (object?)product.DescriptionKa ?? DBNull.Value);
         cmd.Parameters.AddWithValue("price", product.Price);
         cmd.Parameters.AddWithValue("categoryId", product.CategoryId);
         cmd.Parameters.AddWithValue("imageUrl", (object?)product.ImageUrl ?? DBNull.Value);
@@ -151,12 +153,14 @@ public class ProductRepository
             Id = reader.GetInt32(0),
             Name = reader.GetString(1),
             Description = reader.IsDBNull(2) ? null : reader.GetString(2),
-            Price = reader.GetDecimal(3),
-            CategoryId = reader.GetInt32(4),
-            CategoryName = reader.IsDBNull(5) ? null : reader.GetString(5),
-            ImageUrl = reader.IsDBNull(6) ? null : reader.GetString(6),
-            StockQuantity = reader.GetInt32(7),
-            CreatedAt = reader.GetDateTime(8)
+            DescriptionKa = reader.IsDBNull(3) ? null : reader.GetString(3),
+            Price = reader.GetDecimal(4),
+            CategoryId = reader.GetInt32(5),
+            CategoryName = reader.IsDBNull(6) ? null : reader.GetString(6),
+            CategoryNameKa = reader.IsDBNull(7) ? null : reader.GetString(7),
+            ImageUrl = reader.IsDBNull(8) ? null : reader.GetString(8),
+            StockQuantity = reader.GetInt32(9),
+            CreatedAt = reader.GetDateTime(10)
         };
     }
 }

@@ -17,6 +17,7 @@ import { useTranslation } from '@/lib/i18n';
 const emptyForm = {
   name: '',
   description: '',
+  descriptionKa: '',
   price: '',
   categoryId: '',
   imageUrl: '',
@@ -68,6 +69,7 @@ function AdminPageContent() {
     setForm({
       name: product.name,
       description: product.description ?? '',
+      descriptionKa: product.descriptionKa ?? '',
       price: String(product.price),
       categoryId: String(product.categoryId),
       imageUrl: product.imageUrl ?? '',
@@ -110,6 +112,7 @@ function AdminPageContent() {
     const payload = {
       name: form.name.trim(),
       description: form.description.trim() || undefined,
+      descriptionKa: form.descriptionKa.trim() || undefined,
       price,
       categoryId,
       imageUrl: form.imageUrl.trim() || undefined,
@@ -190,6 +193,19 @@ function AdminPageContent() {
             value={form.description}
             onChange={handleChange('description')}
             rows={3}
+            className={inputClasses}
+          />
+        </div>
+
+        <div className="md:col-span-2">
+          <label className="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2 block">
+            {t('admin_description_ka_label')}
+          </label>
+          <textarea
+            value={form.descriptionKa}
+            onChange={handleChange('descriptionKa')}
+            rows={3}
+            placeholder={t('admin_description_ka_placeholder')}
             className={inputClasses}
           />
         </div>

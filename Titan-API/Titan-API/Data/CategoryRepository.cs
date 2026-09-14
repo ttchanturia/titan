@@ -18,7 +18,7 @@ public class CategoryRepository
         await using var conn = new NpgsqlConnection(_connectionString);
         await conn.OpenAsync();
 
-        await using var cmd = new NpgsqlCommand("SELECT id, name, description FROM categories ORDER BY id", conn);
+        await using var cmd = new NpgsqlCommand("SELECT id, name, description, name_ka FROM categories ORDER BY id", conn);
         await using var reader = await cmd.ExecuteReaderAsync();
         while (await reader.ReadAsync())
         {
@@ -26,7 +26,8 @@ public class CategoryRepository
             {
                 Id = reader.GetInt32(0),
                 Name = reader.GetString(1),
-                Description = reader.IsDBNull(2) ? null : reader.GetString(2)
+                Description = reader.IsDBNull(2) ? null : reader.GetString(2),
+                NameKa = reader.IsDBNull(3) ? null : reader.GetString(3)
             });
         }
         return categories;
@@ -37,7 +38,7 @@ public class CategoryRepository
         await using var conn = new NpgsqlConnection(_connectionString);
         await conn.OpenAsync();
 
-        await using var cmd = new NpgsqlCommand("SELECT id, name, description FROM categories WHERE id = @id", conn);
+        await using var cmd = new NpgsqlCommand("SELECT id, name, description, name_ka FROM categories WHERE id = @id", conn);
         cmd.Parameters.AddWithValue("id", id);
 
         await using var reader = await cmd.ExecuteReaderAsync();
@@ -47,7 +48,8 @@ public class CategoryRepository
             {
                 Id = reader.GetInt32(0),
                 Name = reader.GetString(1),
-                Description = reader.IsDBNull(2) ? null : reader.GetString(2)
+                Description = reader.IsDBNull(2) ? null : reader.GetString(2),
+                NameKa = reader.IsDBNull(3) ? null : reader.GetString(3)
             };
         }
         return null;
@@ -59,9 +61,10 @@ public class CategoryRepository
         await conn.OpenAsync();
 
         await using var cmd = new NpgsqlCommand(
-            "INSERT INTO categories (name, description) VALUES (@name, @desc) RETURNING id", conn);
+            "INSERT INTO categories (name, description, name_ka) VALUES (@name, @desc, @nameKa) RETURNING id", conn);
         cmd.Parameters.AddWithValue("name", category.Name);
         cmd.Parameters.AddWithValue("desc", (object?)category.Description ?? DBNull.Value);
+        cmd.Parameters.AddWithValue("nameKa", (object?)category.NameKa ?? DBNull.Value);
 
         category.Id = (int)(await cmd.ExecuteScalarAsync())!;
         return category;
@@ -73,10 +76,11 @@ public class CategoryRepository
         await conn.OpenAsync();
 
         await using var cmd = new NpgsqlCommand(
-            "UPDATE categories SET name = @name, description = @desc WHERE id = @id", conn);
+            "UPDATE categories SET name = @name, description = @desc, name_ka = @nameKa WHERE id = @id", conn);
         cmd.Parameters.AddWithValue("id", id);
         cmd.Parameters.AddWithValue("name", category.Name);
         cmd.Parameters.AddWithValue("desc", (object?)category.Description ?? DBNull.Value);
+        cmd.Parameters.AddWithValue("nameKa", (object?)category.NameKa ?? DBNull.Value);
 
         return await cmd.ExecuteNonQueryAsync() > 0;
     }
