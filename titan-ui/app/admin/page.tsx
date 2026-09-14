@@ -2,6 +2,7 @@
 
 import { useState, type ChangeEvent, type FormEvent } from 'react';
 import Link from 'next/link';
+import { isAxiosError } from 'axios';
 import { AdminLoginGate } from '../components/AdminLoginGate';
 import {
   useProducts,
@@ -13,6 +14,7 @@ import {
 } from '@/lib/hooks';
 import type { Product } from '@/lib/types';
 import { useTranslation } from '@/lib/i18n';
+import { MAX_UPLOAD_SIZE_BYTES, MAX_UPLOAD_SIZE_MB } from '@/lib/constants';
 
 const MAX_IMAGES = 3;
 
@@ -93,7 +95,11 @@ function AdminPageContent() {
     if (files.length === 0) return;
 
     const remainingSlots = MAX_IMAGES - form.imageUrls.length;
-    const filesToUpload = files.slice(0, remainingSlots);
+    const selected = files.slice(0, remainingSlots);
+    // Checked client-side too (not just relying on the API's 400) so oversized
+    // files are rejected instantly instead of after a wasted upload round-trip.
+    const oversized = selected.filter((f) => f.size > MAX_UPLOAD_SIZE_BYTES);
+    const filesToUpload = selected.filter((f) => f.size <= MAX_UPLOAD_SIZE_BYTES);
     setFormError(null);
 
     // Uploaded one at a time (not in parallel) so a shared "uploading" state
@@ -102,10 +108,21 @@ function AdminPageContent() {
       try {
         const { url } = await uploadImage.mutateAsync(file);
         setForm((f) => ({ ...f, imageUrls: [...f.imageUrls, url] }));
-      } catch {
-        setFormError(t('admin_image_upload_failed'));
-        break;
+      } catch (err) {
+        const serverMessage =
+          isAxiosError<{ error?: string }>(err) && err.response?.data?.error;
+        setFormError(serverMessage || t('admin_image_upload_failed'));
+        return;
       }
+    }
+
+    if (oversized.length > 0) {
+      setFormError(
+        t('admin_image_too_large', {
+          max: MAX_UPLOAD_SIZE_MB,
+          files: oversized.map((f) => f.name).join(', '),
+        }),
+      );
     }
   };
 
