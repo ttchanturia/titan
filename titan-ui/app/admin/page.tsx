@@ -357,7 +357,7 @@ function AdminPageContent() {
                   >
                     <td className="py-3 pr-4">{p.name}</td>
                     <td className="py-3 pr-4">{p.categoryName ?? p.categoryId}</td>
-                    <td className="py-3 pr-4">${p.price.toFixed(2)}</td>
+                    <td className="py-3 pr-4">₾{p.price.toFixed(2)}</td>
                     <td className="py-3 pr-4">{p.stockQuantity}</td>
                     <td className="py-3 flex gap-4">
                       <button
