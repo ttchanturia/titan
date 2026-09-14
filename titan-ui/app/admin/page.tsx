@@ -87,16 +87,26 @@ function AdminPageContent() {
     setForm(emptyForm);
   };
 
-  const handleImageSelect = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    e.target.value = ''; // let the same file be re-picked after a failure
-    if (!file || form.imageUrls.length >= MAX_IMAGES) return;
+  const handleImageSelect = async (e: ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? []);
+    e.target.value = ''; // let the same file(s) be re-picked after a failure
+    if (files.length === 0) return;
+
+    const remainingSlots = MAX_IMAGES - form.imageUrls.length;
+    const filesToUpload = files.slice(0, remainingSlots);
     setFormError(null);
-    uploadImage.mutate(file, {
-      onSuccess: ({ url }) =>
-        setForm((f) => ({ ...f, imageUrls: [...f.imageUrls, url] })),
-      onError: () => setFormError(t('admin_image_upload_failed')),
-    });
+
+    // Uploaded one at a time (not in parallel) so a shared "uploading" state
+    // stays accurate and the droplet isn't asked to resize several images at once.
+    for (const file of filesToUpload) {
+      try {
+        const { url } = await uploadImage.mutateAsync(file);
+        setForm((f) => ({ ...f, imageUrls: [...f.imageUrls, url] }));
+      } catch {
+        setFormError(t('admin_image_upload_failed'));
+        break;
+      }
+    }
   };
 
   const handleImageRemove = (index: number) =>
@@ -288,6 +298,7 @@ function AdminPageContent() {
                 <input
                   type="file"
                   accept="image/*"
+                  multiple
                   onChange={handleImageSelect}
                   disabled={uploadImage.isPending}
                   className="hidden"
