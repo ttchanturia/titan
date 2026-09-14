@@ -4,7 +4,7 @@ import { getStoredAuthHeader } from './auth';
 
 // Configure base URL - adjust based on your backend URL
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+  process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5196/api';
 
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
