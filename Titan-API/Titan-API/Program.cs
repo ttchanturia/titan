@@ -6,11 +6,17 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers();
 
-// Basic Authentication with hardcoded users (see Auth/BasicAuthenticationHandler.cs)
+// Basic Authentication with hardcoded users
 builder.Services
     .AddAuthentication(BasicAuthenticationHandler.SchemeName)
-    .AddScheme<Microsoft.AspNetCore.Authentication.AuthenticationSchemeOptions, BasicAuthenticationHandler>(
-        BasicAuthenticationHandler.SchemeName, null);
+    .AddScheme<
+        Microsoft.AspNetCore.Authentication.AuthenticationSchemeOptions,
+        BasicAuthenticationHandler
+    >(
+        BasicAuthenticationHandler.SchemeName,
+        null
+    );
+
 builder.Services.AddAuthorization();
 
 // Add CORS policy for frontend
@@ -18,16 +24,51 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:3000", "http://127.0.0.1:3000")
-              .AllowAnyMethod()
-              .AllowAnyHeader()
-              .AllowCredentials();
+        policy.WithOrigins(
+                "http://localhost:3000",
+                "http://127.0.0.1:3000"
+            )
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials();
     });
 });
 
 // Add Swagger/OpenAPI services
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition(
+        "BasicAuthentication",
+        new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+        {
+            Name = "Authorization",
+            Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
+            Scheme = "basic",
+            In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+            Description = "Enter your username and password"
+        }
+    );
+
+    options.AddSecurityRequirement(
+        new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+        {
+            {
+                new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+                {
+                    Reference =
+                        new Microsoft.OpenApi.Models.OpenApiReference
+                        {
+                            Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                            Id = "BasicAuthentication"
+                        }
+                },
+                Array.Empty<string>()
+            }
+        }
+    );
+});
 
 // Register database services
 builder.Services.AddSingleton<DatabaseInitializer>();
@@ -36,20 +77,19 @@ builder.Services.AddScoped<CategoryRepository>();
 
 var app = builder.Build();
 
-// Initialize database (ensure DB, tables, and seed data exist)
+// Initialize database
 using (var scope = app.Services.CreateScope())
 {
-    var dbInit = scope.ServiceProvider.GetRequiredService<DatabaseInitializer>();
+    var dbInit = scope.ServiceProvider
+        .GetRequiredService<DatabaseInitializer>();
+
     await dbInit.InitializeAsync();
 }
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    // Enable middleware to serve generated Swagger as a JSON endpoint.
     app.UseSwagger();
-    // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
-    // specifying the Swagger JSON endpoint.
     app.UseSwaggerUI();
 }
 

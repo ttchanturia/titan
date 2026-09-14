@@ -162,7 +162,7 @@ export default function ProductPage() {
                 </h1>
 
                 <p className="text-3xl font-headline font-bold text-primary mb-8">
-                  ${product.price.toFixed(2)}
+                  ₾{product.price.toFixed(2)}
                 </p>
 
                 {product.description && (
@@ -246,7 +246,7 @@ export default function ProductPage() {
                   <span className="font-semibold text-on-surface">
                     {t('product_price_label')}
                   </span>{' '}
-                  ${product.price.toFixed(2)}
+                  ₾{product.price.toFixed(2)}
                 </li>
                 <li>
                   <span className="font-semibold text-on-surface">

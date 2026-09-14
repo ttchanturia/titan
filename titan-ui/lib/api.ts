@@ -4,7 +4,7 @@ import { getStoredAuthHeader } from './auth';
 
 // Configure base URL - adjust based on your backend URL
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+  process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5196/api';
 
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
@@ -26,7 +26,6 @@ export const productApi = {
     const response = await axiosInstance.get<Product[]>('/products');
     return response.data;
   },
-
   getById: async (id: number): Promise<Product> => {
     const response = await axiosInstance.get<Product>(`/products/${id}`);
     return response.data;
