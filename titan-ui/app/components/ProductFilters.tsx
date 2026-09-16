@@ -1,7 +1,8 @@
 'use client';
 
 import type { Category } from '@/lib/types';
-import { useTranslation, localizedText } from '@/lib/i18n';
+import { useTranslation } from '@/lib/i18n';
+import { CategoryFilterDropdown } from './CategoryFilterDropdown';
 
 export type SortOption = 'name-asc' | 'name-desc' | 'price-asc' | 'price-desc';
 
@@ -42,7 +43,7 @@ export function ProductFilters({
   sort,
   onSortChange,
 }: ProductFiltersProps) {
-  const { t, locale } = useTranslation();
+  const { t } = useTranslation();
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6 mb-16 items-end">
@@ -63,18 +64,11 @@ export function ProductFilters({
         <label className="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2 block">
           {t('filters_category_label')}
         </label>
-        <select
-          className={selectClasses}
+        <CategoryFilterDropdown
+          categories={categories}
           value={category}
-          onChange={(e) => onCategoryChange(e.target.value)}
-        >
-          <option value="">{t('filters_all_categories')}</option>
-          {categories?.map((c) => (
-            <option key={c.id} value={String(c.id)}>
-              {localizedText(c.name, c.nameKa, locale)}
-            </option>
-          ))}
-        </select>
+          onChange={onCategoryChange}
+        />
       </div>
 
       <div className="flex gap-3">
