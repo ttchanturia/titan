@@ -10,6 +10,7 @@ export interface Product {
   categoryName?: string;
   categoryNameKa?: string;
   imageUrl?: string;
+  imageUrls?: string[];
   stockQuantity: number;
   createdAt: string;
 }

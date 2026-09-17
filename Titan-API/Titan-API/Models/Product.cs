@@ -13,6 +13,10 @@ public class Product
     public string? CategoryName { get; set; }
     public string? CategoryNameKa { get; set; }
     public string? ImageUrl { get; set; }
+
+    /// <summary>Up to 3 image URLs, in display order. ImageUrl mirrors the first entry for back-compat.</summary>
+    public List<string> ImageUrls { get; set; } = new();
+
     public int StockQuantity { get; set; }
     public DateTime CreatedAt { get; set; }
 

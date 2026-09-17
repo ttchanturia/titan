@@ -77,6 +77,14 @@ public class DatabaseInitializer
                 description_ka TEXT
             );
 
+            -- Added when product galleries (up to 3 images) were introduced.
+            -- CREATE TABLE IF NOT EXISTS above won't add columns to an already-existing
+            -- table, so this ALTER runs every startup and backfills existing rows.
+            ALTER TABLE products ADD COLUMN IF NOT EXISTS image_urls TEXT[];
+            UPDATE products
+            SET image_urls = ARRAY[image_url]
+            WHERE image_urls IS NULL AND image_url IS NOT NULL;
+
             -- Idempotent upgrade path for databases created before these columns existed
             ALTER TABLE categories ADD COLUMN IF NOT EXISTS name_ka VARCHAR(100);
             ALTER TABLE products ADD COLUMN IF NOT EXISTS description_ka TEXT;
@@ -107,10 +115,10 @@ public class DatabaseInitializer
                 ('Drums', 'Drum kits and percussion instruments', 'დასარტყამი ინსტრუმენტები'),
                 ('Keyboards', 'Pianos, synthesizers, and MIDI controllers', 'კლავიშებიანი ინსტრუმენტები');
 
-            INSERT INTO products (name, description, price, category_id, image_url, stock_quantity, description_ka) VALUES
-                ('Fender Stratocaster', 'Classic electric guitar with versatile tone', 1299.99, 1, 'https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=500&h=500&fit=crop&q=80', 15, 'კლასიკური ელექტრო გიტარა მრავალმხრივი ჟღერადობით'),
-                ('Yamaha Stage Custom', 'Professional 5-piece drum kit', 849.00, 2, 'https://images.unsplash.com/photo-1487180144351-b8472da7d491?w=500&h=500&fit=crop&q=80', 8, 'პროფესიონალური 5-ნაწილიანი დრამის კომპლექტი'),
-                ('Roland FP-30X', 'Portable digital piano with weighted keys', 699.99, 3, 'https://images.unsplash.com/photo-1520523839897-bd0b52aaf081?w=500&h=500&fit=crop&q=80', 12, 'პიანინო');
+            INSERT INTO products (name, description, price, category_id, image_url, image_urls, stock_quantity, description_ka) VALUES
+                ('Fender Stratocaster', 'Classic electric guitar with versatile tone', 1299.99, 1, 'https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=500&h=500&fit=crop&q=80', ARRAY['https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=500&h=500&fit=crop&q=80'], 15, 'კლასიკური ელექტრო გიტარა მრავალმხრივი ჟღერადობით'),
+                ('Yamaha Stage Custom', 'Professional 5-piece drum kit', 849.00, 2, 'https://images.unsplash.com/photo-1487180144351-b8472da7d491?w=500&h=500&fit=crop&q=80', ARRAY['https://images.unsplash.com/photo-1487180144351-b8472da7d491?w=500&h=500&fit=crop&q=80'], 8, 'პროფესიონალური 5-ნაწილიანი დრამის კომპლექტი'),
+                ('Roland FP-30X', 'Portable digital piano with weighted keys', 699.99, 3, 'https://images.unsplash.com/photo-1520523839897-bd0b52aaf081?w=500&h=500&fit=crop&q=80', ARRAY['https://images.unsplash.com/photo-1520523839897-bd0b52aaf081?w=500&h=500&fit=crop&q=80'], 12, 'პიანინო');
             """;
 
         await using var cmd = new NpgsqlCommand(sql, conn);
