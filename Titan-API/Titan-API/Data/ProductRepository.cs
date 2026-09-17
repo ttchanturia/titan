@@ -158,14 +158,18 @@ public class ProductRepository
         return await cmd.ExecuteNonQueryAsync() > 0;
     }
 
+    // Column order must match the SELECT lists above exactly:
+    // 0 id, 1 name, 2 description, 3 description_ka, 4 price, 5 category_id,
+    // 6 category_name, 7 category_name_ka, 8 image_url, 9 stock_quantity,
+    // 10 created_at, 11 image_urls
     private static Product MapProduct(NpgsqlDataReader reader)
     {
-        var imageUrl = reader.IsDBNull(6) ? null : reader.GetString(6);
+        var imageUrl = reader.IsDBNull(8) ? null : reader.GetString(8);
         // image_urls may briefly lag image_url for rows written just before the
         // startup backfill runs (see DatabaseInitializer) - fall back accordingly.
-        var imageUrls = reader.IsDBNull(9)
+        var imageUrls = reader.IsDBNull(11)
             ? (imageUrl is null ? new List<string>() : new List<string> { imageUrl })
-            : reader.GetFieldValue<string[]>(9).ToList();
+            : reader.GetFieldValue<string[]>(11).ToList();
 
         return new Product
         {
