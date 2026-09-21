@@ -27,6 +27,21 @@ function interpolate(template: string, vars?: Record<string, string | number>) {
   );
 }
 
+/**
+ * Resolves a database-backed display string (a category name, a product
+ * description, etc.) for the current locale, falling back to the English
+ * value whenever no translation has been filled in yet. Mirrors
+ * Category.GetLocalizedName / Product.GetLocalizedDescription on the backend.
+ */
+export function localizedText(
+  text: string | undefined | null,
+  textKa: string | undefined | null,
+  locale: Locale,
+): string | undefined {
+  if (locale === 'ka' && textKa) return textKa;
+  return text ?? undefined;
+}
+
 export function I18nProvider({ children }: { children: ReactNode }) {
   const [locale, setLocaleState] = useState<Locale>('en');
 

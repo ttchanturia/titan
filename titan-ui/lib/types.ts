@@ -4,9 +4,11 @@ export interface Product {
   id: number;
   name: string;
   description?: string;
+  descriptionKa?: string;
   price: number;
   categoryId: number;
   categoryName?: string;
+  categoryNameKa?: string;
   imageUrl?: string;
   imageUrls?: string[];
   stockQuantity: number;
@@ -17,4 +19,5 @@ export interface Category {
   id: number;
   name: string;
   description?: string;
+  nameKa?: string;
 }
