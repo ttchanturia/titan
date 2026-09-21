@@ -141,9 +141,14 @@ export const translations = {
     admin_sign_in: 'Sign In',
     admin_logout: 'Log Out',
 
+    // Admin nav
+    admin_nav_products: 'Manage Products',
+    admin_nav_categories: 'Manage Categories',
+
     // Admin page
     admin_badge: 'Admin',
     admin_heading: 'Manage Products',
+    admin_categories_heading: 'Manage Categories',
     admin_view_storefront: 'View Storefront',
     admin_edit_product: 'Edit Product',
     admin_add_product: 'Add Product',
@@ -319,9 +324,14 @@ export const translations = {
     admin_sign_in: 'შესვლა',
     admin_logout: 'გასვლა',
 
+    // Admin nav
+    admin_nav_products: 'პროდუქტების მართვა',
+    admin_nav_categories: 'კატეგორიების მართვა',
+
     // Admin page
     admin_badge: 'ადმინი',
     admin_heading: 'პროდუქტების მართვა',
+    admin_categories_heading: 'კატეგორიების მართვა',
     admin_view_storefront: 'მაღაზიის ნახვა',
     admin_edit_product: 'პროდუქტის რედაქტირება',
     admin_add_product: 'პროდუქტის დამატება',

@@ -1,29 +1,23 @@
-import { redirect } from 'next/navigation';
+'use client';
 
 import { useState, type ChangeEvent, type FormEvent } from 'react';
-import Link from 'next/link';
-import { isAxiosError } from 'axios';
-import { AdminLoginGate } from '../components/AdminLoginGate';
+import { AdminPageHeader } from '../../components/AdminPageHeader';
 import {
   useProducts,
   useCategories,
   useCreateProduct,
   useUpdateProduct,
   useDeleteProduct,
-  useUploadImage,
 } from '@/lib/hooks';
 import type { Product } from '@/lib/types';
 import { useTranslation } from '@/lib/i18n';
-import { MAX_UPLOAD_SIZE_BYTES, MAX_UPLOAD_SIZE_MB } from '@/lib/constants';
-
-const MAX_IMAGES = 3;
 
 const emptyForm = {
   name: '',
   description: '',
   price: '',
   categoryId: '',
-  imageUrls: [] as string[],
+  imageUrl: '',
   stockQuantity: '',
 };
 
@@ -35,22 +29,13 @@ const inputClasses =
 const selectClasses =
   'w-full bg-surface border-b border-outline-variant py-3 focus:outline-none focus:border-primary transition-colors text-sm font-body';
 
-export default function AdminPage() {
-  return (
-    <AdminLoginGate>
-      <AdminPageContent />
-    </AdminLoginGate>
-  );
-}
-
-function AdminPageContent() {
+export default function AdminProductsPage() {
   const { t } = useTranslation();
   const { data: products, isLoading, error } = useProducts();
   const { data: categories } = useCategories();
   const createProduct = useCreateProduct();
   const updateProduct = useUpdateProduct();
   const deleteProduct = useDeleteProduct();
-  const uploadImage = useUploadImage();
 
   const [form, setForm] = useState<FormState>(emptyForm);
   const [formError, setFormError] = useState<string | null>(null);
@@ -74,11 +59,7 @@ function AdminPageContent() {
       description: product.description ?? '',
       price: String(product.price),
       categoryId: String(product.categoryId),
-      imageUrls: product.imageUrls?.length
-        ? product.imageUrls
-        : product.imageUrl
-          ? [product.imageUrl]
-          : [],
+      imageUrl: product.imageUrl ?? '',
       stockQuantity: String(product.stockQuantity),
     });
   };
@@ -88,49 +69,6 @@ function AdminPageContent() {
     setFormError(null);
     setForm(emptyForm);
   };
-
-  const handleImageSelect = async (e: ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files ?? []);
-    e.target.value = ''; // let the same file(s) be re-picked after a failure
-    if (files.length === 0) return;
-
-    const remainingSlots = MAX_IMAGES - form.imageUrls.length;
-    const selected = files.slice(0, remainingSlots);
-    // Checked client-side too (not just relying on the API's 400) so oversized
-    // files are rejected instantly instead of after a wasted upload round-trip.
-    const oversized = selected.filter((f) => f.size > MAX_UPLOAD_SIZE_BYTES);
-    const filesToUpload = selected.filter((f) => f.size <= MAX_UPLOAD_SIZE_BYTES);
-    setFormError(null);
-
-    // Uploaded one at a time (not in parallel) so a shared "uploading" state
-    // stays accurate and the droplet isn't asked to resize several images at once.
-    for (const file of filesToUpload) {
-      try {
-        const { url } = await uploadImage.mutateAsync(file);
-        setForm((f) => ({ ...f, imageUrls: [...f.imageUrls, url] }));
-      } catch (err) {
-        const serverMessage =
-          isAxiosError<{ error?: string }>(err) && err.response?.data?.error;
-        setFormError(serverMessage || t('admin_image_upload_failed'));
-        return;
-      }
-    }
-
-    if (oversized.length > 0) {
-      setFormError(
-        t('admin_image_too_large', {
-          max: MAX_UPLOAD_SIZE_MB,
-          files: oversized.map((f) => f.name).join(', '),
-        }),
-      );
-    }
-  };
-
-  const handleImageRemove = (index: number) =>
-    setForm((f) => ({
-      ...f,
-      imageUrls: f.imageUrls.filter((_, i) => i !== index),
-    }));
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -150,7 +88,7 @@ function AdminPageContent() {
       description: form.description.trim() || undefined,
       price,
       categoryId,
-      imageUrls: form.imageUrls,
+      imageUrl: form.imageUrl.trim() || undefined,
       stockQuantity: Number.isFinite(stockQuantity) ? stockQuantity : 0,
     };
 
@@ -181,23 +119,8 @@ function AdminPageContent() {
   };
 
   return (
-    <main className="min-h-screen bg-surface px-8 py-16 max-w-screen-lg mx-auto">
-      <div className="flex items-center justify-between mb-12">
-        <div>
-          <span className="font-label text-xs uppercase tracking-[0.3em] text-on-surface-variant mb-2 block">
-            {t('admin_badge')}
-          </span>
-          <h1 className="font-headline text-4xl font-bold tracking-tighter text-primary">
-            {t('admin_heading')}
-          </h1>
-        </div>
-        <Link
-          href="/products"
-          className="text-sm font-semibold underline underline-offset-4"
-        >
-          {t('admin_view_storefront')}
-        </Link>
-      </div>
+    <>
+      <AdminPageHeader heading={t('admin_heading')} />
 
       <form
         onSubmit={handleSubmit}
@@ -279,53 +202,16 @@ function AdminPageContent() {
           </select>
         </div>
 
-        <div className="md:col-span-2">
+        <div>
           <label className="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2 block">
-            {t('admin_image_label')}
+            {t('admin_image_url_label')}
           </label>
-          <div className="flex items-center gap-4">
-            {form.imageUrls.map((url, index) => (
-              <div key={url} className="relative w-20 h-20">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={url}
-                  alt=""
-                  className="w-20 h-20 object-cover rounded-sm border border-outline-variant"
-                />
-                <button
-                  type="button"
-                  onClick={() => handleImageRemove(index)}
-                  aria-label={t('admin_image_remove')}
-                  className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-primary text-on-primary text-xs flex items-center justify-center"
-                >
-                  ×
-                </button>
-              </div>
-            ))}
-            {form.imageUrls.length < MAX_IMAGES && (
-              <label
-                aria-label={t('admin_image_choose')}
-                className={`w-20 h-20 rounded-sm border border-dashed border-outline-variant flex items-center justify-center text-on-surface-variant text-center text-[10px] leading-tight px-1 ${uploadImage.isPending ? 'cursor-wait' : 'cursor-pointer'}`}
-              >
-                {uploadImage.isPending ? (
-                  t('admin_image_uploading')
-                ) : (
-                  <span className="material-symbols-outlined">add_photo_alternate</span>
-                )}
-                <input
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={handleImageSelect}
-                  disabled={uploadImage.isPending}
-                  className="hidden"
-                />
-              </label>
-            )}
-          </div>
-          <p className="text-xs text-on-surface-variant mt-2">
-            {t('admin_image_hint', { count: form.imageUrls.length, max: MAX_IMAGES })}
-          </p>
+          <input
+            type="text"
+            value={form.imageUrl}
+            onChange={handleChange('imageUrl')}
+            className={inputClasses}
+          />
         </div>
 
         {formError && (
@@ -401,7 +287,7 @@ function AdminPageContent() {
                   >
                     <td className="py-3 pr-4">{p.name}</td>
                     <td className="py-3 pr-4">{p.categoryName ?? p.categoryId}</td>
-                    <td className="py-3 pr-4">₾{p.price.toFixed(2)}</td>
+                    <td className="py-3 pr-4">${p.price.toFixed(2)}</td>
                     <td className="py-3 pr-4">{p.stockQuantity}</td>
                     <td className="py-3 flex gap-4">
                       <button
@@ -427,6 +313,6 @@ function AdminPageContent() {
           </div>
         )}
       </section>
-    </main>
+    </>
   );
 }
