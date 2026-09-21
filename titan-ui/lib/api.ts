@@ -26,7 +26,6 @@ export const productApi = {
     const response = await axiosInstance.get<Product[]>('/products');
     return response.data;
   },
-
   getById: async (id: number): Promise<Product> => {
     const response = await axiosInstance.get<Product>(`/products/${id}`);
     return response.data;
@@ -76,6 +75,19 @@ export const authApi = {
     await axiosInstance.get('/auth/verify', {
       auth: { username, password },
     });
+  },
+};
+
+// Image upload
+export const uploadApi = {
+  uploadImage: async (file: File): Promise<{ url: string }> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await axiosInstance.post<{ url: string }>(
+      '/uploads',
+      formData,
+    );
+    return response.data;
   },
 };
 

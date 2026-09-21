@@ -2,7 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Product } from './types';
-import { productApi, categoryApi } from './api';
+import { productApi, categoryApi, uploadApi } from './api';
 
 /**
  * Hook for fetching all products
@@ -108,5 +108,15 @@ export function useDeleteProduct() {
       // Revalidate products list after deleting
       queryClient.invalidateQueries({ queryKey: ['products'] });
     },
+  });
+}
+
+/**
+ * Hook for uploading a product image
+ * Returns the stored image URL to save on the product
+ */
+export function useUploadImage() {
+  return useMutation({
+    mutationFn: (file: File) => uploadApi.uploadImage(file),
   });
 }

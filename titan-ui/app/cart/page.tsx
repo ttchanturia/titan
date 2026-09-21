@@ -65,11 +65,11 @@ export default function CartPage() {
                           {item.name}
                         </h3>
                         <p className="font-headline text-xl font-medium">
-                          ${(item.price * item.quantity).toFixed(2)}
+                          ₾{(item.price * item.quantity).toFixed(2)}
                         </p>
                       </div>
                       <p className="text-on-surface-variant text-sm">
-                        ${item.price.toFixed(2)} {t('cart_each')}
+                        ₾{item.price.toFixed(2)} {t('cart_each')}
                       </p>
                     </div>
                     <div className="flex items-center justify-between mt-8 md:mt-0">
@@ -126,19 +126,19 @@ export default function CartPage() {
                     <span className="text-on-surface-variant">
                       {t('cart_subtotal')}
                     </span>
-                    <span>${subtotal.toFixed(2)}</span>
+                    <span>₾{subtotal.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-on-surface-variant">
                       {t('cart_shipping')}
                     </span>
-                    <span>${shipping.toFixed(2)}</span>
+                    <span>₾{shipping.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-on-surface-variant">
                       {t('cart_estimated_tax')}
                     </span>
-                    <span>${tax.toFixed(2)}</span>
+                    <span>₾{tax.toFixed(2)}</span>
                   </div>
                 </div>
                 <div className="pt-8 border-t border-outline-variant/20">
@@ -147,7 +147,7 @@ export default function CartPage() {
                       {t('cart_total')}
                     </span>
                     <span className="font-headline text-3xl font-extrabold tracking-tighter">
-                      ${total.toFixed(2)}
+                      ₾{total.toFixed(2)}
                     </span>
                   </div>
                   <button className="w-full bg-primary text-on-primary py-5 px-8 font-headline font-bold uppercase tracking-widest text-xs hover:bg-primary-container transition-all active:scale-[0.98] duration-200">

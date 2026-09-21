@@ -65,7 +65,7 @@ export function ProductGrid({ products }: ProductGridProps) {
               </p>
             )}
             <p className="font-headline text-2xl font-bold text-primary">
-              ${product.price.toFixed(2)}
+              ₾{product.price.toFixed(2)}
             </p>
           </Link>
         );

@@ -17,7 +17,17 @@ export default function ProductPage() {
   const { data: product, isLoading, error } = useProduct(id);
   const { addItem } = useCart();
   const [added, setAdded] = useState(false);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [lastProductId, setLastProductId] = useState(id);
   const { t, locale } = useTranslation();
+
+  // Reset which image is active when navigating to a different product.
+  // Adjusting state during render (rather than an effect) per React's guidance
+  // for state that depends on a prop change.
+  if (id !== lastProductId) {
+    setLastProductId(id);
+    setActiveImageIndex(0);
+  }
 
   const handleAddToCart = () => {
     if (!product) return;
@@ -108,6 +118,13 @@ export default function ProductPage() {
         ? { label: t('product_stock_low'), color: 'bg-amber-500' }
         : { label: t('product_stock_out'), color: 'bg-red-500' };
 
+  const images = product.imageUrls?.length
+    ? product.imageUrls
+    : product.imageUrl
+      ? [product.imageUrl]
+      : [];
+  const mainImage = images[activeImageIndex] ?? images[0] ?? DEFAULT_PRODUCT_IMAGE;
+
   return (
     <>
       <Nav />
@@ -133,20 +150,45 @@ export default function ProductPage() {
             {/* Product Details */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
               {/* Image */}
-              <div className="relative bg-surface-container-high aspect-square rounded overflow-hidden">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={product.imageUrl || DEFAULT_PRODUCT_IMAGE}
-                  alt={product.name}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute top-6 right-6">
-                  <span
-                    className={`${stockStatus.color} text-white text-sm font-bold px-4 py-2 rounded-full`}
-                  >
-                    {stockStatus.label}
-                  </span>
+              <div>
+                <div className="relative bg-surface-container-high aspect-square rounded overflow-hidden">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={mainImage}
+                    alt={product.name}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute top-6 right-6">
+                    <span
+                      className={`${stockStatus.color} text-white text-sm font-bold px-4 py-2 rounded-full`}
+                    >
+                      {stockStatus.label}
+                    </span>
+                  </div>
                 </div>
+                {images.length > 1 && (
+                  <div className="flex gap-3 mt-4">
+                    {images.map((url, index) => (
+                      <button
+                        key={url}
+                        type="button"
+                        onClick={() => setActiveImageIndex(index)}
+                        className={`w-16 h-16 rounded overflow-hidden border-2 transition-colors ${
+                          index === activeImageIndex
+                            ? 'border-primary'
+                            : 'border-transparent hover:border-outline'
+                        }`}
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={url}
+                          alt=""
+                          className="w-full h-full object-cover"
+                        />
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Info */}
@@ -162,7 +204,7 @@ export default function ProductPage() {
                 </h1>
 
                 <p className="text-3xl font-headline font-bold text-primary mb-8">
-                  ${product.price.toFixed(2)}
+                  ₾{product.price.toFixed(2)}
                 </p>
 
                 {product.description && (
@@ -246,7 +288,7 @@ export default function ProductPage() {
                   <span className="font-semibold text-on-surface">
                     {t('product_price_label')}
                   </span>{' '}
-                  ${product.price.toFixed(2)}
+                  ₾{product.price.toFixed(2)}
                 </li>
                 <li>
                   <span className="font-semibold text-on-surface">

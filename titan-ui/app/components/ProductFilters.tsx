@@ -86,7 +86,7 @@ export function ProductFilters({
             type="number"
             min="0"
             className={inputClasses}
-            placeholder="$0"
+            placeholder="₾0"
             value={minPrice}
             onChange={(e) => onMinPriceChange(e.target.value)}
           />
