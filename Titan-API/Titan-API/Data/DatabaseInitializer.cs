@@ -25,6 +25,10 @@ public class DatabaseInitializer
         await EnsureDatabaseExists();
         await EnsureTablesExist();
         await SeedDataAsync();
+        await BackfillCategoryTranslationsAsync();
+        await BackfillProductTranslationsAsync();
+        await BackfillSubcategoriesAsync();
+        await BackfillProductSubcategoriesAsync();
     }
 
     private async Task EnsureDatabaseExists()
@@ -59,7 +63,9 @@ public class DatabaseInitializer
             CREATE TABLE IF NOT EXISTS categories (
                 id SERIAL PRIMARY KEY,
                 name VARCHAR(100) NOT NULL,
-                description TEXT
+                description TEXT,
+                name_ka VARCHAR(100),
+                parent_id INT REFERENCES categories(id)
             );
 
             CREATE TABLE IF NOT EXISTS products (
@@ -70,7 +76,8 @@ public class DatabaseInitializer
                 category_id INT REFERENCES categories(id),
                 image_url TEXT,
                 stock_quantity INT NOT NULL DEFAULT 0,
-                created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+                created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                description_ka TEXT
             );
 
             -- Added when product galleries (up to 3 images) were introduced.
@@ -80,6 +87,14 @@ public class DatabaseInitializer
             UPDATE products
             SET image_urls = ARRAY[image_url]
             WHERE image_urls IS NULL AND image_url IS NOT NULL;
+
+            -- Idempotent upgrade path for databases created before these columns existed
+            ALTER TABLE categories ADD COLUMN IF NOT EXISTS name_ka VARCHAR(100);
+            ALTER TABLE products ADD COLUMN IF NOT EXISTS description_ka TEXT;
+
+            -- Added when subcategories (parent_id self-reference) were introduced.
+            ALTER TABLE categories ADD COLUMN IF NOT EXISTS parent_id INT REFERENCES categories(id);
+            CREATE INDEX IF NOT EXISTS idx_categories_parent_id ON categories(parent_id);
             """;
 
         await using var cmd = new NpgsqlCommand(sql, conn);
@@ -102,19 +117,165 @@ public class DatabaseInitializer
         }
 
         var sql = """
-            INSERT INTO categories (name, description) VALUES
-                ('Guitars', 'Electric and acoustic guitars'),
-                ('Drums', 'Drum kits and percussion instruments'),
-                ('Keyboards', 'Pianos, synthesizers, and MIDI controllers');
+            INSERT INTO categories (name, description, name_ka) VALUES
+                ('Guitars', 'Electric and acoustic guitars', 'გიტარები'),
+                ('Drums', 'Drum kits and percussion instruments', 'დასარტყამი ინსტრუმენტები'),
+                ('Keyboards', 'Pianos, synthesizers, and MIDI controllers', 'კლავიშებიანი ინსტრუმენტები');
 
-            INSERT INTO products (name, description, price, category_id, image_url, image_urls, stock_quantity) VALUES
-                ('Fender Stratocaster', 'Classic electric guitar with versatile tone', 1299.99, 1, 'https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=500&h=500&fit=crop&q=80', ARRAY['https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=500&h=500&fit=crop&q=80'], 15),
-                ('Yamaha Stage Custom', 'Professional 5-piece drum kit', 849.00, 2, 'https://images.unsplash.com/photo-1487180144351-b8472da7d491?w=500&h=500&fit=crop&q=80', ARRAY['https://images.unsplash.com/photo-1487180144351-b8472da7d491?w=500&h=500&fit=crop&q=80'], 8),
-                ('Roland FP-30X', 'Portable digital piano with weighted keys', 699.99, 3, 'https://images.unsplash.com/photo-1520523839897-bd0b52aaf081?w=500&h=500&fit=crop&q=80', ARRAY['https://images.unsplash.com/photo-1520523839897-bd0b52aaf081?w=500&h=500&fit=crop&q=80'], 12);
+            INSERT INTO products (name, description, price, category_id, image_url, image_urls, stock_quantity, description_ka) VALUES
+                ('Fender Stratocaster', 'Classic electric guitar with versatile tone', 1299.99, 1, 'https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=500&h=500&fit=crop&q=80', ARRAY['https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=500&h=500&fit=crop&q=80'], 15, 'კლასიკური ელექტრო გიტარა მრავალმხრივი ჟღერადობით'),
+                ('Yamaha Stage Custom', 'Professional 5-piece drum kit', 849.00, 2, 'https://images.unsplash.com/photo-1487180144351-b8472da7d491?w=500&h=500&fit=crop&q=80', ARRAY['https://images.unsplash.com/photo-1487180144351-b8472da7d491?w=500&h=500&fit=crop&q=80'], 8, 'პროფესიონალური 5-ნაწილიანი დრამის კომპლექტი'),
+                ('Roland FP-30X', 'Portable digital piano with weighted keys', 699.99, 3, 'https://images.unsplash.com/photo-1520523839897-bd0b52aaf081?w=500&h=500&fit=crop&q=80', ARRAY['https://images.unsplash.com/photo-1520523839897-bd0b52aaf081?w=500&h=500&fit=crop&q=80'], 12, 'პიანინო');
             """;
 
         await using var cmd = new NpgsqlCommand(sql, conn);
         await cmd.ExecuteNonQueryAsync();
         _logger.LogInformation("Seeded database with sample categories and products");
+    }
+
+    /// <summary>
+    /// Fills in Georgian names for the well-known seed categories on databases that
+    /// already existed before name_ka was introduced (SeedDataAsync only runs on an
+    /// empty table, so it would otherwise never reach already-seeded rows).
+    /// Safe to run on every startup: only touches rows still missing a translation.
+    /// </summary>
+    private async Task BackfillCategoryTranslationsAsync()
+    {
+        await using var conn = new NpgsqlConnection(_connectionString);
+        await conn.OpenAsync();
+
+        var sql = """
+            UPDATE categories SET name_ka = 'გიტარები' WHERE name = 'Guitars' AND name_ka IS NULL;
+            UPDATE categories SET name_ka = 'დასარტყამი ინსტრუმენტები' WHERE name = 'Drums' AND name_ka IS NULL;
+            UPDATE categories SET name_ka = 'კლავიშებიანი ინსტრუმენტები' WHERE name = 'Keyboards' AND name_ka IS NULL;
+            """;
+
+        await using var cmd = new NpgsqlCommand(sql, conn);
+        var rows = await cmd.ExecuteNonQueryAsync();
+        if (rows > 0)
+        {
+            _logger.LogInformation("Backfilled Georgian names for {Rows} existing categories", rows);
+        }
+    }
+
+    /// <summary>
+    /// Fills in Georgian descriptions for a known set of already-seeded products.
+    /// Matches by product name rather than description text, since description text
+    /// isn't guaranteed unique/stable (e.g. punctuation can drift). Safe to re-run:
+    /// only touches rows still missing a translation.
+    /// </summary>
+    private async Task BackfillProductTranslationsAsync()
+    {
+        await using var conn = new NpgsqlConnection(_connectionString);
+        await conn.OpenAsync();
+
+        var sql = """
+            UPDATE products SET description_ka = 'კლასიკური ელექტრო გიტარა მრავალმხრივი ჟღერადობით' WHERE name = 'Fender Stratocaster' AND description_ka IS NULL;
+            UPDATE products SET description_ka = 'პროფესიონალური 5-ნაწილიანი დრამის კომპლექტი' WHERE name = 'Yamaha Stage Custom' AND description_ka IS NULL;
+            UPDATE products SET description_ka = 'პიანინო' WHERE name = 'Roland FP-30X' AND description_ka IS NULL;
+            UPDATE products SET description_ka = 'კლასიკური ელექტრო გიტარა' WHERE name = 'Gibson Les Paul' AND description_ka IS NULL;
+            UPDATE products SET description_ka = 'პრემიუმ კლასის ელექტრო გიტარა' WHERE name = 'Gibson Les Paul Standard' AND description_ka IS NULL;
+            """;
+
+        await using var cmd = new NpgsqlCommand(sql, conn);
+        var rows = await cmd.ExecuteNonQueryAsync();
+        if (rows > 0)
+        {
+            _logger.LogInformation("Backfilled Georgian descriptions for {Rows} existing products", rows);
+        }
+    }
+
+    /// <summary>
+    /// Ensures the standard subcategory taxonomy exists under each top-level category.
+    /// Looks up each parent by name (rather than assuming ids 1/2/3) so it works
+    /// whether this runs as part of a fresh seed or against an existing database.
+    /// Safe to run on every startup: each INSERT is guarded by NOT EXISTS, so a
+    /// subcategory that's already there (or one an admin has since edited/renamed
+    /// under the same parent) is left alone.
+    /// </summary>
+    private async Task BackfillSubcategoriesAsync()
+    {
+        await using var conn = new NpgsqlConnection(_connectionString);
+        await conn.OpenAsync();
+
+        var sql = """
+            INSERT INTO categories (name, name_ka, parent_id)
+            SELECT v.name, v.name_ka, p.id
+            FROM (VALUES
+                ('Guitars', 'Acoustic Guitars', 'აკუსტიკური გიტარები'),
+                ('Guitars', 'Electric Guitars', 'ელექტრო გიტარები'),
+                ('Guitars', 'Bass Guitars', 'ბას-გიტარები'),
+                ('Guitars', 'Ukulele', 'უკულელე'),
+                ('Guitars', 'Classical Guitars', 'კლასიკური გიტარები'),
+                ('Drums', 'Acoustic Drum Sets', 'აკუსტიკური დრამები'),
+                ('Drums', 'Electronic Drums', 'ელექტრონული დრამები'),
+                ('Drums', 'Percussion', 'პერკუსია'),
+                ('Drums', 'Cymbals', 'თეფშები'),
+                ('Drums', 'Drum Accessories', 'დასარტყამების აქსესუარები'),
+                ('Keyboards', 'Acoustic Pianos', 'აკუსტიკური პიანინო'),
+                ('Keyboards', 'Digital Pianos', 'ციფრული პიანინოები'),
+                ('Keyboards', 'Synthesizers', 'სინთეზატორები'),
+                ('Keyboards', 'MIDI Keyboards', 'MIDI კლავიატურები'),
+                ('Keyboards', 'Organs / Accordions', 'ორღანები / აკორდეონები')
+            ) AS v(parent_name, name, name_ka)
+            JOIN categories p ON p.name = v.parent_name AND p.parent_id IS NULL
+            WHERE NOT EXISTS (
+                SELECT 1 FROM categories sc WHERE sc.parent_id = p.id AND sc.name = v.name
+            );
+            """;
+
+        await using var cmd = new NpgsqlCommand(sql, conn);
+        var rows = await cmd.ExecuteNonQueryAsync();
+        if (rows > 0)
+        {
+            _logger.LogInformation("Backfilled {Rows} subcategories", rows);
+        }
+    }
+
+    /// <summary>
+    /// Moves the well-known seed/demo products off their top-level category and onto
+    /// the matching subcategory, so the storefront has real data to demonstrate
+    /// subcategory filtering with. Guarded by "still pointing at the top-level
+    /// category" so it only ever moves a product off its original default — it never
+    /// overwrites a category an admin has since chosen deliberately (including moving
+    /// it back to the parent on purpose).
+    /// </summary>
+    private async Task BackfillProductSubcategoriesAsync()
+    {
+        await using var conn = new NpgsqlConnection(_connectionString);
+        await conn.OpenAsync();
+
+        var sql = """
+            UPDATE products p
+            SET category_id = sc.id
+            FROM categories sc
+            JOIN categories parent ON parent.id = sc.parent_id
+            WHERE sc.name = 'Electric Guitars' AND parent.name = 'Guitars'
+              AND p.name IN ('Fender Stratocaster', 'Gibson Les Paul', 'Gibson Les Paul Standard')
+              AND p.category_id = parent.id;
+
+            UPDATE products p
+            SET category_id = sc.id
+            FROM categories sc
+            JOIN categories parent ON parent.id = sc.parent_id
+            WHERE sc.name = 'Acoustic Drum Sets' AND parent.name = 'Drums'
+              AND p.name = 'Yamaha Stage Custom'
+              AND p.category_id = parent.id;
+
+            UPDATE products p
+            SET category_id = sc.id
+            FROM categories sc
+            JOIN categories parent ON parent.id = sc.parent_id
+            WHERE sc.name = 'Digital Pianos' AND parent.name = 'Keyboards'
+              AND p.name = 'Roland FP-30X'
+              AND p.category_id = parent.id;
+            """;
+
+        await using var cmd = new NpgsqlCommand(sql, conn);
+        var rows = await cmd.ExecuteNonQueryAsync();
+        if (rows > 0)
+        {
+            _logger.LogInformation("Reassigned {Rows} demo products onto subcategories", rows);
+        }
     }
 }

@@ -3,14 +3,14 @@
 import Link from 'next/link';
 import { DEFAULT_PRODUCT_IMAGE } from '@/lib/constants';
 import type { Product } from '@/lib/types';
-import { useTranslation } from '@/lib/i18n';
+import { useTranslation, localizedText } from '@/lib/i18n';
 
 interface ProductGridProps {
   products: Product[];
 }
 
 export function ProductGrid({ products }: ProductGridProps) {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
 
   if (products.length === 0) {
     return (
@@ -56,12 +56,12 @@ export function ProductGrid({ products }: ProductGridProps) {
             </h3>
             {product.categoryName && (
               <p className="text-sm text-on-surface-variant mb-2">
-                {product.categoryName}
+                {localizedText(product.categoryName, product.categoryNameKa, locale)}
               </p>
             )}
             {product.description && (
               <p className="text-sm text-on-surface-variant mb-3 line-clamp-2">
-                {product.description}
+                {localizedText(product.description, product.descriptionKa, locale)}
               </p>
             )}
             <p className="font-headline text-2xl font-bold text-primary">
