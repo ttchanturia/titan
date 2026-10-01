@@ -288,9 +288,14 @@ function AdminPageContent() {
           >
             <option value="">{t('admin_select_category')}</option>
             {categories?.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-              </option>
+              <optgroup key={c.id} label={c.name}>
+                <option value={c.id}>{c.name}</option>
+                {c.children?.map((sub) => (
+                  <option key={sub.id} value={sub.id}>
+                    {sub.name}
+                  </option>
+                ))}
+              </optgroup>
             ))}
           </select>
         </div>

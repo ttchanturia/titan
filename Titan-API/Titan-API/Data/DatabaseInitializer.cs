@@ -27,6 +27,8 @@ public class DatabaseInitializer
         await SeedDataAsync();
         await BackfillCategoryTranslationsAsync();
         await BackfillProductTranslationsAsync();
+        await BackfillSubcategoriesAsync();
+        await BackfillProductSubcategoriesAsync();
     }
 
     private async Task EnsureDatabaseExists()
@@ -62,7 +64,8 @@ public class DatabaseInitializer
                 id SERIAL PRIMARY KEY,
                 name VARCHAR(100) NOT NULL,
                 description TEXT,
-                name_ka VARCHAR(100)
+                name_ka VARCHAR(100),
+                parent_id INT REFERENCES categories(id)
             );
 
             CREATE TABLE IF NOT EXISTS products (
@@ -88,6 +91,10 @@ public class DatabaseInitializer
             -- Idempotent upgrade path for databases created before these columns existed
             ALTER TABLE categories ADD COLUMN IF NOT EXISTS name_ka VARCHAR(100);
             ALTER TABLE products ADD COLUMN IF NOT EXISTS description_ka TEXT;
+
+            -- Added when subcategories (parent_id self-reference) were introduced.
+            ALTER TABLE categories ADD COLUMN IF NOT EXISTS parent_id INT REFERENCES categories(id);
+            CREATE INDEX IF NOT EXISTS idx_categories_parent_id ON categories(parent_id);
             """;
 
         await using var cmd = new NpgsqlCommand(sql, conn);
@@ -175,6 +182,100 @@ public class DatabaseInitializer
         if (rows > 0)
         {
             _logger.LogInformation("Backfilled Georgian descriptions for {Rows} existing products", rows);
+        }
+    }
+
+    /// <summary>
+    /// Ensures the standard subcategory taxonomy exists under each top-level category.
+    /// Looks up each parent by name (rather than assuming ids 1/2/3) so it works
+    /// whether this runs as part of a fresh seed or against an existing database.
+    /// Safe to run on every startup: each INSERT is guarded by NOT EXISTS, so a
+    /// subcategory that's already there (or one an admin has since edited/renamed
+    /// under the same parent) is left alone.
+    /// </summary>
+    private async Task BackfillSubcategoriesAsync()
+    {
+        await using var conn = new NpgsqlConnection(_connectionString);
+        await conn.OpenAsync();
+
+        var sql = """
+            INSERT INTO categories (name, name_ka, parent_id)
+            SELECT v.name, v.name_ka, p.id
+            FROM (VALUES
+                ('Guitars', 'Acoustic Guitars', 'აკუსტიკური გიტარები'),
+                ('Guitars', 'Electric Guitars', 'ელექტრო გიტარები'),
+                ('Guitars', 'Bass Guitars', 'ბას-გიტარები'),
+                ('Guitars', 'Ukulele', 'უკულელე'),
+                ('Guitars', 'Classical Guitars', 'კლასიკური გიტარები'),
+                ('Drums', 'Acoustic Drum Sets', 'აკუსტიკური დრამები'),
+                ('Drums', 'Electronic Drums', 'ელექტრონული დრამები'),
+                ('Drums', 'Percussion', 'პერკუსია'),
+                ('Drums', 'Cymbals', 'თეფშები'),
+                ('Drums', 'Drum Accessories', 'დასარტყამების აქსესუარები'),
+                ('Keyboards', 'Acoustic Pianos', 'აკუსტიკური პიანინო'),
+                ('Keyboards', 'Digital Pianos', 'ციფრული პიანინოები'),
+                ('Keyboards', 'Synthesizers', 'სინთეზატორები'),
+                ('Keyboards', 'MIDI Keyboards', 'MIDI კლავიატურები'),
+                ('Keyboards', 'Organs / Accordions', 'ორღანები / აკორდეონები')
+            ) AS v(parent_name, name, name_ka)
+            JOIN categories p ON p.name = v.parent_name AND p.parent_id IS NULL
+            WHERE NOT EXISTS (
+                SELECT 1 FROM categories sc WHERE sc.parent_id = p.id AND sc.name = v.name
+            );
+            """;
+
+        await using var cmd = new NpgsqlCommand(sql, conn);
+        var rows = await cmd.ExecuteNonQueryAsync();
+        if (rows > 0)
+        {
+            _logger.LogInformation("Backfilled {Rows} subcategories", rows);
+        }
+    }
+
+    /// <summary>
+    /// Moves the well-known seed/demo products off their top-level category and onto
+    /// the matching subcategory, so the storefront has real data to demonstrate
+    /// subcategory filtering with. Guarded by "still pointing at the top-level
+    /// category" so it only ever moves a product off its original default — it never
+    /// overwrites a category an admin has since chosen deliberately (including moving
+    /// it back to the parent on purpose).
+    /// </summary>
+    private async Task BackfillProductSubcategoriesAsync()
+    {
+        await using var conn = new NpgsqlConnection(_connectionString);
+        await conn.OpenAsync();
+
+        var sql = """
+            UPDATE products p
+            SET category_id = sc.id
+            FROM categories sc
+            JOIN categories parent ON parent.id = sc.parent_id
+            WHERE sc.name = 'Electric Guitars' AND parent.name = 'Guitars'
+              AND p.name IN ('Fender Stratocaster', 'Gibson Les Paul', 'Gibson Les Paul Standard')
+              AND p.category_id = parent.id;
+
+            UPDATE products p
+            SET category_id = sc.id
+            FROM categories sc
+            JOIN categories parent ON parent.id = sc.parent_id
+            WHERE sc.name = 'Acoustic Drum Sets' AND parent.name = 'Drums'
+              AND p.name = 'Yamaha Stage Custom'
+              AND p.category_id = parent.id;
+
+            UPDATE products p
+            SET category_id = sc.id
+            FROM categories sc
+            JOIN categories parent ON parent.id = sc.parent_id
+            WHERE sc.name = 'Digital Pianos' AND parent.name = 'Keyboards'
+              AND p.name = 'Roland FP-30X'
+              AND p.category_id = parent.id;
+            """;
+
+        await using var cmd = new NpgsqlCommand(sql, conn);
+        var rows = await cmd.ExecuteNonQueryAsync();
+        if (rows > 0)
+        {
+            _logger.LogInformation("Reassigned {Rows} demo products onto subcategories", rows);
         }
     }
 }

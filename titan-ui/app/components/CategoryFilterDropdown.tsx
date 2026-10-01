@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { Category } from '@/lib/types';
 import { useTranslation, localizedText } from '@/lib/i18n';
-import { CATEGORY_TAXONOMY } from '@/lib/categoryTaxonomy';
 
 interface CategoryFilterDropdownProps {
   categories: Category[] | undefined;
@@ -14,6 +13,28 @@ interface CategoryFilterDropdownProps {
 const triggerClasses =
   'w-full flex items-center justify-between gap-2 bg-surface-container-low px-4 py-3 rounded-sm text-sm font-body outline-none focus:ring-1 focus:ring-primary text-left';
 
+/**
+ * Plain-text chevron, not the material-symbols-outlined icon font — that font
+ * isn't actually linked anywhere in this app (no <link> for it in layout.tsx),
+ * so it was rendering as raw "expand_more" text here instead of a glyph.
+ */
+function Chevron({ expanded }: { expanded: boolean }) {
+  return (
+    <span
+      className={`inline-block text-xs shrink-0 transition-transform ${expanded ? 'rotate-180' : ''}`}
+      aria-hidden="true"
+    >
+      ▾
+    </span>
+  );
+}
+
+/** Parents plus every nested child, flattened one level (the tree is only ever two deep). */
+function flatten(categories: Category[] | undefined): Category[] {
+  if (!categories) return [];
+  return categories.flatMap((c) => [c, ...(c.children ?? [])]);
+}
+
 export function CategoryFilterDropdown({
   categories,
   value,
@@ -21,26 +42,16 @@ export function CategoryFilterDropdown({
 }: CategoryFilterDropdownProps) {
   const { t, locale } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
-  const [expandedParent, setExpandedParent] = useState<string | null>(null);
-  // Purely cosmetic: remembers which subcategory (by its canonical English
-  // name, paired with the categoryId it produced) was last clicked, so the
-  // trigger can show it. Stored as the key rather than a rendered label so it
-  // re-localizes correctly if the user switches language afterwards. Not
-  // persisted — if `value` changes from outside (URL nav, reset), it no
-  // longer matches the stored categoryId and is ignored, falling back to the
-  // parent category's name, since only the parent id is real filter state.
-  const [selectedSub, setSelectedSub] = useState<{ categoryId: string; subName: string } | null>(
-    null,
-  );
+  const [expandedParentId, setExpandedParentId] = useState<number | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
 
-  const selectedCategory = categories?.find((c) => String(c.id) === value);
-  const selectedSubEntry =
-    selectedSub?.categoryId === value
-      ? CATEGORY_TAXONOMY.flatMap((p) => p.subcategories).find(
-          (s) => s.name === selectedSub.subName,
-        )
-      : undefined;
+  // The selected entry is looked up fresh from the fetched tree by its real id
+  // every render, so the trigger label always reflects live API data (both the
+  // current locale and any future admin edits) rather than a stale local copy.
+  const selected = flatten(categories).find((c) => String(c.id) === value);
+  const triggerLabel = selected
+    ? localizedText(selected.name, selected.nameKa, locale)
+    : t('filters_all_categories');
 
   useEffect(() => {
     if (!isOpen) return;
@@ -60,28 +71,20 @@ export function CategoryFilterDropdown({
     };
   }, [isOpen]);
 
-  const triggerLabel = selectedSubEntry
-    ? localizedText(selectedSubEntry.name, selectedSubEntry.nameKa, locale)
-    : selectedCategory
-      ? localizedText(selectedCategory.name, selectedCategory.nameKa, locale)
-      : t('filters_all_categories');
-
-  const toggleParent = (name: string) => {
-    setExpandedParent((current) => (current === name ? null : name));
+  const toggleParent = (id: number) => {
+    setExpandedParentId((current) => (current === id ? null : id));
   };
 
   const selectAll = () => {
-    setSelectedSub(null);
     onChange('');
     setIsOpen(false);
   };
 
-  const selectSubcategory = (parentName: string, subName: string) => {
-    const parentCategory = categories?.find((c) => c.name === parentName);
-    if (!parentCategory) return;
-    const categoryId = String(parentCategory.id);
-    setSelectedSub({ categoryId, subName });
-    onChange(categoryId);
+  // Selects the category's own real id — a parent id when the parent row itself
+  // is chosen, or the subcategory's own id when a child row is chosen. There is
+  // no fallback-to-parent here: a subcategory filters by its own id end to end.
+  const selectCategory = (id: number) => {
+    onChange(String(id));
     setIsOpen(false);
   };
 
@@ -95,12 +98,7 @@ export function CategoryFilterDropdown({
         onClick={() => setIsOpen((open) => !open)}
       >
         <span className="truncate">{triggerLabel}</span>
-        <span
-          className={`material-symbols-outlined text-base shrink-0 transition-transform ${isOpen ? 'rotate-180' : ''}`}
-          aria-hidden="true"
-        >
-          expand_more
-        </span>
+        <Chevron expanded={isOpen} />
       </button>
 
       {isOpen && (
@@ -118,58 +116,53 @@ export function CategoryFilterDropdown({
             {t('filters_all_categories')}
           </button>
 
-          {CATEGORY_TAXONOMY.map((parent) => {
-            const parentCategory = categories?.find((c) => c.name === parent.name);
-            const parentLabel = parentCategory
-              ? localizedText(parentCategory.name, parentCategory.nameKa, locale)
-              : localizedText(parent.name, parent.nameKa, locale);
-            const isExpanded = expandedParent === parent.name;
-            const isParentSelected = !!parentCategory && String(parentCategory.id) === value;
+          {categories?.map((parent) => {
+            const parentLabel = localizedText(parent.name, parent.nameKa, locale);
+            const isExpanded = expandedParentId === parent.id;
+            const isParentSelected = String(parent.id) === value;
+            const children = parent.children ?? [];
 
             return (
-              <div key={parent.name} className="border-t border-outline-variant/10 first:border-t-0">
+              <div key={parent.id} className="border-t border-outline-variant/10 first:border-t-0">
                 <button
                   type="button"
-                  onClick={() => toggleParent(parent.name)}
+                  onClick={() => toggleParent(parent.id)}
                   aria-expanded={isExpanded}
                   className={`w-full flex items-center justify-between gap-2 px-4 py-2.5 text-sm font-body font-semibold hover:bg-surface-container-high transition-colors ${
                     isParentSelected ? 'text-primary' : 'text-on-surface'
                   }`}
                 >
                   <span>{parentLabel}</span>
-                  <span
-                    className={`material-symbols-outlined text-base shrink-0 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
-                    aria-hidden="true"
-                  >
-                    expand_more
-                  </span>
+                  {children.length > 0 && <Chevron expanded={isExpanded} />}
                 </button>
 
-                <div
-                  className={`grid transition-[grid-template-rows] duration-200 ease-out ${
-                    isExpanded ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
-                  }`}
-                >
-                  <div className="overflow-hidden">
-                    {parent.subcategories.map((sub) => {
-                      const isSubSelected = isParentSelected && selectedSub?.subName === sub.name;
-                      return (
-                        <button
-                          key={sub.name}
-                          type="button"
-                          onClick={() => selectSubcategory(parent.name, sub.name)}
-                          className={`w-full text-left pl-8 pr-4 py-2 text-sm font-body hover:bg-surface-container-high transition-colors ${
-                            isSubSelected
-                              ? 'text-primary font-semibold'
-                              : 'text-on-surface-variant'
-                          }`}
-                        >
-                          {localizedText(sub.name, sub.nameKa, locale)}
-                        </button>
-                      );
-                    })}
+                {children.length > 0 && (
+                  <div
+                    className={`grid transition-[grid-template-rows] duration-200 ease-out ${
+                      isExpanded ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
+                    }`}
+                  >
+                    <div className="overflow-hidden">
+                      {children.map((sub) => {
+                        const isSubSelected = String(sub.id) === value;
+                        return (
+                          <button
+                            key={sub.id}
+                            type="button"
+                            onClick={() => selectCategory(sub.id)}
+                            className={`w-full text-left pl-8 pr-4 py-2 text-sm font-body hover:bg-surface-container-high transition-colors ${
+                              isSubSelected
+                                ? 'text-primary font-semibold'
+                                : 'text-on-surface-variant'
+                            }`}
+                          >
+                            {localizedText(sub.name, sub.nameKa, locale)}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             );
           })}

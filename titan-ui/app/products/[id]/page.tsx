@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useProduct } from '@/lib/hooks';
 import { DEFAULT_PRODUCT_IMAGE } from '@/lib/constants';
@@ -18,16 +18,12 @@ export default function ProductPage() {
   const { addItem } = useCart();
   const [added, setAdded] = useState(false);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
-  const [lastProductId, setLastProductId] = useState(id);
   const { t, locale } = useTranslation();
 
   // Reset which image is active when navigating to a different product.
-  // Adjusting state during render (rather than an effect) per React's guidance
-  // for state that depends on a prop change.
-  if (id !== lastProductId) {
-    setLastProductId(id);
+  useEffect(() => {
     setActiveImageIndex(0);
-  }
+  }, [id]);
 
   const handleAddToCart = () => {
     if (!product) return;
