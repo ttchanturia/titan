@@ -78,7 +78,17 @@ export function ProductsPageClient() {
     let result: Product[] = products;
 
     if (category) {
-      result = result.filter((p) => String(p.categoryId) === category);
+      // Selecting a subcategory filters by its own real id (exact match below).
+      // Selecting a top-level category must still include its subcategories'
+      // products too — otherwise a direct link to a parent category (e.g. the
+      // footer's quick links) would show nothing once products live on
+      // subcategories rather than directly on the parent.
+      const selectedId = Number(category);
+      const selectedParent = categories?.find((c) => c.id === selectedId);
+      const matchingIds = selectedParent
+        ? [selectedParent.id, ...(selectedParent.children ?? []).map((c) => c.id)]
+        : [selectedId];
+      result = result.filter((p) => matchingIds.includes(p.categoryId));
     }
     if (searchInput.trim()) {
       const q = searchInput.trim().toLowerCase();
@@ -111,7 +121,7 @@ export function ProductsPageClient() {
     }
 
     return result;
-  }, [products, category, searchInput, minPrice, maxPrice, inStockOnly, sort]);
+  }, [products, categories, category, searchInput, minPrice, maxPrice, inStockOnly, sort]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PRODUCTS_PAGE_SIZE));
   const safePage = Math.min(page, totalPages);

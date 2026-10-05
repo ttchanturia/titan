@@ -2,6 +2,7 @@
 
 import type { Category } from '@/lib/types';
 import { useTranslation } from '@/lib/i18n';
+import { CategoryFilterDropdown } from './CategoryFilterDropdown';
 
 export type SortOption = 'name-asc' | 'name-desc' | 'price-asc' | 'price-desc';
 
@@ -63,18 +64,11 @@ export function ProductFilters({
         <label className="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2 block">
           {t('filters_category_label')}
         </label>
-        <select
-          className={selectClasses}
+        <CategoryFilterDropdown
+          categories={categories}
           value={category}
-          onChange={(e) => onCategoryChange(e.target.value)}
-        >
-          <option value="">{t('filters_all_categories')}</option>
-          {categories?.map((c) => (
-            <option key={c.id} value={String(c.id)}>
-              {c.name}
-            </option>
-          ))}
-        </select>
+          onChange={onCategoryChange}
+        />
       </div>
 
       <div className="flex gap-3">

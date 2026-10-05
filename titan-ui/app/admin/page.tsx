@@ -21,6 +21,7 @@ const MAX_IMAGES = 3;
 const emptyForm = {
   name: '',
   description: '',
+  descriptionKa: '',
   price: '',
   categoryId: '',
   imageUrls: [] as string[],
@@ -72,6 +73,7 @@ function AdminPageContent() {
     setForm({
       name: product.name,
       description: product.description ?? '',
+      descriptionKa: product.descriptionKa ?? '',
       price: String(product.price),
       categoryId: String(product.categoryId),
       imageUrls: product.imageUrls?.length
@@ -148,6 +150,7 @@ function AdminPageContent() {
     const payload = {
       name: form.name.trim(),
       description: form.description.trim() || undefined,
+      descriptionKa: form.descriptionKa.trim() || undefined,
       price,
       categoryId,
       imageUrls: form.imageUrls,
@@ -232,6 +235,19 @@ function AdminPageContent() {
           />
         </div>
 
+        <div className="md:col-span-2">
+          <label className="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2 block">
+            {t('admin_description_ka_label')}
+          </label>
+          <textarea
+            value={form.descriptionKa}
+            onChange={handleChange('descriptionKa')}
+            rows={3}
+            placeholder={t('admin_description_ka_placeholder')}
+            className={inputClasses}
+          />
+        </div>
+
         <div>
           <label className="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2 block">
             {t('admin_price_label')}
@@ -272,9 +288,14 @@ function AdminPageContent() {
           >
             <option value="">{t('admin_select_category')}</option>
             {categories?.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-              </option>
+              <optgroup key={c.id} label={c.name}>
+                <option value={c.id}>{c.name}</option>
+                {c.children?.map((sub) => (
+                  <option key={sub.id} value={sub.id}>
+                    {sub.name}
+                  </option>
+                ))}
+              </optgroup>
             ))}
           </select>
         </div>

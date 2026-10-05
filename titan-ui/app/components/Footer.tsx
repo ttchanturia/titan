@@ -2,15 +2,16 @@
 
 import Link from 'next/link';
 import { useCategories } from '@/lib/hooks';
-import { useTranslation } from '@/lib/i18n';
+import { useTranslation, localizedText } from '@/lib/i18n';
 
 export default function Footer() {
   const { data: categories } = useCategories();
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const productLinks = categories?.length
-    ? categories
-        .slice(0, 4)
-        .map((c) => ({ label: c.name, href: `/products?category=${c.id}` }))
+    ? categories.slice(0, 4).map((c) => ({
+        label: localizedText(c.name, c.nameKa, locale) ?? c.name,
+        href: `/products?category=${c.id}`,
+      }))
     : [{ label: t('footer_shop_all'), href: '/products' }];
 
   return (
