@@ -18,16 +18,18 @@ public class CategoryRepository
         await using var conn = new NpgsqlConnection(_connectionString);
         await conn.OpenAsync();
 
-        await using var cmd = new NpgsqlCommand("SELECT id, name, description FROM categories ORDER BY id", conn);
+        var sql = """
+            SELECT c.id, c.name, c.name_ka, c.description, c.parent_id, p.name AS parent_name
+            FROM categories c
+            LEFT JOIN categories p ON p.id = c.parent_id
+            ORDER BY c.id
+            """;
+
+        await using var cmd = new NpgsqlCommand(sql, conn);
         await using var reader = await cmd.ExecuteReaderAsync();
         while (await reader.ReadAsync())
         {
-            categories.Add(new Category
-            {
-                Id = reader.GetInt32(0),
-                Name = reader.GetString(1),
-                Description = reader.IsDBNull(2) ? null : reader.GetString(2)
-            });
+            categories.Add(MapCategory(reader));
         }
         return categories;
     }
@@ -37,20 +39,18 @@ public class CategoryRepository
         await using var conn = new NpgsqlConnection(_connectionString);
         await conn.OpenAsync();
 
-        await using var cmd = new NpgsqlCommand("SELECT id, name, description FROM categories WHERE id = @id", conn);
+        var sql = """
+            SELECT c.id, c.name, c.name_ka, c.description, c.parent_id, p.name AS parent_name
+            FROM categories c
+            LEFT JOIN categories p ON p.id = c.parent_id
+            WHERE c.id = @id
+            """;
+
+        await using var cmd = new NpgsqlCommand(sql, conn);
         cmd.Parameters.AddWithValue("id", id);
 
         await using var reader = await cmd.ExecuteReaderAsync();
-        if (await reader.ReadAsync())
-        {
-            return new Category
-            {
-                Id = reader.GetInt32(0),
-                Name = reader.GetString(1),
-                Description = reader.IsDBNull(2) ? null : reader.GetString(2)
-            };
-        }
-        return null;
+        return await reader.ReadAsync() ? MapCategory(reader) : null;
     }
 
     public async Task<Category> CreateAsync(Category category)
@@ -58,10 +58,17 @@ public class CategoryRepository
         await using var conn = new NpgsqlConnection(_connectionString);
         await conn.OpenAsync();
 
-        await using var cmd = new NpgsqlCommand(
-            "INSERT INTO categories (name, description) VALUES (@name, @desc) RETURNING id", conn);
+        var sql = """
+            INSERT INTO categories (name, name_ka, description, parent_id)
+            VALUES (@name, @nameKa, @desc, @parentId)
+            RETURNING id
+            """;
+
+        await using var cmd = new NpgsqlCommand(sql, conn);
         cmd.Parameters.AddWithValue("name", category.Name);
+        cmd.Parameters.AddWithValue("nameKa", (object?)category.NameKa ?? DBNull.Value);
         cmd.Parameters.AddWithValue("desc", (object?)category.Description ?? DBNull.Value);
+        cmd.Parameters.AddWithValue("parentId", (object?)category.ParentId ?? DBNull.Value);
 
         category.Id = (int)(await cmd.ExecuteScalarAsync())!;
         return category;
@@ -72,11 +79,18 @@ public class CategoryRepository
         await using var conn = new NpgsqlConnection(_connectionString);
         await conn.OpenAsync();
 
-        await using var cmd = new NpgsqlCommand(
-            "UPDATE categories SET name = @name, description = @desc WHERE id = @id", conn);
+        var sql = """
+            UPDATE categories
+            SET name = @name, name_ka = @nameKa, description = @desc, parent_id = @parentId
+            WHERE id = @id
+            """;
+
+        await using var cmd = new NpgsqlCommand(sql, conn);
         cmd.Parameters.AddWithValue("id", id);
         cmd.Parameters.AddWithValue("name", category.Name);
+        cmd.Parameters.AddWithValue("nameKa", (object?)category.NameKa ?? DBNull.Value);
         cmd.Parameters.AddWithValue("desc", (object?)category.Description ?? DBNull.Value);
+        cmd.Parameters.AddWithValue("parentId", (object?)category.ParentId ?? DBNull.Value);
 
         return await cmd.ExecuteNonQueryAsync() > 0;
     }
@@ -90,5 +104,18 @@ public class CategoryRepository
         cmd.Parameters.AddWithValue("id", id);
 
         return await cmd.ExecuteNonQueryAsync() > 0;
+    }
+
+    private static Category MapCategory(NpgsqlDataReader reader)
+    {
+        return new Category
+        {
+            Id = reader.GetInt32(0),
+            Name = reader.GetString(1),
+            NameKa = reader.IsDBNull(2) ? null : reader.GetString(2),
+            Description = reader.IsDBNull(3) ? null : reader.GetString(3),
+            ParentId = reader.IsDBNull(4) ? null : reader.GetInt32(4),
+            ParentName = reader.IsDBNull(5) ? null : reader.GetString(5)
+        };
     }
 }

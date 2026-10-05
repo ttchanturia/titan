@@ -17,6 +17,7 @@ const emptyForm = {
   description: '',
   price: '',
   categoryId: '',
+  subcategoryId: '',
   imageUrl: '',
   stockQuantity: '',
 };
@@ -43,6 +44,15 @@ export default function AdminProductsPage() {
 
   const isSaving = createProduct.isPending || updateProduct.isPending;
 
+  // Categories form a single level of nesting: a top-level category plus,
+  // optionally, subcategories under it (e.g. Guitars -> Electric Guitars).
+  const topLevelCategories = categories?.filter((c) => c.parentId == null);
+  const selectedParentId = form.categoryId ? parseInt(form.categoryId, 10) : null;
+  const subcategoryOptions =
+    selectedParentId != null
+      ? categories?.filter((c) => c.parentId === selectedParentId)
+      : [];
+
   const handleChange =
     (field: keyof FormState) =>
     (
@@ -51,14 +61,24 @@ export default function AdminProductsPage() {
       setForm((f) => ({ ...f, [field]: e.target.value }));
     };
 
+  const handleCategoryChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    // Changing the top-level category invalidates whatever subcategory was picked
+    setForm((f) => ({ ...f, categoryId: e.target.value, subcategoryId: '' }));
+  };
+
   const handleEditClick = (product: Product) => {
     setEditingId(product.id);
     setFormError(null);
+    const assignedCategory = categories?.find((c) => c.id === product.categoryId);
+    const isSubcategory = assignedCategory?.parentId != null;
     setForm({
       name: product.name,
       description: product.description ?? '',
       price: String(product.price),
-      categoryId: String(product.categoryId),
+      categoryId: isSubcategory
+        ? String(assignedCategory!.parentId)
+        : String(product.categoryId),
+      subcategoryId: isSubcategory ? String(product.categoryId) : '',
       imageUrl: product.imageUrl ?? '',
       stockQuantity: String(product.stockQuantity),
     });
@@ -75,7 +95,10 @@ export default function AdminProductsPage() {
     setFormError(null);
 
     const price = parseFloat(form.price);
-    const categoryId = parseInt(form.categoryId, 10);
+    // A subcategory, when picked, is the more specific choice and wins
+    const categoryId = form.subcategoryId
+      ? parseInt(form.subcategoryId, 10)
+      : parseInt(form.categoryId, 10);
     const stockQuantity = form.stockQuantity ? parseInt(form.stockQuantity, 10) : 0;
 
     if (!form.name.trim() || !Number.isFinite(price) || !Number.isFinite(categoryId)) {
@@ -190,17 +213,37 @@ export default function AdminProductsPage() {
           <select
             required
             value={form.categoryId}
-            onChange={handleChange('categoryId')}
+            onChange={handleCategoryChange}
             className={selectClasses}
           >
             <option value="">{t('admin_select_category')}</option>
-            {categories?.map((c) => (
+            {topLevelCategories?.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.name}
               </option>
             ))}
           </select>
         </div>
+
+        {subcategoryOptions && subcategoryOptions.length > 0 && (
+          <div>
+            <label className="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2 block">
+              {t('admin_subcategory_label')}
+            </label>
+            <select
+              value={form.subcategoryId}
+              onChange={handleChange('subcategoryId')}
+              className={selectClasses}
+            >
+              <option value="">{t('admin_no_subcategory_option')}</option>
+              {subcategoryOptions.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
 
         <div>
           <label className="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2 block">
@@ -276,38 +319,47 @@ export default function AdminProductsPage() {
                 </tr>
               </thead>
               <tbody>
-                {products.map((p) => (
-                  <tr
-                    key={p.id}
-                    className={
-                      p.id === editingId
-                        ? 'border-b border-outline-variant/50 bg-primary/5'
-                        : 'border-b border-outline-variant/50'
-                    }
-                  >
-                    <td className="py-3 pr-4">{p.name}</td>
-                    <td className="py-3 pr-4">{p.categoryName ?? p.categoryId}</td>
-                    <td className="py-3 pr-4">${p.price.toFixed(2)}</td>
-                    <td className="py-3 pr-4">{p.stockQuantity}</td>
-                    <td className="py-3 flex gap-4">
-                      <button
-                        type="button"
-                        onClick={() => handleEditClick(p)}
-                        className="text-primary hover:underline"
-                      >
-                        {t('admin_edit')}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleDelete(p.id, p.name)}
-                        disabled={deleteProduct.isPending}
-                        className="text-red-600 hover:underline disabled:opacity-50"
-                      >
-                        {t('admin_delete')}
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                {products.map((p) => {
+                  const assignedCategory = categories?.find(
+                    (c) => c.id === p.categoryId,
+                  );
+                  const categoryDisplay = assignedCategory?.parentName
+                    ? `${assignedCategory.parentName} / ${assignedCategory.name}`
+                    : (p.categoryName ?? p.categoryId);
+
+                  return (
+                    <tr
+                      key={p.id}
+                      className={
+                        p.id === editingId
+                          ? 'border-b border-outline-variant/50 bg-primary/5'
+                          : 'border-b border-outline-variant/50'
+                      }
+                    >
+                      <td className="py-3 pr-4">{p.name}</td>
+                      <td className="py-3 pr-4">{categoryDisplay}</td>
+                      <td className="py-3 pr-4">${p.price.toFixed(2)}</td>
+                      <td className="py-3 pr-4">{p.stockQuantity}</td>
+                      <td className="py-3 flex gap-4">
+                        <button
+                          type="button"
+                          onClick={() => handleEditClick(p)}
+                          className="text-primary hover:underline"
+                        >
+                          {t('admin_edit')}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDelete(p.id, p.name)}
+                          disabled={deleteProduct.isPending}
+                          className="text-red-600 hover:underline disabled:opacity-50"
+                        >
+                          {t('admin_delete')}
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

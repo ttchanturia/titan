@@ -68,6 +68,26 @@ export const categoryApi = {
     const response = await axiosInstance.get<Category>(`/categories/${id}`);
     return response.data;
   },
+
+  create: async (
+    category: Omit<Category, 'id' | 'parentName'>,
+  ): Promise<Category> => {
+    const response = await axiosInstance.post<Category>(
+      '/categories',
+      category,
+    );
+    return response.data;
+  },
+
+  update: async (id: number, category: Partial<Category>): Promise<boolean> => {
+    const response = await axiosInstance.put(`/categories/${id}`, category);
+    return response.status === 204 || response.status === 200;
+  },
+
+  delete: async (id: number): Promise<boolean> => {
+    const response = await axiosInstance.delete(`/categories/${id}`);
+    return response.status === 204 || response.status === 200;
+  },
 };
 
 // Auth API calls

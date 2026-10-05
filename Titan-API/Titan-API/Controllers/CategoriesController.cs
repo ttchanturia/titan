@@ -41,6 +41,9 @@ public class CategoriesController : ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id, Category category)
     {
+        if (category.ParentId == id)
+            return BadRequest("A category cannot be its own parent.");
+
         var updated = await _repo.UpdateAsync(id, category);
         return updated ? NoContent() : NotFound();
     }
