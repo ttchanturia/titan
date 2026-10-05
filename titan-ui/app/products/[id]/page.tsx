@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useProduct } from '@/lib/hooks';
 import { DEFAULT_PRODUCT_IMAGE } from '@/lib/constants';
@@ -8,7 +8,7 @@ import { useParams } from 'next/navigation';
 import Nav from '@/app/components/Nav';
 import Footer from '@/app/components/Footer';
 import { useCart } from '@/lib/cart-context';
-import { useTranslation } from '@/lib/i18n';
+import { useTranslation, localizedText } from '@/lib/i18n';
 
 export default function ProductPage() {
   const params = useParams();
@@ -17,7 +17,13 @@ export default function ProductPage() {
   const { data: product, isLoading, error } = useProduct(id);
   const { addItem } = useCart();
   const [added, setAdded] = useState(false);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
   const { t, locale } = useTranslation();
+
+  // Reset which image is active when navigating to a different product.
+  useEffect(() => {
+    setActiveImageIndex(0);
+  }, [id]);
 
   const handleAddToCart = () => {
     if (!product) return;
@@ -108,6 +114,13 @@ export default function ProductPage() {
         ? { label: t('product_stock_low'), color: 'bg-amber-500' }
         : { label: t('product_stock_out'), color: 'bg-red-500' };
 
+  const images = product.imageUrls?.length
+    ? product.imageUrls
+    : product.imageUrl
+      ? [product.imageUrl]
+      : [];
+  const mainImage = images[activeImageIndex] ?? images[0] ?? DEFAULT_PRODUCT_IMAGE;
+
   return (
     <>
       <Nav />
@@ -133,27 +146,52 @@ export default function ProductPage() {
             {/* Product Details */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
               {/* Image */}
-              <div className="relative bg-surface-container-high aspect-square rounded overflow-hidden">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={product.imageUrl || DEFAULT_PRODUCT_IMAGE}
-                  alt={product.name}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute top-6 right-6">
-                  <span
-                    className={`${stockStatus.color} text-white text-sm font-bold px-4 py-2 rounded-full`}
-                  >
-                    {stockStatus.label}
-                  </span>
+              <div>
+                <div className="relative bg-surface-container-high aspect-square rounded overflow-hidden">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={mainImage}
+                    alt={product.name}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute top-6 right-6">
+                    <span
+                      className={`${stockStatus.color} text-white text-sm font-bold px-4 py-2 rounded-full`}
+                    >
+                      {stockStatus.label}
+                    </span>
+                  </div>
                 </div>
+                {images.length > 1 && (
+                  <div className="flex gap-3 mt-4">
+                    {images.map((url, index) => (
+                      <button
+                        key={url}
+                        type="button"
+                        onClick={() => setActiveImageIndex(index)}
+                        className={`w-16 h-16 rounded overflow-hidden border-2 transition-colors ${
+                          index === activeImageIndex
+                            ? 'border-primary'
+                            : 'border-transparent hover:border-outline'
+                        }`}
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={url}
+                          alt=""
+                          className="w-full h-full object-cover"
+                        />
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Info */}
               <div className="flex flex-col justify-start">
                 {product.categoryName && (
                   <p className="text-sm text-on-surface-variant mb-2 uppercase font-semibold tracking-wide">
-                    {product.categoryName}
+                    {localizedText(product.categoryName, product.categoryNameKa, locale)}
                   </p>
                 )}
 
@@ -162,12 +200,12 @@ export default function ProductPage() {
                 </h1>
 
                 <p className="text-3xl font-headline font-bold text-primary mb-8">
-                  ${product.price.toFixed(2)}
+                  ₾{product.price.toFixed(2)}
                 </p>
 
                 {product.description && (
                   <p className="text-lg text-on-surface-variant mb-8 leading-relaxed">
-                    {product.description}
+                    {localizedText(product.description, product.descriptionKa, locale)}
                   </p>
                 )}
 
@@ -240,13 +278,14 @@ export default function ProductPage() {
                   <span className="font-semibold text-on-surface">
                     {t('product_category_label')}
                   </span>{' '}
-                  {product.categoryName || t('product_uncategorized')}
+                  {localizedText(product.categoryName, product.categoryNameKa, locale) ||
+                    t('product_uncategorized')}
                 </li>
                 <li>
                   <span className="font-semibold text-on-surface">
                     {t('product_price_label')}
                   </span>{' '}
-                  ${product.price.toFixed(2)}
+                  ₾{product.price.toFixed(2)}
                 </li>
                 <li>
                   <span className="font-semibold text-on-surface">

@@ -35,10 +35,17 @@ public class ProductsController : ControllerBase
         return await _repo.GetByCategoryAsync(categoryId);
     }
 
+    private const int MaxImages = 3;
+
     [Authorize]
     [HttpPost]
     public async Task<ActionResult<Product>> Create(Product product)
     {
+        if (product.ImageUrls?.Count > MaxImages)
+        {
+            return BadRequest(new { error = $"A product can have at most {MaxImages} images." });
+        }
+
         var created = await _repo.CreateAsync(product);
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
@@ -47,6 +54,11 @@ public class ProductsController : ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id, Product product)
     {
+        if (product.ImageUrls?.Count > MaxImages)
+        {
+            return BadRequest(new { error = $"A product can have at most {MaxImages} images." });
+        }
+
         var updated = await _repo.UpdateAsync(id, product);
         return updated ? NoContent() : NotFound();
     }
