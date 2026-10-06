@@ -9,6 +9,7 @@ import {
   useDeleteCategory,
 } from '@/lib/hooks';
 import type { Category } from '@/lib/types';
+import { flattenCategories } from '@/lib/categories';
 import { useTranslation } from '@/lib/i18n';
 
 const emptyForm = {
@@ -114,14 +115,19 @@ export default function AdminCategoriesPage() {
     }
   };
 
-  // A category can't be assigned as its own parent
-  const parentOptions = categories?.filter((c) => c.id !== editingId);
+  // The API nests subcategories under their parent (`children`), so flatten first.
+  // Only two levels are supported: a parent must be top-level, and a category
+  // can't be its own parent.
+  const allCategories = flattenCategories(categories);
+  const parentOptions = allCategories.filter(
+    (c) => c.parentId == null && c.id !== editingId,
+  );
 
   // Group for display: each top-level category followed by its own subcategories,
   // so the hierarchy the admin just built is actually visible in the table.
-  const topLevelCategories = categories?.filter((c) => c.parentId == null) ?? [];
+  const topLevelCategories = allCategories.filter((c) => c.parentId == null);
   const subcategoriesByParent = new Map<number, Category[]>();
-  categories?.forEach((c) => {
+  allCategories.forEach((c) => {
     if (c.parentId != null) {
       subcategoriesByParent.set(c.parentId, [
         ...(subcategoriesByParent.get(c.parentId) ?? []),
@@ -245,11 +251,11 @@ export default function AdminCategoriesPage() {
           </p>
         )}
 
-        {categories && categories.length === 0 && (
+        {categories && allCategories.length === 0 && (
           <p className="text-on-surface-variant text-sm">{t('admin_no_categories')}</p>
         )}
 
-        {categories && categories.length > 0 && (
+        {categories && allCategories.length > 0 && (
           <div className="overflow-x-auto">
             <table className="w-full text-sm text-left">
               <thead>

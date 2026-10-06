@@ -122,6 +122,19 @@ public class CategoryRepository
         return await cmd.ExecuteNonQueryAsync() > 0;
     }
 
+    /// <summary>True when at least one category is nested directly under this one.</summary>
+    public async Task<bool> HasChildrenAsync(int id)
+    {
+        await using var conn = new NpgsqlConnection(_connectionString);
+        await conn.OpenAsync();
+
+        await using var cmd = new NpgsqlCommand(
+            "SELECT EXISTS (SELECT 1 FROM categories WHERE parent_id = @id)", conn);
+        cmd.Parameters.AddWithValue("id", id);
+
+        return (bool)(await cmd.ExecuteScalarAsync())!;
+    }
+
     public async Task<bool> DeleteAsync(int id)
     {
         await using var conn = new NpgsqlConnection(_connectionString);

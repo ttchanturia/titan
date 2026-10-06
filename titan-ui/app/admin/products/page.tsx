@@ -12,6 +12,7 @@ import {
   useUploadImage,
 } from '@/lib/hooks';
 import type { Product } from '@/lib/types';
+import { flattenCategories } from '@/lib/categories';
 import { useTranslation } from '@/lib/i18n';
 import { MAX_UPLOAD_SIZE_BYTES, MAX_UPLOAD_SIZE_MB } from '@/lib/constants';
 
@@ -52,11 +53,13 @@ export default function AdminProductsPage() {
 
   // Categories form a single level of nesting: a top-level category plus,
   // optionally, subcategories under it (e.g. Guitars -> Electric Guitars).
-  const topLevelCategories = categories?.filter((c) => c.parentId == null);
+  // The API nests subcategories under their parent (`children`), so flatten first.
+  const allCategories = flattenCategories(categories);
+  const topLevelCategories = allCategories.filter((c) => c.parentId == null);
   const selectedParentId = form.categoryId ? parseInt(form.categoryId, 10) : null;
   const subcategoryOptions =
     selectedParentId != null
-      ? categories?.filter((c) => c.parentId === selectedParentId)
+      ? allCategories.filter((c) => c.parentId === selectedParentId)
       : [];
 
   const handleChange =
@@ -75,7 +78,7 @@ export default function AdminProductsPage() {
   const handleEditClick = (product: Product) => {
     setEditingId(product.id);
     setFormError(null);
-    const assignedCategory = categories?.find((c) => c.id === product.categoryId);
+    const assignedCategory = allCategories.find((c) => c.id === product.categoryId);
     const isSubcategory = assignedCategory?.parentId != null;
     setForm({
       name: product.name,
@@ -409,7 +412,7 @@ export default function AdminProductsPage() {
               </thead>
               <tbody>
                 {products.map((p) => {
-                  const assignedCategory = categories?.find(
+                  const assignedCategory = allCategories.find(
                     (c) => c.id === p.categoryId,
                   );
                   const categoryDisplay = assignedCategory?.parentName

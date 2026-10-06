@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import type { Category } from '@/lib/types';
+import { flattenCategories } from '@/lib/categories';
 import { useTranslation, localizedText } from '@/lib/i18n';
 
 interface CategoryFilterDropdownProps {
@@ -29,12 +30,6 @@ function Chevron({ expanded }: { expanded: boolean }) {
   );
 }
 
-/** Parents plus every nested child, flattened one level (the tree is only ever two deep). */
-function flatten(categories: Category[] | undefined): Category[] {
-  if (!categories) return [];
-  return categories.flatMap((c) => [c, ...(c.children ?? [])]);
-}
-
 export function CategoryFilterDropdown({
   categories,
   value,
@@ -48,7 +43,7 @@ export function CategoryFilterDropdown({
   // The selected entry is looked up fresh from the fetched tree by its real id
   // every render, so the trigger label always reflects live API data (both the
   // current locale and any future admin edits) rather than a stale local copy.
-  const selected = flatten(categories).find((c) => String(c.id) === value);
+  const selected = flattenCategories(categories).find((c) => String(c.id) === value);
   const triggerLabel = selected
     ? localizedText(selected.name, selected.nameKa, locale)
     : t('filters_all_categories');
