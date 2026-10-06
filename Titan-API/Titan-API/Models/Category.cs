@@ -4,6 +4,7 @@ public class Category
 {
     public int Id { get; set; }
     public string Name { get; set; } = string.Empty;
+    public string? NameKa { get; set; }
     public string? Description { get; set; }
 
     /// <summary>Georgian display name. Optional — not every category has been translated yet.</summary>

@@ -91,8 +91,8 @@ public class CategoryRepository
             "INSERT INTO categories (name, description, name_ka, parent_id) VALUES (@name, @desc, @nameKa, @parentId) RETURNING id",
             conn);
         cmd.Parameters.AddWithValue("name", category.Name);
-        cmd.Parameters.AddWithValue("desc", (object?)category.Description ?? DBNull.Value);
         cmd.Parameters.AddWithValue("nameKa", (object?)category.NameKa ?? DBNull.Value);
+        cmd.Parameters.AddWithValue("desc", (object?)category.Description ?? DBNull.Value);
         cmd.Parameters.AddWithValue("parentId", (object?)category.ParentId ?? DBNull.Value);
 
         category.Id = (int)(await cmd.ExecuteScalarAsync())!;
@@ -109,8 +109,8 @@ public class CategoryRepository
             conn);
         cmd.Parameters.AddWithValue("id", id);
         cmd.Parameters.AddWithValue("name", category.Name);
-        cmd.Parameters.AddWithValue("desc", (object?)category.Description ?? DBNull.Value);
         cmd.Parameters.AddWithValue("nameKa", (object?)category.NameKa ?? DBNull.Value);
+        cmd.Parameters.AddWithValue("desc", (object?)category.Description ?? DBNull.Value);
         cmd.Parameters.AddWithValue("parentId", (object?)category.ParentId ?? DBNull.Value);
 
         return await cmd.ExecuteNonQueryAsync() > 0;
@@ -125,5 +125,18 @@ public class CategoryRepository
         cmd.Parameters.AddWithValue("id", id);
 
         return await cmd.ExecuteNonQueryAsync() > 0;
+    }
+
+    private static Category MapCategory(NpgsqlDataReader reader)
+    {
+        return new Category
+        {
+            Id = reader.GetInt32(0),
+            Name = reader.GetString(1),
+            NameKa = reader.IsDBNull(2) ? null : reader.GetString(2),
+            Description = reader.IsDBNull(3) ? null : reader.GetString(3),
+            ParentId = reader.IsDBNull(4) ? null : reader.GetInt32(4),
+            ParentName = reader.IsDBNull(5) ? null : reader.GetString(5)
+        };
     }
 }

@@ -63,10 +63,13 @@ public class DatabaseInitializer
             CREATE TABLE IF NOT EXISTS categories (
                 id SERIAL PRIMARY KEY,
                 name VARCHAR(100) NOT NULL,
-                description TEXT,
                 name_ka VARCHAR(100),
-                parent_id INT REFERENCES categories(id)
+                description TEXT,
+                parent_id INT REFERENCES categories(id) ON DELETE SET NULL
             );
+
+            ALTER TABLE categories ADD COLUMN IF NOT EXISTS name_ka VARCHAR(100);
+            ALTER TABLE categories ADD COLUMN IF NOT EXISTS parent_id INT REFERENCES categories(id) ON DELETE SET NULL;
 
             CREATE TABLE IF NOT EXISTS products (
                 id SERIAL PRIMARY KEY,

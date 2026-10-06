@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, type FormEvent, type ReactNode } from 'react';
+import axios from 'axios';
 import { authApi } from '@/lib/api';
 import {
   clearStoredAuthHeader,
@@ -31,8 +32,11 @@ export function AdminLoginGate({ children }: { children: ReactNode }) {
       await authApi.verify(username, password);
       setStoredAuthHeader(username, password);
       setAuthed(true);
-    } catch {
-      setError(t('admin_login_error'));
+    } catch (err) {
+      // Distinguish "wrong credentials" from "couldn't reach the API" —
+      // the latter has no response at all (network error, server not running).
+      const unreachable = axios.isAxiosError(err) && !err.response;
+      setError(t(unreachable ? 'admin_login_unreachable' : 'admin_login_error'));
     } finally {
       setIsSubmitting(false);
     }

@@ -18,6 +18,7 @@ export interface Product {
 export interface Category {
   id: number;
   name: string;
+  nameKa?: string;
   description?: string;
   nameKa?: string;
   /** Null/undefined for a top-level category; otherwise the id of its parent. */
