@@ -13,7 +13,7 @@ import {
 } from '@/lib/hooks';
 import type { Product } from '@/lib/types';
 import { flattenCategories } from '@/lib/categories';
-import { useTranslation } from '@/lib/i18n';
+import { useTranslation, localizedText } from '@/lib/i18n';
 import { MAX_UPLOAD_SIZE_BYTES, MAX_UPLOAD_SIZE_MB } from '@/lib/constants';
 
 const MAX_IMAGES = 3;
@@ -36,7 +36,7 @@ const selectClasses =
   'w-full bg-surface border-b border-outline-variant py-3 focus:outline-none focus:border-primary transition-colors text-sm font-body';
 
 export default function AdminProductsPage() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const { data: products, isLoading, error } = useProducts();
   const { data: categories } = useCategories();
   const createProduct = useCreateProduct();
@@ -54,6 +54,10 @@ export default function AdminProductsPage() {
   // The picker lists each top-level category followed by its subcategories, and
   // any entry can be chosen directly.
   const allCategories = flattenCategories(categories);
+  // Admin labels follow the admin's current locale, falling back to English
+  // when a category has no Georgian name yet.
+  const categoryLabel = (c: { name: string; nameKa?: string }) =>
+    localizedText(c.name, c.nameKa, locale) ?? c.name;
 
   const handleChange =
     (field: keyof FormState) =>
@@ -254,10 +258,10 @@ export default function AdminProductsPage() {
             <option value="">{t('admin_select_category')}</option>
             {categories?.map((parent) => (
               <Fragment key={parent.id}>
-                <option value={parent.id}>{parent.name}</option>
+                <option value={parent.id}>{categoryLabel(parent)}</option>
                 {(parent.children ?? []).map((sub) => (
                   <option key={sub.id} value={sub.id}>
-                    {`  ↳ ${sub.name}`}
+                    {`  ↳ ${categoryLabel(sub)}`}
                   </option>
                 ))}
               </Fragment>
@@ -380,9 +384,16 @@ export default function AdminProductsPage() {
                   const assignedCategory = allCategories.find(
                     (c) => c.id === p.categoryId,
                   );
-                  const categoryDisplay = assignedCategory?.parentName
-                    ? `${assignedCategory.parentName} / ${assignedCategory.name}`
-                    : (p.categoryName ?? p.categoryId);
+                  const parentCategory =
+                    assignedCategory?.parentId != null
+                      ? allCategories.find((c) => c.id === assignedCategory.parentId)
+                      : undefined;
+                  const categoryDisplay = assignedCategory
+                    ? parentCategory
+                      ? `${categoryLabel(parentCategory)} / ${categoryLabel(assignedCategory)}`
+                      : categoryLabel(assignedCategory)
+                    : (localizedText(p.categoryName, p.categoryNameKa, locale) ??
+                      p.categoryId);
 
                   return (
                     <tr
