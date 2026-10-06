@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type ChangeEvent, type FormEvent } from 'react';
+import { Fragment, useState, type ChangeEvent, type FormEvent } from 'react';
 import { isAxiosError } from 'axios';
 import { AdminPageHeader } from '../../components/AdminPageHeader';
 import {
@@ -51,11 +51,9 @@ export default function AdminProductsPage() {
   const isSaving = createProduct.isPending || updateProduct.isPending;
 
   // The API nests subcategories under their parent (`children`), so flatten first.
-  // A product gets one category: the most specific one, a subcategory when there
-  // is one. The picker shows top-level categories with their subcategories grouped
-  // under them, and each parent also stays selectable for products that sit on it.
+  // The picker lists each top-level category followed by its subcategories, and
+  // any entry can be chosen directly.
   const allCategories = flattenCategories(categories);
-  const topLevelCategories = allCategories.filter((c) => c.parentId == null);
 
   const handleChange =
     (field: keyof FormState) =>
@@ -254,26 +252,16 @@ export default function AdminProductsPage() {
             className={selectClasses}
           >
             <option value="">{t('admin_select_category')}</option>
-            {topLevelCategories.map((parent) => {
-              const children = parent.children ?? [];
-              if (children.length === 0) {
-                return (
-                  <option key={parent.id} value={parent.id}>
-                    {parent.name}
+            {categories?.map((parent) => (
+              <Fragment key={parent.id}>
+                <option value={parent.id}>{parent.name}</option>
+                {(parent.children ?? []).map((sub) => (
+                  <option key={sub.id} value={sub.id}>
+                    {`  ↳ ${sub.name}`}
                   </option>
-                );
-              }
-              return (
-                <optgroup key={parent.id} label={parent.name}>
-                  <option value={parent.id}>{t('admin_category_general_option')}</option>
-                  {children.map((sub) => (
-                    <option key={sub.id} value={sub.id}>
-                      {sub.name}
-                    </option>
-                  ))}
-                </optgroup>
-              );
-            })}
+                ))}
+              </Fragment>
+            ))}
           </select>
         </div>
 
