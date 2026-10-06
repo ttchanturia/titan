@@ -40,8 +40,7 @@ public class CategoryRepository
                 Name = reader.GetString(1),
                 Description = reader.IsDBNull(2) ? null : reader.GetString(2),
                 NameKa = reader.IsDBNull(3) ? null : reader.GetString(3),
-                ParentId = reader.IsDBNull(4) ? null : reader.GetInt32(4),
-                ParentName = reader.IsDBNull(5) ? null : reader.GetString(5)
+                ParentId = reader.IsDBNull(4) ? null : reader.GetInt32(4)
             };
             byId[category.Id] = category;
 
