@@ -8,6 +8,7 @@ export const translations = {
     // Nav
     nav_home: 'Home',
     nav_products: 'Products',
+    nav_rental: 'Rental',
     nav_search_placeholder: 'Search products...',
 
     // Footer
@@ -70,6 +71,12 @@ export const translations = {
     products_subtitle:
       'From solid-body electrics to studio monitors and beyond, explore the complete Titan catalogue, engineered for precision at every price point.',
     products_load_error: 'Failed to load products:',
+
+    // Rental listing page (same layout as products; shows products flagged as rentals)
+    rental_badge: 'Rent Instead of Buy',
+    rental_heading: 'Rental',
+    rental_subtitle:
+      'Instruments available to rent. Pick one, check the details, and get in touch to arrange your rental.',
 
     // Product filters
     filters_search_label: 'Search',
@@ -145,6 +152,8 @@ export const translations = {
     // Admin nav
     admin_nav_products: 'Manage Products',
     admin_nav_categories: 'Manage Categories',
+    admin_rental_label: 'Rental',
+    admin_rental_hint: 'List on the Rental page instead of Products',
 
     // Admin page
     admin_badge: 'Admin',
@@ -215,6 +224,7 @@ export const translations = {
     // Nav
     nav_home: 'მთავარი',
     nav_products: 'პროდუქტები',
+    nav_rental: 'გაქირავება',
     nav_search_placeholder: 'მოძებნეთ პროდუქტი...',
 
     // Footer
@@ -277,6 +287,12 @@ export const translations = {
     products_subtitle:
       'სოლიდ-ბოდი ელექტროგიტარებიდან სტუდიურ მონიტორებამდე — გაეცანით Titan-ის სრულ კატალოგს, შექმნილს სიზუსტისთვის ნებისმიერ ფასად.',
     products_load_error: 'პროდუქტების ჩატვირთვა ვერ მოხერხდა:',
+
+    // Rental listing page
+    rental_badge: 'ქირაობა ყიდვის ნაცვლად',
+    rental_heading: 'გაქირავება',
+    rental_subtitle:
+      'ინსტრუმენტები გასაქირავებლად. აირჩიეთ, გაეცანით დეტალებს და დაგვიკავშირდით ქირაობის მოსაწესრიგებლად.',
 
     // Product filters
     filters_search_label: 'ძებნა',
@@ -352,6 +368,8 @@ export const translations = {
     // Admin nav
     admin_nav_products: 'პროდუქტების მართვა',
     admin_nav_categories: 'კატეგორიების მართვა',
+    admin_rental_label: 'გაქირავება',
+    admin_rental_hint: 'გამოჩნდეს გაქირავების გვერდზე პროდუქტების ნაცვლად',
 
     // Admin page
     admin_badge: 'ადმინი',

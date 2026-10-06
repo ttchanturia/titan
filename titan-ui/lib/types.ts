@@ -12,6 +12,8 @@ export interface Product {
   imageUrl?: string;
   imageUrls?: string[];
   stockQuantity: number;
+  /** True when listed on the Rental page instead of the Products page. */
+  isRental?: boolean;
   createdAt: string;
 }
 

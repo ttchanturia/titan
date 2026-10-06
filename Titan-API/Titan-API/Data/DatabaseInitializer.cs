@@ -89,6 +89,10 @@ public class DatabaseInitializer
             SET image_urls = ARRAY[image_url]
             WHERE image_urls IS NULL AND image_url IS NOT NULL;
 
+            -- Added when rental listings were introduced. Products flagged as rentals
+            -- appear on the Rental page instead of the Products page.
+            ALTER TABLE products ADD COLUMN IF NOT EXISTS is_rental BOOLEAN NOT NULL DEFAULT FALSE;
+
             -- Idempotent upgrade path for databases created before these columns existed
             ALTER TABLE categories ADD COLUMN IF NOT EXISTS name_ka VARCHAR(100);
             ALTER TABLE products ADD COLUMN IF NOT EXISTS description_ka TEXT;

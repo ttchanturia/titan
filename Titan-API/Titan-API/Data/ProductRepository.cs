@@ -20,7 +20,7 @@ public class ProductRepository
 
         var sql = """
             SELECT p.id, p.name, p.description, p.description_ka, p.price, p.category_id,
-                   c.name AS category_name, c.name_ka AS category_name_ka, p.image_url, p.stock_quantity, p.created_at, p.image_urls
+                   c.name AS category_name, c.name_ka AS category_name_ka, p.image_url, p.stock_quantity, p.created_at, p.image_urls, p.is_rental
             FROM products p
             LEFT JOIN categories c ON c.id = p.category_id
             ORDER BY p.id
@@ -42,7 +42,7 @@ public class ProductRepository
 
         var sql = """
             SELECT p.id, p.name, p.description, p.description_ka, p.price, p.category_id,
-                   c.name AS category_name, c.name_ka AS category_name_ka, p.image_url, p.stock_quantity, p.created_at, p.image_urls
+                   c.name AS category_name, c.name_ka AS category_name_ka, p.image_url, p.stock_quantity, p.created_at, p.image_urls, p.is_rental
             FROM products p
             LEFT JOIN categories c ON c.id = p.category_id
             WHERE p.id = @id
@@ -63,7 +63,7 @@ public class ProductRepository
 
         var sql = """
             SELECT p.id, p.name, p.description, p.description_ka, p.price, p.category_id,
-                   c.name AS category_name, c.name_ka AS category_name_ka, p.image_url, p.stock_quantity, p.created_at, p.image_urls
+                   c.name AS category_name, c.name_ka AS category_name_ka, p.image_url, p.stock_quantity, p.created_at, p.image_urls, p.is_rental
             FROM products p
             LEFT JOIN categories c ON c.id = p.category_id
             WHERE p.category_id = @categoryId
@@ -91,8 +91,8 @@ public class ProductRepository
         var primaryImageUrl = imageUrls.FirstOrDefault();
 
         var sql = """
-            INSERT INTO products (name, description, description_ka, price, category_id, image_url, image_urls, stock_quantity)
-            VALUES (@name, @desc, @descKa, @price, @categoryId, @imageUrl, @imageUrls, @stock)
+            INSERT INTO products (name, description, description_ka, price, category_id, image_url, image_urls, stock_quantity, is_rental)
+            VALUES (@name, @desc, @descKa, @price, @categoryId, @imageUrl, @imageUrls, @stock, @isRental)
             RETURNING id, created_at
             """;
 
@@ -105,6 +105,7 @@ public class ProductRepository
         cmd.Parameters.AddWithValue("imageUrl", (object?)primaryImageUrl ?? DBNull.Value);
         cmd.Parameters.AddWithValue("imageUrls", imageUrls.ToArray());
         cmd.Parameters.AddWithValue("stock", product.StockQuantity);
+        cmd.Parameters.AddWithValue("isRental", product.IsRental);
 
         await using var reader = await cmd.ExecuteReaderAsync();
         if (await reader.ReadAsync())
@@ -129,7 +130,7 @@ public class ProductRepository
             UPDATE products
             SET name = @name, description = @desc, description_ka = @descKa, price = @price,
                 category_id = @categoryId, image_url = @imageUrl, image_urls = @imageUrls,
-                stock_quantity = @stock
+                stock_quantity = @stock, is_rental = @isRental
             WHERE id = @id
             """;
 
@@ -143,6 +144,7 @@ public class ProductRepository
         cmd.Parameters.AddWithValue("imageUrl", (object?)primaryImageUrl ?? DBNull.Value);
         cmd.Parameters.AddWithValue("imageUrls", imageUrls.ToArray());
         cmd.Parameters.AddWithValue("stock", product.StockQuantity);
+        cmd.Parameters.AddWithValue("isRental", product.IsRental);
 
         return await cmd.ExecuteNonQueryAsync() > 0;
     }
@@ -161,7 +163,7 @@ public class ProductRepository
     // Column order must match the SELECT lists above exactly:
     // 0 id, 1 name, 2 description, 3 description_ka, 4 price, 5 category_id,
     // 6 category_name, 7 category_name_ka, 8 image_url, 9 stock_quantity,
-    // 10 created_at, 11 image_urls
+    // 10 created_at, 11 image_urls, 12 is_rental
     private static Product MapProduct(NpgsqlDataReader reader)
     {
         var imageUrl = reader.IsDBNull(8) ? null : reader.GetString(8);
@@ -184,7 +186,8 @@ public class ProductRepository
             ImageUrl = imageUrls.Count > 0 ? imageUrls[0] : imageUrl,
             ImageUrls = imageUrls,
             StockQuantity = reader.GetInt32(9),
-            CreatedAt = reader.GetDateTime(10)
+            CreatedAt = reader.GetDateTime(10),
+            IsRental = reader.GetBoolean(12)
         };
     }
 }

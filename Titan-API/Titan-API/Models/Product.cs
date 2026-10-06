@@ -18,6 +18,10 @@ public class Product
     public List<string> ImageUrls { get; set; } = new();
 
     public int StockQuantity { get; set; }
+
+    /// <summary>True when the product is listed for rent (Rental page) instead of sale (Products page).</summary>
+    public bool IsRental { get; set; }
+
     public DateTime CreatedAt { get; set; }
 
     /// <summary>

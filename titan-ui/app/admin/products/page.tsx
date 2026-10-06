@@ -25,6 +25,7 @@ const emptyForm = {
   categoryId: '',
   imageUrls: [] as string[],
   stockQuantity: '',
+  isRental: false,
 };
 
 type FormState = typeof emptyForm;
@@ -81,6 +82,7 @@ export default function AdminProductsPage() {
           ? [product.imageUrl]
           : [],
       stockQuantity: String(product.stockQuantity),
+      isRental: Boolean(product.isRental),
     });
   };
 
@@ -152,6 +154,7 @@ export default function AdminProductsPage() {
       categoryId,
       imageUrls: form.imageUrls,
       stockQuantity: Number.isFinite(stockQuantity) ? stockQuantity : 0,
+      isRental: form.isRental,
     };
 
     if (editingId !== null) {
@@ -268,6 +271,21 @@ export default function AdminProductsPage() {
             ))}
           </select>
         </div>
+
+        <label className="md:col-span-2 flex items-center gap-3 text-sm font-body cursor-pointer">
+          <input
+            type="checkbox"
+            checked={form.isRental}
+            onChange={(e) => setForm((f) => ({ ...f, isRental: e.target.checked }))}
+            className="h-4 w-4 accent-primary"
+          />
+          <span>
+            <span className="font-semibold">{t('admin_rental_label')}</span>
+            <span className="block text-xs text-on-surface-variant">
+              {t('admin_rental_hint')}
+            </span>
+          </span>
+        </label>
 
         <div className="md:col-span-2">
           <label className="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2 block">
@@ -405,7 +423,14 @@ export default function AdminProductsPage() {
                       }
                     >
                       <td className="py-3 pr-4">{p.name}</td>
-                      <td className="py-3 pr-4">{categoryDisplay}</td>
+                      <td className="py-3 pr-4">
+                        {categoryDisplay}
+                        {p.isRental && (
+                          <span className="ml-2 text-xs uppercase tracking-widest text-primary">
+                            {t('admin_rental_label')}
+                          </span>
+                        )}
+                      </td>
                       <td className="py-3 pr-4">${p.price.toFixed(2)}</td>
                       <td className="py-3 pr-4">{p.stockQuantity}</td>
                       <td className="py-3 flex gap-4">
