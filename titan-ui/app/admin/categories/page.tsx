@@ -10,7 +10,7 @@ import {
 } from '@/lib/hooks';
 import type { Category } from '@/lib/types';
 import { flattenCategories } from '@/lib/categories';
-import { useTranslation } from '@/lib/i18n';
+import { useTranslation, localizedText } from '@/lib/i18n';
 
 const emptyForm = {
   name: '',
@@ -28,7 +28,7 @@ const selectClasses =
   'w-full bg-surface border-b border-outline-variant py-3 focus:outline-none focus:border-primary transition-colors text-sm font-body';
 
 export default function AdminCategoriesPage() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const { data: categories, isLoading, error } = useCategories();
   const createCategory = useCreateCategory();
   const updateCategory = useUpdateCategory();
@@ -119,6 +119,9 @@ export default function AdminCategoriesPage() {
   // Only two levels are supported: a parent must be top-level, and a category
   // can't be its own parent.
   const allCategories = flattenCategories(categories);
+  // Admin labels follow the admin's current locale, falling back to English
+  // when a category has no Georgian name yet.
+  const categoryLabel = (c: Category) => localizedText(c.name, c.nameKa, locale) ?? c.name;
   const parentOptions = allCategories.filter(
     (c) => c.parentId == null && c.id !== editingId,
   );
@@ -186,7 +189,7 @@ export default function AdminCategoriesPage() {
             <option value="">{t('admin_no_parent_option')}</option>
             {parentOptions?.map((c) => (
               <option key={c.id} value={c.id}>
-                {c.name}
+                {categoryLabel(c)}
               </option>
             ))}
           </select>
@@ -284,6 +287,7 @@ export default function AdminCategoriesPage() {
                       <CategoryRow
                         key={child.id}
                         category={child}
+                        parentLabel={categoryLabel(parent)}
                         isChild
                         isEditing={child.id === editingId}
                         onEdit={handleEditClick}
@@ -306,6 +310,7 @@ export default function AdminCategoriesPage() {
 
 function CategoryRow({
   category,
+  parentLabel,
   isChild,
   isEditing,
   onEdit,
@@ -315,6 +320,8 @@ function CategoryRow({
   t,
 }: {
   category: Category;
+  /** Display name of the parent, already localized. Undefined for top-level rows. */
+  parentLabel?: string;
   isChild: boolean;
   isEditing: boolean;
   onEdit: (category: Category) => void;
@@ -337,7 +344,7 @@ function CategoryRow({
       </td>
       <td className="py-3 pr-4">{category.nameKa || t('admin_no_parent_value')}</td>
       <td className="py-3 pr-4">
-        {category.parentName ?? t('admin_no_parent_value')}
+        {parentLabel ?? t('admin_no_parent_value')}
       </td>
       <td className="py-3 flex gap-4">
         {!isChild && (
