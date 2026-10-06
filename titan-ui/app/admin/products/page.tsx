@@ -23,7 +23,6 @@ const emptyForm = {
   description: '',
   price: '',
   categoryId: '',
-  subcategoryId: '',
   imageUrls: [] as string[],
   stockQuantity: '',
 };
@@ -51,16 +50,12 @@ export default function AdminProductsPage() {
 
   const isSaving = createProduct.isPending || updateProduct.isPending;
 
-  // Categories form a single level of nesting: a top-level category plus,
-  // optionally, subcategories under it (e.g. Guitars -> Electric Guitars).
   // The API nests subcategories under their parent (`children`), so flatten first.
+  // A product gets one category: the most specific one, a subcategory when there
+  // is one. The picker shows top-level categories with their subcategories grouped
+  // under them, and each parent also stays selectable for products that sit on it.
   const allCategories = flattenCategories(categories);
   const topLevelCategories = allCategories.filter((c) => c.parentId == null);
-  const selectedParentId = form.categoryId ? parseInt(form.categoryId, 10) : null;
-  const subcategoryOptions =
-    selectedParentId != null
-      ? allCategories.filter((c) => c.parentId === selectedParentId)
-      : [];
 
   const handleChange =
     (field: keyof FormState) =>
@@ -70,24 +65,14 @@ export default function AdminProductsPage() {
       setForm((f) => ({ ...f, [field]: e.target.value }));
     };
 
-  const handleCategoryChange = (e: ChangeEvent<HTMLSelectElement>) => {
-    // Changing the top-level category invalidates whatever subcategory was picked
-    setForm((f) => ({ ...f, categoryId: e.target.value, subcategoryId: '' }));
-  };
-
   const handleEditClick = (product: Product) => {
     setEditingId(product.id);
     setFormError(null);
-    const assignedCategory = allCategories.find((c) => c.id === product.categoryId);
-    const isSubcategory = assignedCategory?.parentId != null;
     setForm({
       name: product.name,
       description: product.description ?? '',
       price: String(product.price),
-      categoryId: isSubcategory
-        ? String(assignedCategory!.parentId)
-        : String(product.categoryId),
-      subcategoryId: isSubcategory ? String(product.categoryId) : '',
+      categoryId: String(product.categoryId),
       imageUrls: product.imageUrls?.length
         ? product.imageUrls
         : product.imageUrl
@@ -150,10 +135,7 @@ export default function AdminProductsPage() {
     setFormError(null);
 
     const price = parseFloat(form.price);
-    // A subcategory, when picked, is the more specific choice and wins
-    const categoryId = form.subcategoryId
-      ? parseInt(form.subcategoryId, 10)
-      : parseInt(form.categoryId, 10);
+    const categoryId = parseInt(form.categoryId, 10);
     const stockQuantity = form.stockQuantity ? parseInt(form.stockQuantity, 10) : 0;
 
     if (!form.name.trim() || !Number.isFinite(price) || !Number.isFinite(categoryId)) {
@@ -268,37 +250,32 @@ export default function AdminProductsPage() {
           <select
             required
             value={form.categoryId}
-            onChange={handleCategoryChange}
+            onChange={handleChange('categoryId')}
             className={selectClasses}
           >
             <option value="">{t('admin_select_category')}</option>
-            {topLevelCategories?.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-              </option>
-            ))}
+            {topLevelCategories.map((parent) => {
+              const children = parent.children ?? [];
+              if (children.length === 0) {
+                return (
+                  <option key={parent.id} value={parent.id}>
+                    {parent.name}
+                  </option>
+                );
+              }
+              return (
+                <optgroup key={parent.id} label={parent.name}>
+                  <option value={parent.id}>{t('admin_category_general_option')}</option>
+                  {children.map((sub) => (
+                    <option key={sub.id} value={sub.id}>
+                      {sub.name}
+                    </option>
+                  ))}
+                </optgroup>
+              );
+            })}
           </select>
         </div>
-
-        {subcategoryOptions && subcategoryOptions.length > 0 && (
-          <div>
-            <label className="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2 block">
-              {t('admin_subcategory_label')}
-            </label>
-            <select
-              value={form.subcategoryId}
-              onChange={handleChange('subcategoryId')}
-              className={selectClasses}
-            >
-              <option value="">{t('admin_no_subcategory_option')}</option>
-              {subcategoryOptions.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
 
         <div className="md:col-span-2">
           <label className="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2 block">

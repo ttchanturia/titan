@@ -119,17 +119,30 @@ export function CategoryFilterDropdown({
 
             return (
               <div key={parent.id} className="border-t border-outline-variant/10 first:border-t-0">
-                <button
-                  type="button"
-                  onClick={() => toggleParent(parent.id)}
-                  aria-expanded={isExpanded}
-                  className={`w-full flex items-center justify-between gap-2 px-4 py-2.5 text-sm font-body font-semibold hover:bg-surface-container-high transition-colors ${
-                    isParentSelected ? 'text-primary' : 'text-on-surface'
-                  }`}
-                >
-                  <span>{parentLabel}</span>
-                  {children.length > 0 && <Chevron expanded={isExpanded} />}
-                </button>
+                {/* The name selects the top-level category itself; the chevron only
+                    expands its subcategories, so both choices are reachable. */}
+                <div className="flex items-stretch">
+                  <button
+                    type="button"
+                    onClick={() => selectCategory(parent.id)}
+                    className={`flex-1 text-left px-4 py-2.5 text-sm font-body font-semibold hover:bg-surface-container-high transition-colors ${
+                      isParentSelected ? 'text-primary' : 'text-on-surface'
+                    }`}
+                  >
+                    {parentLabel}
+                  </button>
+                  {children.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => toggleParent(parent.id)}
+                      aria-expanded={isExpanded}
+                      aria-label={parentLabel}
+                      className="px-4 hover:bg-surface-container-high transition-colors text-on-surface-variant"
+                    >
+                      <Chevron expanded={isExpanded} />
+                    </button>
+                  )}
+                </div>
 
                 {children.length > 0 && (
                   <div
