@@ -26,13 +26,13 @@ export const translations = {
     footer_email_aria: 'Email',
     footer_location_aria: 'Location',
     footer_call_aria: 'Call',
-    footer_copyright: '© 2024 Titan. Precision in Sound.',
+    footer_copyright: '© {year} Titan. Precision in Sound.',
     footer_cookies: 'Cookies',
     footer_terms: 'Terms',
     footer_accessibility: 'Accessibility',
 
     // Home
-    home_collection_badge: 'The 2024 Collection',
+    home_collection_badge: 'The {year} Collection',
     home_hero_title_line1: 'The Soul of',
     home_hero_title_line2: 'Precision.',
     home_hero_subtitle:
@@ -53,7 +53,7 @@ export const translations = {
     home_bento_feature_title: 'Carbon Studio Monit-X',
     home_bento_learn_more: 'Learn More',
     home_bento_pedalboard_title: 'Pedalboard Precision',
-    home_bento_pedalboard_subtitle: 'The 2024 Analog Series',
+    home_bento_pedalboard_subtitle: 'The {year} Analog Series',
     home_bento_artist_title: 'Artist Collaborations',
     home_bento_artist_desc:
       'Limited edition artifacts designed with world-class engineers.',
@@ -242,13 +242,13 @@ export const translations = {
     footer_email_aria: 'ელფოსტა',
     footer_location_aria: 'მდებარეობა',
     footer_call_aria: 'დარეკვა',
-    footer_copyright: '© 2024 Titan. სიზუსტე ბგერაში.',
+    footer_copyright: '© {year} Titan. სიზუსტე ბგერაში.',
     footer_cookies: 'ქუქიები',
     footer_terms: 'წესები და პირობები',
     footer_accessibility: 'ხელმისაწვდომობა',
 
     // Home
-    home_collection_badge: '2024 წლის კოლექცია',
+    home_collection_badge: '{year} წლის კოლექცია',
     home_hero_title_line1: 'ბგერის სული',
     home_hero_title_line2: 'სიზუსტეში.',
     home_hero_subtitle:
@@ -269,7 +269,7 @@ export const translations = {
     home_bento_feature_title: 'Carbon Studio Monit-X',
     home_bento_learn_more: 'გაიგე მეტი',
     home_bento_pedalboard_title: 'პედალბორდის სიზუსტე',
-    home_bento_pedalboard_subtitle: '2024 წლის ანალოგური სერია',
+    home_bento_pedalboard_subtitle: '{year} წლის ანალოგური სერია',
     home_bento_artist_title: 'თანამშრომლობა შემსრულებლებთან',
     home_bento_artist_desc:
       'შეზღუდული გამოშვების ნაკეთობები, შექმნილი მსოფლიო დონის ინჟინრებთან ერთად.',

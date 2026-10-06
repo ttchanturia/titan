@@ -136,7 +136,7 @@ export default function Footer() {
         </div>
       </div>
       <div className="max-w-screen-2xl mx-auto mt-20 pt-8 border-t border-[#C8C5CB]/10 flex flex-col md:flex-row justify-between items-center text-[10px] text-[#9EA0A3] uppercase tracking-[0.2em]">
-        <span>{t('footer_copyright')}</span>
+        <span>{t('footer_copyright', { year: new Date().getFullYear() })}</span>
         <div className="flex space-x-8 mt-4 md:mt-0">
           <Link className="hover:text-[#000000]" href="#">
             {t('footer_cookies')}

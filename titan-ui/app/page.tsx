@@ -25,7 +25,7 @@ export default function HomePage() {
           <div className="max-w-screen-2xl mx-auto px-8 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center w-full">
             <div className="lg:col-span-5 z-10">
               <span className="inline-block text-xs font-bold tracking-[0.3em] uppercase mb-6 text-on-surface-variant">
-                {t('home_collection_badge')}
+                {t('home_collection_badge', { year: new Date().getFullYear() })}
               </span>
               <h1 className="text-5xl sm:text-6xl md:text-8xl font-headline font-extrabold tracking-tighter leading-[0.9] mb-8">
                 {t('home_hero_title_line1')} <br />
@@ -181,7 +181,7 @@ export default function HomePage() {
                       {t('home_bento_pedalboard_title')}
                     </h4>
                     <p className="text-sm text-on-surface-variant">
-                      {t('home_bento_pedalboard_subtitle')}
+                      {t('home_bento_pedalboard_subtitle', { year: new Date().getFullYear() })}
                     </p>
                   </div>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
