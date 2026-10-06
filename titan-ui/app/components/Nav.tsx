@@ -45,11 +45,9 @@ export default function Nav() {
   return (
     <nav className="fixed top-0 w-full z-50 bg-[#FBFAEE]">
       <div className="flex justify-between items-center w-full px-4 sm:px-8 py-6 max-w-screen-2xl mx-auto font-headline tracking-tight antialiased">
-        <Link
-          href="/"
-          className="text-xl font-bold tracking-tighter text-[#000000] uppercase"
-        >
-          Titan
+        <Link href="/" aria-label="Titan" className="flex items-center">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/titan-logo.png" alt="Titan" className="h-10 w-auto" />
         </Link>
         <div className="hidden md:flex items-center gap-12">
           {navLinks.map((link) => (
