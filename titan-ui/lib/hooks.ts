@@ -156,6 +156,10 @@ export function useDeleteCategory() {
       queryClient.invalidateQueries({ queryKey: ['categories'] });
       queryClient.invalidateQueries({ queryKey: ['products'] });
     },
+  });
+}
+
+/**
  * Hook for uploading a product image
  * Returns the stored image URL to save on the product
  */

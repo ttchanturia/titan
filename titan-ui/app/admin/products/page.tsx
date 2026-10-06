@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, type ChangeEvent, type FormEvent } from 'react';
+import { isAxiosError } from 'axios';
 import { AdminPageHeader } from '../../components/AdminPageHeader';
 import {
   useProducts,
@@ -8,9 +9,13 @@ import {
   useCreateProduct,
   useUpdateProduct,
   useDeleteProduct,
+  useUploadImage,
 } from '@/lib/hooks';
 import type { Product } from '@/lib/types';
 import { useTranslation } from '@/lib/i18n';
+import { MAX_UPLOAD_SIZE_BYTES, MAX_UPLOAD_SIZE_MB } from '@/lib/constants';
+
+const MAX_IMAGES = 3;
 
 const emptyForm = {
   name: '',
@@ -18,7 +23,7 @@ const emptyForm = {
   price: '',
   categoryId: '',
   subcategoryId: '',
-  imageUrl: '',
+  imageUrls: [] as string[],
   stockQuantity: '',
 };
 
@@ -37,6 +42,7 @@ export default function AdminProductsPage() {
   const createProduct = useCreateProduct();
   const updateProduct = useUpdateProduct();
   const deleteProduct = useDeleteProduct();
+  const uploadImage = useUploadImage();
 
   const [form, setForm] = useState<FormState>(emptyForm);
   const [formError, setFormError] = useState<string | null>(null);
@@ -79,7 +85,11 @@ export default function AdminProductsPage() {
         ? String(assignedCategory!.parentId)
         : String(product.categoryId),
       subcategoryId: isSubcategory ? String(product.categoryId) : '',
-      imageUrl: product.imageUrl ?? '',
+      imageUrls: product.imageUrls?.length
+        ? product.imageUrls
+        : product.imageUrl
+          ? [product.imageUrl]
+          : [],
       stockQuantity: String(product.stockQuantity),
     });
   };
@@ -89,6 +99,48 @@ export default function AdminProductsPage() {
     setFormError(null);
     setForm(emptyForm);
   };
+
+  const handleImageSelect = async (e: ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? []);
+    e.target.value = ''; // let the same file(s) be re-picked after a failure
+    if (files.length === 0) return;
+
+    const remainingSlots = MAX_IMAGES - form.imageUrls.length;
+    const selected = files.slice(0, remainingSlots);
+    // Checked client-side too so oversized files are rejected instantly.
+    const oversized = selected.filter((f) => f.size > MAX_UPLOAD_SIZE_BYTES);
+    const filesToUpload = selected.filter((f) => f.size <= MAX_UPLOAD_SIZE_BYTES);
+    setFormError(null);
+
+    // One at a time: keeps the "uploading" state accurate and avoids resizing
+    // several images concurrently on the small droplet.
+    for (const file of filesToUpload) {
+      try {
+        const { url } = await uploadImage.mutateAsync(file);
+        setForm((f) => ({ ...f, imageUrls: [...f.imageUrls, url] }));
+      } catch (err) {
+        const serverMessage =
+          isAxiosError<{ error?: string }>(err) && err.response?.data?.error;
+        setFormError(serverMessage || t('admin_image_upload_failed'));
+        return;
+      }
+    }
+
+    if (oversized.length > 0) {
+      setFormError(
+        t('admin_image_too_large', {
+          max: MAX_UPLOAD_SIZE_MB,
+          files: oversized.map((f) => f.name).join(', '),
+        }),
+      );
+    }
+  };
+
+  const handleImageRemove = (index: number) =>
+    setForm((f) => ({
+      ...f,
+      imageUrls: f.imageUrls.filter((_, i) => i !== index),
+    }));
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -111,7 +163,7 @@ export default function AdminProductsPage() {
       description: form.description.trim() || undefined,
       price,
       categoryId,
-      imageUrl: form.imageUrl.trim() || undefined,
+      imageUrls: form.imageUrls,
       stockQuantity: Number.isFinite(stockQuantity) ? stockQuantity : 0,
     };
 
@@ -245,16 +297,53 @@ export default function AdminProductsPage() {
           </div>
         )}
 
-        <div>
+        <div className="md:col-span-2">
           <label className="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2 block">
-            {t('admin_image_url_label')}
+            {t('admin_image_label')}
           </label>
-          <input
-            type="text"
-            value={form.imageUrl}
-            onChange={handleChange('imageUrl')}
-            className={inputClasses}
-          />
+          <div className="flex items-center gap-4">
+            {form.imageUrls.map((url, index) => (
+              <div key={url} className="relative w-20 h-20">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={url}
+                  alt=""
+                  className="w-20 h-20 object-cover rounded-sm border border-outline-variant"
+                />
+                <button
+                  type="button"
+                  onClick={() => handleImageRemove(index)}
+                  aria-label={t('admin_image_remove')}
+                  className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-primary text-on-primary text-xs flex items-center justify-center"
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+            {form.imageUrls.length < MAX_IMAGES && (
+              <label
+                aria-label={t('admin_image_choose')}
+                className={`w-20 h-20 rounded-sm border border-dashed border-outline-variant flex items-center justify-center text-on-surface-variant text-center text-[10px] leading-tight px-1 ${uploadImage.isPending ? 'cursor-wait' : 'cursor-pointer'}`}
+              >
+                {uploadImage.isPending ? (
+                  t('admin_image_uploading')
+                ) : (
+                  <span className="material-symbols-outlined">add_photo_alternate</span>
+                )}
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handleImageSelect}
+                  disabled={uploadImage.isPending}
+                  className="hidden"
+                />
+              </label>
+            )}
+          </div>
+          <p className="text-xs text-on-surface-variant mt-2">
+            {t('admin_image_hint', { count: form.imageUrls.length, max: MAX_IMAGES })}
+          </p>
         </div>
 
         {formError && (

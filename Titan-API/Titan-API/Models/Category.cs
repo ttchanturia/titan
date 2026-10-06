@@ -4,7 +4,6 @@ public class Category
 {
     public int Id { get; set; }
     public string Name { get; set; } = string.Empty;
-    public string? NameKa { get; set; }
     public string? Description { get; set; }
 
     /// <summary>Georgian display name. Optional — not every category has been translated yet.</summary>
@@ -12,6 +11,9 @@ public class Category
 
     /// <summary>Null for a top-level category; otherwise the id of the parent category (self-referencing FK).</summary>
     public int? ParentId { get; set; }
+
+    /// <summary>Name of the parent category, for display ("Parent / Child"). Null for top-level.</summary>
+    public string? ParentName { get; set; }
 
     /// <summary>
     /// Subcategories nested under this category. Populated only on the top-level

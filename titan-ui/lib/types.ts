@@ -20,9 +20,10 @@ export interface Category {
   name: string;
   nameKa?: string;
   description?: string;
-  nameKa?: string;
   /** Null/undefined for a top-level category; otherwise the id of its parent. */
   parentId?: number | null;
+  /** Name of the parent category, for display. Null/undefined for top-level. */
+  parentName?: string | null;
   /** Subcategories nested under this category. Populated on top-level entries by GET /api/categories. */
   children?: Category[];
 }

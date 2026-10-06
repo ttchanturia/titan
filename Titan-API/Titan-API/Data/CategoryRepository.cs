@@ -40,12 +40,14 @@ public class CategoryRepository
                 Name = reader.GetString(1),
                 Description = reader.IsDBNull(2) ? null : reader.GetString(2),
                 NameKa = reader.IsDBNull(3) ? null : reader.GetString(3),
-                ParentId = reader.IsDBNull(4) ? null : reader.GetInt32(4)
+                ParentId = reader.IsDBNull(4) ? null : reader.GetInt32(4),
+                ParentName = reader.IsDBNull(5) ? null : reader.GetString(5)
             };
             byId[category.Id] = category;
 
             if (category.ParentId is int parentId && byId.TryGetValue(parentId, out var parent))
             {
+                category.ParentName = parent.Name;
                 parent.Children.Add(category);
             }
             else
@@ -64,7 +66,12 @@ public class CategoryRepository
         await conn.OpenAsync();
 
         await using var cmd = new NpgsqlCommand(
-            "SELECT id, name, description, name_ka, parent_id FROM categories WHERE id = @id", conn);
+            """
+            SELECT c.id, c.name, c.description, c.name_ka, c.parent_id, p.name AS parent_name
+            FROM categories c
+            LEFT JOIN categories p ON p.id = c.parent_id
+            WHERE c.id = @id
+            """, conn);
         cmd.Parameters.AddWithValue("id", id);
 
         await using var reader = await cmd.ExecuteReaderAsync();
@@ -127,16 +134,4 @@ public class CategoryRepository
         return await cmd.ExecuteNonQueryAsync() > 0;
     }
 
-    private static Category MapCategory(NpgsqlDataReader reader)
-    {
-        return new Category
-        {
-            Id = reader.GetInt32(0),
-            Name = reader.GetString(1),
-            NameKa = reader.IsDBNull(2) ? null : reader.GetString(2),
-            Description = reader.IsDBNull(3) ? null : reader.GetString(3),
-            ParentId = reader.IsDBNull(4) ? null : reader.GetInt32(4),
-            ParentName = reader.IsDBNull(5) ? null : reader.GetString(5)
-        };
-    }
 }
