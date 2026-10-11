@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { DEFAULT_PRODUCT_IMAGE } from '@/lib/constants';
 import type { Product } from '@/lib/types';
 import { useTranslation } from '@/lib/i18n';
+import { discountPercent, hasDiscount } from '@/lib/pricing';
+import { PriceTag } from './PriceTag';
 
 interface ProductGridProps {
   products: Product[];
@@ -43,6 +45,13 @@ export function ProductGrid({ products }: ProductGridProps) {
                 alt={product.name}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
               />
+              {hasDiscount(product) && (
+                <div className="absolute top-4 left-4">
+                  <span className="bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full">
+                    -{discountPercent(product)}%
+                  </span>
+                </div>
+              )}
               <div className="absolute top-4 right-4">
                 <span
                   className={`${stockStatus.color} text-white text-xs font-bold px-3 py-1 rounded-full`}
@@ -64,9 +73,10 @@ export function ProductGrid({ products }: ProductGridProps) {
                 {product.description}
               </p>
             )}
-            <p className="font-headline text-2xl font-bold text-primary">
-              ${product.price.toFixed(2)}
-            </p>
+            <PriceTag
+              product={product}
+              className="font-headline text-2xl font-bold text-primary"
+            />
           </Link>
         );
       })}

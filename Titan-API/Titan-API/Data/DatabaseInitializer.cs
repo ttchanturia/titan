@@ -77,6 +77,8 @@ public class DatabaseInitializer
                 stock_quantity INT NOT NULL DEFAULT 0,
                 created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
             );
+
+            ALTER TABLE products ADD COLUMN IF NOT EXISTS discount_price NUMERIC(10,2);
             """;
 
         await using var cmd = new NpgsqlCommand(sql, conn);

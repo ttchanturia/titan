@@ -9,6 +9,8 @@ import Nav from '@/app/components/Nav';
 import Footer from '@/app/components/Footer';
 import { useCart } from '@/lib/cart-context';
 import { useTranslation } from '@/lib/i18n';
+import { effectivePrice } from '@/lib/pricing';
+import { PriceTag } from '@/app/components/PriceTag';
 
 export default function ProductPage() {
   const params = useParams();
@@ -161,9 +163,12 @@ export default function ProductPage() {
                   {product.name}
                 </h1>
 
-                <p className="text-3xl font-headline font-bold text-primary mb-8">
-                  ${product.price.toFixed(2)}
-                </p>
+                <div className="mb-8">
+                  <PriceTag
+                    product={product}
+                    className="text-3xl font-headline font-bold text-primary"
+                  />
+                </div>
 
                 {product.description && (
                   <p className="text-lg text-on-surface-variant mb-8 leading-relaxed">
@@ -246,7 +251,7 @@ export default function ProductPage() {
                   <span className="font-semibold text-on-surface">
                     {t('product_price_label')}
                   </span>{' '}
-                  ${product.price.toFixed(2)}
+                  ${effectivePrice(product).toFixed(2)}
                 </li>
                 <li>
                   <span className="font-semibold text-on-surface">

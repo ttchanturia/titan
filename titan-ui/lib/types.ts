@@ -5,6 +5,8 @@ export interface Product {
   name: string;
   description?: string;
   price: number;
+  /** Sale price; null/absent means the product isn't discounted */
+  discountPrice?: number | null;
   categoryId: number;
   categoryName?: string;
   imageUrl?: string;

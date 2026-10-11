@@ -20,7 +20,8 @@ public class ProductRepository
 
         var sql = """
             SELECT p.id, p.name, p.description, p.price, p.category_id,
-                   c.name AS category_name, p.image_url, p.stock_quantity, p.created_at
+                   c.name AS category_name, p.image_url, p.stock_quantity, p.created_at,
+                   p.discount_price
             FROM products p
             LEFT JOIN categories c ON c.id = p.category_id
             ORDER BY p.id
@@ -42,7 +43,8 @@ public class ProductRepository
 
         var sql = """
             SELECT p.id, p.name, p.description, p.price, p.category_id,
-                   c.name AS category_name, p.image_url, p.stock_quantity, p.created_at
+                   c.name AS category_name, p.image_url, p.stock_quantity, p.created_at,
+                   p.discount_price
             FROM products p
             LEFT JOIN categories c ON c.id = p.category_id
             WHERE p.id = @id
@@ -63,7 +65,8 @@ public class ProductRepository
 
         var sql = """
             SELECT p.id, p.name, p.description, p.price, p.category_id,
-                   c.name AS category_name, p.image_url, p.stock_quantity, p.created_at
+                   c.name AS category_name, p.image_url, p.stock_quantity, p.created_at,
+                   p.discount_price
             FROM products p
             LEFT JOIN categories c ON c.id = p.category_id
             WHERE p.category_id = @categoryId
@@ -87,8 +90,8 @@ public class ProductRepository
         await conn.OpenAsync();
 
         var sql = """
-            INSERT INTO products (name, description, price, category_id, image_url, stock_quantity)
-            VALUES (@name, @desc, @price, @categoryId, @imageUrl, @stock)
+            INSERT INTO products (name, description, price, discount_price, category_id, image_url, stock_quantity)
+            VALUES (@name, @desc, @price, @discountPrice, @categoryId, @imageUrl, @stock)
             RETURNING id, created_at
             """;
 
@@ -96,6 +99,7 @@ public class ProductRepository
         cmd.Parameters.AddWithValue("name", product.Name);
         cmd.Parameters.AddWithValue("desc", (object?)product.Description ?? DBNull.Value);
         cmd.Parameters.AddWithValue("price", product.Price);
+        cmd.Parameters.AddWithValue("discountPrice", (object?)product.DiscountPrice ?? DBNull.Value);
         cmd.Parameters.AddWithValue("categoryId", product.CategoryId);
         cmd.Parameters.AddWithValue("imageUrl", (object?)product.ImageUrl ?? DBNull.Value);
         cmd.Parameters.AddWithValue("stock", product.StockQuantity);
@@ -116,7 +120,7 @@ public class ProductRepository
 
         var sql = """
             UPDATE products
-            SET name = @name, description = @desc, price = @price,
+            SET name = @name, description = @desc, price = @price, discount_price = @discountPrice,
                 category_id = @categoryId, image_url = @imageUrl, stock_quantity = @stock
             WHERE id = @id
             """;
@@ -126,6 +130,7 @@ public class ProductRepository
         cmd.Parameters.AddWithValue("name", product.Name);
         cmd.Parameters.AddWithValue("desc", (object?)product.Description ?? DBNull.Value);
         cmd.Parameters.AddWithValue("price", product.Price);
+        cmd.Parameters.AddWithValue("discountPrice", (object?)product.DiscountPrice ?? DBNull.Value);
         cmd.Parameters.AddWithValue("categoryId", product.CategoryId);
         cmd.Parameters.AddWithValue("imageUrl", (object?)product.ImageUrl ?? DBNull.Value);
         cmd.Parameters.AddWithValue("stock", product.StockQuantity);
@@ -156,7 +161,8 @@ public class ProductRepository
             CategoryName = reader.IsDBNull(5) ? null : reader.GetString(5),
             ImageUrl = reader.IsDBNull(6) ? null : reader.GetString(6),
             StockQuantity = reader.GetInt32(7),
-            CreatedAt = reader.GetDateTime(8)
+            CreatedAt = reader.GetDateTime(8),
+            DiscountPrice = reader.IsDBNull(9) ? null : reader.GetDecimal(9)
         };
     }
 }
