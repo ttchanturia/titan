@@ -1,8 +1,8 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Category, Product } from './types';
-import { productApi, categoryApi } from './api';
+import { Brand, Category, Product } from './types';
+import { productApi, categoryApi, brandApi } from './api';
 
 /**
  * Hook for fetching all products
@@ -155,6 +155,59 @@ export function useDeleteCategory() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['categories'] });
       queryClient.invalidateQueries({ queryKey: ['products'] });
+    },
+  });
+}
+
+/**
+ * Hook for fetching all brands
+ */
+export function useBrands() {
+  return useQuery({
+    queryKey: ['brands'],
+    queryFn: () => brandApi.getAll(),
+  });
+}
+
+/**
+ * Hook for creating a brand
+ */
+export function useCreateBrand() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (newBrand: Omit<Brand, 'id'>) => brandApi.create(newBrand),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['brands'] });
+    },
+  });
+}
+
+/**
+ * Hook for updating a brand
+ */
+export function useUpdateBrand() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, ...brand }: { id: number } & Partial<Brand>) =>
+      brandApi.update(id, brand),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['brands'] });
+    },
+  });
+}
+
+/**
+ * Hook for deleting a brand
+ */
+export function useDeleteBrand() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: number) => brandApi.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['brands'] });
     },
   });
 }

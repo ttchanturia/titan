@@ -146,6 +146,7 @@ export const translations = {
     // Admin nav
     admin_nav_products: 'Manage Products',
     admin_nav_categories: 'Manage Categories',
+    admin_nav_brands: 'Manage Brands',
 
     // Admin page
     admin_badge: 'Admin',
@@ -205,6 +206,20 @@ export const translations = {
     admin_no_parent_value: '—',
     admin_category_update_failed: 'Failed to update category. Please try again.',
     admin_category_create_failed: 'Failed to create category. Please try again.',
+
+    // Admin brands page
+    admin_brands_heading: 'Manage Brands',
+    admin_add_brand: 'Add Brand',
+    admin_edit_brand: 'Edit Brand',
+    admin_brand_name_en_label: 'Name (English)',
+    admin_brand_name_ka_label: 'Name (Georgian, optional)',
+    admin_brand_required_error: 'The English name is required.',
+    admin_existing_brands: 'Existing Brands',
+    admin_loading_brands: 'Loading brands…',
+    admin_load_brands_failed: 'Failed to load brands:',
+    admin_no_brands: 'No brands yet.',
+    admin_brand_update_failed: 'Failed to update brand. Please try again.',
+    admin_brand_create_failed: 'Failed to create brand. Please try again.',
   },
   ka: {
     // Global
@@ -351,6 +366,7 @@ export const translations = {
     // Admin nav
     admin_nav_products: 'პროდუქტების მართვა',
     admin_nav_categories: 'კატეგორიების მართვა',
+    admin_nav_brands: 'ბრენდების მართვა',
 
     // Admin page
     admin_badge: 'ადმინი',
@@ -410,6 +426,20 @@ export const translations = {
     admin_no_parent_value: '—',
     admin_category_update_failed: 'კატეგორიის განახლება ვერ მოხერხდა. გაიმეორეთ.',
     admin_category_create_failed: 'კატეგორიის შექმნა ვერ მოხერხდა. გაიმეორეთ.',
+
+    // Admin brands page
+    admin_brands_heading: 'ბრენდების მართვა',
+    admin_add_brand: 'ბრენდის დამატება',
+    admin_edit_brand: 'ბრენდის რედაქტირება',
+    admin_brand_name_en_label: 'სახელი (ინგლისურად)',
+    admin_brand_name_ka_label: 'სახელი (ქართულად, არასავალდებულო)',
+    admin_brand_required_error: 'ინგლისური სახელი სავალდებულოა.',
+    admin_existing_brands: 'არსებული ბრენდები',
+    admin_loading_brands: 'ბრენდები იტვირთება...',
+    admin_load_brands_failed: 'ბრენდების ჩატვირთვა ვერ მოხერხდა:',
+    admin_no_brands: 'ბრენდები ჯერ არ არის.',
+    admin_brand_update_failed: 'ბრენდის განახლება ვერ მოხერხდა. გაიმეორეთ.',
+    admin_brand_create_failed: 'ბრენდის შექმნა ვერ მოხერხდა. გაიმეორეთ.',
   },
 } satisfies Record<Locale, Record<string, string>>;
 

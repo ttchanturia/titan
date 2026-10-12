@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Product, Category } from './types';
+import { Product, Category, Brand } from './types';
 import { getStoredAuthHeader } from './auth';
 
 // Configure base URL - adjust based on your backend URL
@@ -86,6 +86,29 @@ export const categoryApi = {
 
   delete: async (id: number): Promise<boolean> => {
     const response = await axiosInstance.delete(`/categories/${id}`);
+    return response.status === 204 || response.status === 200;
+  },
+};
+
+// Brand API calls
+export const brandApi = {
+  getAll: async (): Promise<Brand[]> => {
+    const response = await axiosInstance.get<Brand[]>('/brands');
+    return response.data;
+  },
+
+  create: async (brand: Omit<Brand, 'id'>): Promise<Brand> => {
+    const response = await axiosInstance.post<Brand>('/brands', brand);
+    return response.data;
+  },
+
+  update: async (id: number, brand: Partial<Brand>): Promise<boolean> => {
+    const response = await axiosInstance.put(`/brands/${id}`, brand);
+    return response.status === 204 || response.status === 200;
+  },
+
+  delete: async (id: number): Promise<boolean> => {
+    const response = await axiosInstance.delete(`/brands/${id}`);
     return response.status === 204 || response.status === 200;
   },
 };

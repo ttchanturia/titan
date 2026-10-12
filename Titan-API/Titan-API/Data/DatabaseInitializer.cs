@@ -67,6 +67,12 @@ public class DatabaseInitializer
             ALTER TABLE categories ADD COLUMN IF NOT EXISTS name_ka VARCHAR(100);
             ALTER TABLE categories ADD COLUMN IF NOT EXISTS parent_id INT REFERENCES categories(id) ON DELETE SET NULL;
 
+            CREATE TABLE IF NOT EXISTS brands (
+                id SERIAL PRIMARY KEY,
+                name VARCHAR(100) NOT NULL,
+                name_ka VARCHAR(100)
+            );
+
             CREATE TABLE IF NOT EXISTS products (
                 id SERIAL PRIMARY KEY,
                 name VARCHAR(200) NOT NULL,

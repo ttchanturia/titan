@@ -22,3 +22,9 @@ export interface Category {
   parentId?: number | null;
   parentName?: string;
 }
+
+export interface Brand {
+  id: number;
+  name: string;
+  nameKa?: string;
+}
