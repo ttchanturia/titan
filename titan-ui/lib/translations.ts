@@ -17,10 +17,8 @@ export const translations = {
     footer_products_heading: 'Products',
     footer_shop_all: 'Shop All',
     footer_brand_heading: 'Brand',
-    footer_sustainability: 'Sustainability',
-    footer_technical_specs: 'Technical Specs',
-    footer_store_locator: 'Store Locator',
-    footer_privacy: 'Privacy',
+    footer_about_us: 'About Us',
+    footer_our_brands: 'Our Brands',
     footer_connect_heading: 'Connect',
     footer_facebook_aria: 'Facebook',
     footer_email_aria: 'Email',
@@ -77,6 +75,38 @@ export const translations = {
     rental_heading: 'Rental',
     rental_subtitle:
       'Instruments available to rent. Pick one, check the details, and get in touch to arrange your rental.',
+
+    // About Us page
+    about_title: 'About Us',
+    about_lead: '🎶 Serving music and professionalism since 1996!',
+    about_intro:
+      'For almost three decades, our store has been building and serving the world of music — with experience, quality and a professional approach.',
+    about_store:
+      'We are a music store where you can buy professional audio and music equipment, and our work does not stop at sales.',
+    about_services_heading: 'Our services include:',
+    about_service_rental: 'Rental of professional music and audio equipment',
+    about_service_events: 'Technical support for events',
+    about_service_concerts: 'Sound for concerts and all kinds of events',
+    about_service_stage: 'Stage and sound system provision',
+    about_service_technical: 'Professional technical service',
+    about_service_custom: 'Tailored solutions for events of every scale',
+    about_closing: '🎵 Your music — our professionalism!',
+
+    // Our Brands page (brand names themselves are not translated)
+    brands_title: 'Our Brands',
+    brands_intro:
+      'It matters most to us that every product and every detail we offer our customers meets the highest standard.',
+    brands_partners_lead:
+      'That is why we are proud to work with brands that, over the years, have set the standard for quality, innovation and professionalism:',
+    brands_values:
+      'To us, these brands are more than names — they stand for reliability, experience, quality and professional performance.',
+    brands_value_reliability: 'Reliability',
+    brands_value_experience: 'Experience',
+    brands_value_quality: 'Quality',
+    brands_value_performance: 'Professional performance',
+    brands_goal:
+      'Our goal is that, on every project, customers receive not just a product but the best quality, reliability and results that live up to their trust.',
+    brands_thanks: '🤝 Thank you to our partners for their trust and cooperation.',
 
     // Product filters
     filters_search_label: 'Search',
@@ -253,10 +283,8 @@ export const translations = {
     footer_products_heading: 'პროდუქტები',
     footer_shop_all: 'ყველას ნახვა',
     footer_brand_heading: 'ბრენდი',
-    footer_sustainability: 'მდგრადობა',
-    footer_technical_specs: 'ტექნიკური მახასიათებლები',
-    footer_store_locator: 'მაღაზიის მოძებნა',
-    footer_privacy: 'კონფიდენციალურობა',
+    footer_about_us: 'ჩვენს შესახებ',
+    footer_our_brands: 'ჩვენი ბრენდები',
     footer_connect_heading: 'კონტაქტი',
     footer_facebook_aria: 'ფეისბუქი',
     footer_email_aria: 'ელფოსტა',
@@ -313,6 +341,38 @@ export const translations = {
     rental_heading: 'გაქირავება',
     rental_subtitle:
       'ინსტრუმენტები ქირაობისთვის. აირჩიეთ სასურველი ინსტრუმენტი, გაეცანით დეტალებს და დაგვიკავშირდით ქირაობის გასაფორმებლად.',
+
+    // About Us page
+    about_title: 'ჩვენს შესახებ',
+    about_lead: '🎶 1996 წლიდან მუსიკისა და პროფესიონალიზმის სამსახურში!',
+    about_intro:
+      'უკვე თითქმის სამი ათეული წელია, ჩვენი მაღაზია ქმნის და ემსახურება მუსიკალურ სამყაროს — გამოცდილებით, ხარისხითა და პროფესიონალური მიდგომით.',
+    about_store:
+      'ჩვენ ვართ მუსიკალური მაღაზია, სადაც შეგიძლიათ შეიძინოთ პროფესიონალური აუდიო და მუსიკალური ტექნიკა, ხოლო ჩვენი საქმიანობა მხოლოდ გაყიდვით არ შემოიფარგლება.',
+    about_services_heading: 'ჩვენი მომსახურება მოიცავს:',
+    about_service_rental: 'პროფესიონალური მუსიკალური და აუდიო აპარატურის გაქირავებას',
+    about_service_events: 'ღონისძიებების ტექნიკურ უზრუნველყოფას',
+    about_service_concerts: 'კონცერტებისა და სხვადასხვა ივენთების გახმოვანებას',
+    about_service_stage: 'სცენისა და ხმის სისტემების უზრუნველყოფას',
+    about_service_technical: 'პროფესიონალურ ტექნიკურ მომსახურებას',
+    about_service_custom: 'ინდივიდუალურ გადაწყვეტილებებს სხვადასხვა მასშტაბის ღონისძიებისთვის',
+    about_closing: '🎵 თქვენი მუსიკა — ჩვენი პროფესიონალიზმი!',
+
+    // Our Brands page
+    brands_title: 'ჩვენი ბრენდები',
+    brands_intro:
+      'ჩვენთვის უმნიშვნელოვანესია, რომ თითოეული პროდუქტი და თითოეული დეტალი, რომელსაც ჩვენს მომხმარებლებს ვთავაზობთ, შეესაბამებოდეს უმაღლეს სტანდარტს.',
+    brands_partners_lead:
+      'სწორედ ამიტომ ვამაყობთ იმ ბრენდებთან თანამშრომლობით, რომლებიც წლების განმავლობაში ქმნიან ხარისხის, ინოვაციისა და პროფესიონალიზმის სტანდარტს:',
+    brands_values:
+      'ეს ბრენდები ჩვენთვის მხოლოდ სახელები არ არის — ისინი არის სანდოობა, გამოცდილება, ხარისხი და პროფესიონალური შესრულება.',
+    brands_value_reliability: 'სანდოობა',
+    brands_value_experience: 'გამოცდილება',
+    brands_value_quality: 'ხარისხი',
+    brands_value_performance: 'პროფესიონალური შესრულება',
+    brands_goal:
+      'ჩვენი მიზანია, თითოეული პროექტის ფარგლებში მომხმარებელს მივაწოდოთ არა უბრალოდ პროდუქტი, არამედ საუკეთესო ხარისხი, საიმედოობა და შედეგი, რომელსაც შეუძლია ნდობის გამართლება.',
+    brands_thanks: '🤝 მადლობა ჩვენს პარტნიორებს ნდობისა და თანამშრომლობისთვის.',
 
     // Product filters
     filters_search_label: 'ძებნა',

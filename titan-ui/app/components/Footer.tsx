@@ -48,33 +48,17 @@ export default function Footer() {
             <li>
               <Link
                 className="text-[#566067] hover:text-[#000000] underline underline-offset-4 transition-all"
-                href="#"
+                href="/about-us"
               >
-                {t('footer_sustainability')}
+                {t('footer_about_us')}
               </Link>
             </li>
             <li>
               <Link
                 className="text-[#566067] hover:text-[#000000] underline underline-offset-4 transition-all"
-                href="#"
+                href="/our-brands"
               >
-                {t('footer_technical_specs')}
-              </Link>
-            </li>
-            <li>
-              <Link
-                className="text-[#566067] hover:text-[#000000] underline underline-offset-4 transition-all"
-                href="#"
-              >
-                {t('footer_store_locator')}
-              </Link>
-            </li>
-            <li>
-              <Link
-                className="text-[#566067] hover:text-[#000000] underline underline-offset-4 transition-all"
-                href="#"
-              >
-                {t('footer_privacy')}
+                {t('footer_our_brands')}
               </Link>
             </li>
           </ul>
