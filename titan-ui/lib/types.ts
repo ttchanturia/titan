@@ -31,3 +31,9 @@ export interface Category {
   /** Subcategories nested under this category. Populated on top-level entries by GET /api/categories. */
   children?: Category[];
 }
+
+export interface Brand {
+  id: number;
+  name: string;
+  nameKa?: string;
+}

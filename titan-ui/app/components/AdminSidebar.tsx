@@ -8,6 +8,7 @@ import { LanguageToggle } from './LanguageToggle';
 const links = [
   { href: '/admin/products', labelKey: 'admin_nav_products' as const },
   { href: '/admin/categories', labelKey: 'admin_nav_categories' as const },
+  { href: '/admin/brands', labelKey: 'admin_nav_brands' as const },
 ];
 
 export function AdminSidebar() {
