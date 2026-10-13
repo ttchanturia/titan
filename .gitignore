@@ -40,6 +40,9 @@ bin/
 obj/
 publish-output/
 
+# Local uploaded images (dev)
+Titan-API/Titan-API/uploads/
+
 # Visual Studio
 .vs/
 *.user

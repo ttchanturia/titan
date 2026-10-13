@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTranslation } from '@/lib/i18n';
+import { LanguageToggle } from './LanguageToggle';
 
 const links = [
   { href: '/admin/products', labelKey: 'admin_nav_products' as const },
@@ -31,6 +32,10 @@ export function AdminSidebar() {
           </Link>
         );
       })}
+
+      <div className="mt-6">
+        <LanguageToggle />
+      </div>
     </nav>
   );
 }

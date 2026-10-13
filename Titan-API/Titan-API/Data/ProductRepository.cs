@@ -19,9 +19,9 @@ public class ProductRepository
         await conn.OpenAsync();
 
         var sql = """
-            SELECT p.id, p.name, p.description, p.price, p.category_id,
-                   c.name AS category_name, p.image_url, p.stock_quantity, p.created_at,
-                   p.discount_price
+            SELECT p.id, p.name, p.description, p.description_ka, p.price, p.category_id,
+                   c.name AS category_name, c.name_ka AS category_name_ka, p.image_url, p.stock_quantity, p.created_at, p.image_urls, p.is_rental, p.discount_price
+
             FROM products p
             LEFT JOIN categories c ON c.id = p.category_id
             ORDER BY p.id
@@ -42,9 +42,9 @@ public class ProductRepository
         await conn.OpenAsync();
 
         var sql = """
-            SELECT p.id, p.name, p.description, p.price, p.category_id,
-                   c.name AS category_name, p.image_url, p.stock_quantity, p.created_at,
-                   p.discount_price
+            SELECT p.id, p.name, p.description, p.description_ka, p.price, p.category_id,
+                   c.name AS category_name, c.name_ka AS category_name_ka, p.image_url, p.stock_quantity, p.created_at, p.image_urls, p.is_rental, p.discount_price
+
             FROM products p
             LEFT JOIN categories c ON c.id = p.category_id
             WHERE p.id = @id
@@ -64,9 +64,9 @@ public class ProductRepository
         await conn.OpenAsync();
 
         var sql = """
-            SELECT p.id, p.name, p.description, p.price, p.category_id,
-                   c.name AS category_name, p.image_url, p.stock_quantity, p.created_at,
-                   p.discount_price
+            SELECT p.id, p.name, p.description, p.description_ka, p.price, p.category_id,
+                   c.name AS category_name, c.name_ka AS category_name_ka, p.image_url, p.stock_quantity, p.created_at, p.image_urls, p.is_rental, p.discount_price
+
             FROM products p
             LEFT JOIN categories c ON c.id = p.category_id
             WHERE p.category_id = @categoryId
@@ -89,20 +89,28 @@ public class ProductRepository
         await using var conn = new NpgsqlConnection(_connectionString);
         await conn.OpenAsync();
 
+        // image_url mirrors the first gallery entry regardless of what the caller sent.
+        var imageUrls = product.ImageUrls ?? new List<string>();
+        var primaryImageUrl = imageUrls.FirstOrDefault();
+
         var sql = """
-            INSERT INTO products (name, description, price, discount_price, category_id, image_url, stock_quantity)
-            VALUES (@name, @desc, @price, @discountPrice, @categoryId, @imageUrl, @stock)
+            INSERT INTO products (name, description, description_ka, price, discount_price, category_id, image_url, image_urls, stock_quantity, is_rental)
+            VALUES (@name, @desc, @descKa, @price, @discountPrice, @categoryId, @imageUrl, @imageUrls, @stock, @isRental)
+
             RETURNING id, created_at
             """;
 
         await using var cmd = new NpgsqlCommand(sql, conn);
         cmd.Parameters.AddWithValue("name", product.Name);
         cmd.Parameters.AddWithValue("desc", (object?)product.Description ?? DBNull.Value);
+        cmd.Parameters.AddWithValue("descKa", (object?)product.DescriptionKa ?? DBNull.Value);
         cmd.Parameters.AddWithValue("price", product.Price);
         cmd.Parameters.AddWithValue("discountPrice", (object?)product.DiscountPrice ?? DBNull.Value);
         cmd.Parameters.AddWithValue("categoryId", product.CategoryId);
-        cmd.Parameters.AddWithValue("imageUrl", (object?)product.ImageUrl ?? DBNull.Value);
+        cmd.Parameters.AddWithValue("imageUrl", (object?)primaryImageUrl ?? DBNull.Value);
+        cmd.Parameters.AddWithValue("imageUrls", imageUrls.ToArray());
         cmd.Parameters.AddWithValue("stock", product.StockQuantity);
+        cmd.Parameters.AddWithValue("isRental", product.IsRental);
 
         await using var reader = await cmd.ExecuteReaderAsync();
         if (await reader.ReadAsync())
@@ -110,6 +118,8 @@ public class ProductRepository
             product.Id = reader.GetInt32(0);
             product.CreatedAt = reader.GetDateTime(1);
         }
+        product.ImageUrl = primaryImageUrl;
+        product.ImageUrls = imageUrls;
         return product;
     }
 
@@ -118,10 +128,14 @@ public class ProductRepository
         await using var conn = new NpgsqlConnection(_connectionString);
         await conn.OpenAsync();
 
+        var imageUrls = product.ImageUrls ?? new List<string>();
+        var primaryImageUrl = imageUrls.FirstOrDefault();
+
         var sql = """
             UPDATE products
-            SET name = @name, description = @desc, price = @price, discount_price = @discountPrice,
-                category_id = @categoryId, image_url = @imageUrl, stock_quantity = @stock
+SET name = @name, description = @desc, description_ka = @descKa, price = @price, discount_price = @discountPrice,
+                category_id = @categoryId, image_url = @imageUrl, image_urls = @imageUrls,
+                stock_quantity = @stock, is_rental = @isRental
             WHERE id = @id
             """;
 
@@ -129,11 +143,14 @@ public class ProductRepository
         cmd.Parameters.AddWithValue("id", id);
         cmd.Parameters.AddWithValue("name", product.Name);
         cmd.Parameters.AddWithValue("desc", (object?)product.Description ?? DBNull.Value);
+        cmd.Parameters.AddWithValue("descKa", (object?)product.DescriptionKa ?? DBNull.Value);
         cmd.Parameters.AddWithValue("price", product.Price);
         cmd.Parameters.AddWithValue("discountPrice", (object?)product.DiscountPrice ?? DBNull.Value);
         cmd.Parameters.AddWithValue("categoryId", product.CategoryId);
-        cmd.Parameters.AddWithValue("imageUrl", (object?)product.ImageUrl ?? DBNull.Value);
+        cmd.Parameters.AddWithValue("imageUrl", (object?)primaryImageUrl ?? DBNull.Value);
+        cmd.Parameters.AddWithValue("imageUrls", imageUrls.ToArray());
         cmd.Parameters.AddWithValue("stock", product.StockQuantity);
+        cmd.Parameters.AddWithValue("isRental", product.IsRental);
 
         return await cmd.ExecuteNonQueryAsync() > 0;
     }
@@ -149,20 +166,36 @@ public class ProductRepository
         return await cmd.ExecuteNonQueryAsync() > 0;
     }
 
+    // Column order must match the SELECT lists above exactly:
+    // 0 id, 1 name, 2 description, 3 description_ka, 4 price, 5 category_id,
+    // 6 category_name, 7 category_name_ka, 8 image_url, 9 stock_quantity,
+    // 10 created_at, 11 image_urls, 12 is_rental
     private static Product MapProduct(NpgsqlDataReader reader)
     {
+        var imageUrl = reader.IsDBNull(8) ? null : reader.GetString(8);
+        // image_urls may briefly lag image_url for rows written just before the
+        // startup backfill runs (see DatabaseInitializer) - fall back accordingly.
+        var imageUrls = reader.IsDBNull(11)
+            ? (imageUrl is null ? new List<string>() : new List<string> { imageUrl })
+            : reader.GetFieldValue<string[]>(11).ToList();
+
         return new Product
         {
             Id = reader.GetInt32(0),
             Name = reader.GetString(1),
             Description = reader.IsDBNull(2) ? null : reader.GetString(2),
-            Price = reader.GetDecimal(3),
-            CategoryId = reader.GetInt32(4),
-            CategoryName = reader.IsDBNull(5) ? null : reader.GetString(5),
-            ImageUrl = reader.IsDBNull(6) ? null : reader.GetString(6),
-            StockQuantity = reader.GetInt32(7),
-            CreatedAt = reader.GetDateTime(8),
-            DiscountPrice = reader.IsDBNull(9) ? null : reader.GetDecimal(9)
+            DescriptionKa = reader.IsDBNull(3) ? null : reader.GetString(3),
+            Price = reader.GetDecimal(4),
+            CategoryId = reader.GetInt32(5),
+            CategoryName = reader.IsDBNull(6) ? null : reader.GetString(6),
+            CategoryNameKa = reader.IsDBNull(7) ? null : reader.GetString(7),
+            ImageUrl = imageUrls.Count > 0 ? imageUrls[0] : imageUrl,
+            ImageUrls = imageUrls,
+            StockQuantity = reader.GetInt32(9),
+            CreatedAt = reader.GetDateTime(10),
+            IsRental = reader.GetBoolean(12),
+            DiscountPrice = reader.IsDBNull(13) ? null : reader.GetDecimal(13)
+
         };
     }
 }

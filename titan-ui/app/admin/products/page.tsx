@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, type ChangeEvent, type FormEvent } from 'react';
+import { Fragment, useState, type ChangeEvent, type FormEvent } from 'react';
+import { isAxiosError } from 'axios';
 import { AdminPageHeader } from '../../components/AdminPageHeader';
 import {
   useProducts,
@@ -8,9 +9,14 @@ import {
   useCreateProduct,
   useUpdateProduct,
   useDeleteProduct,
+  useUploadImage,
 } from '@/lib/hooks';
 import type { Product } from '@/lib/types';
-import { useTranslation } from '@/lib/i18n';
+import { flattenCategories } from '@/lib/categories';
+import { useTranslation, localizedText } from '@/lib/i18n';
+import { MAX_UPLOAD_SIZE_BYTES, MAX_UPLOAD_SIZE_MB } from '@/lib/constants';
+
+const MAX_IMAGES = 3;
 
 const emptyForm = {
   name: '',
@@ -18,9 +24,9 @@ const emptyForm = {
   price: '',
   discountPrice: '',
   categoryId: '',
-  subcategoryId: '',
-  imageUrl: '',
+  imageUrls: [] as string[],
   stockQuantity: '',
+  isRental: false,
 };
 
 type FormState = typeof emptyForm;
@@ -32,12 +38,13 @@ const selectClasses =
   'w-full bg-surface border-b border-outline-variant py-3 focus:outline-none focus:border-primary transition-colors text-sm font-body';
 
 export default function AdminProductsPage() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const { data: products, isLoading, error } = useProducts();
   const { data: categories } = useCategories();
   const createProduct = useCreateProduct();
   const updateProduct = useUpdateProduct();
   const deleteProduct = useDeleteProduct();
+  const uploadImage = useUploadImage();
 
   const [form, setForm] = useState<FormState>(emptyForm);
   const [formError, setFormError] = useState<string | null>(null);
@@ -45,14 +52,14 @@ export default function AdminProductsPage() {
 
   const isSaving = createProduct.isPending || updateProduct.isPending;
 
-  // Categories form a single level of nesting: a top-level category plus,
-  // optionally, subcategories under it (e.g. Guitars -> Electric Guitars).
-  const topLevelCategories = categories?.filter((c) => c.parentId == null);
-  const selectedParentId = form.categoryId ? parseInt(form.categoryId, 10) : null;
-  const subcategoryOptions =
-    selectedParentId != null
-      ? categories?.filter((c) => c.parentId === selectedParentId)
-      : [];
+  // The API nests subcategories under their parent (`children`), so flatten first.
+  // The picker lists each top-level category followed by its subcategories, and
+  // any entry can be chosen directly.
+  const allCategories = flattenCategories(categories);
+  // Admin labels follow the admin's current locale, falling back to English
+  // when a category has no Georgian name yet.
+  const categoryLabel = (c: { name: string; nameKa?: string }) =>
+    localizedText(c.name, c.nameKa, locale) ?? c.name;
 
   const handleChange =
     (field: keyof FormState) =>
@@ -62,27 +69,23 @@ export default function AdminProductsPage() {
       setForm((f) => ({ ...f, [field]: e.target.value }));
     };
 
-  const handleCategoryChange = (e: ChangeEvent<HTMLSelectElement>) => {
-    // Changing the top-level category invalidates whatever subcategory was picked
-    setForm((f) => ({ ...f, categoryId: e.target.value, subcategoryId: '' }));
-  };
-
   const handleEditClick = (product: Product) => {
     setEditingId(product.id);
     setFormError(null);
-    const assignedCategory = categories?.find((c) => c.id === product.categoryId);
-    const isSubcategory = assignedCategory?.parentId != null;
     setForm({
       name: product.name,
       description: product.description ?? '',
       price: String(product.price),
       discountPrice: product.discountPrice ? String(product.discountPrice) : '',
-      categoryId: isSubcategory
-        ? String(assignedCategory!.parentId)
-        : String(product.categoryId),
-      subcategoryId: isSubcategory ? String(product.categoryId) : '',
-      imageUrl: product.imageUrl ?? '',
+      categoryId: String(product.categoryId),
+      imageUrls: product.imageUrls?.length
+        ? product.imageUrls
+        : product.imageUrl
+          ? [product.imageUrl]
+          : [],
+
       stockQuantity: String(product.stockQuantity),
+      isRental: Boolean(product.isRental),
     });
   };
 
@@ -92,15 +95,54 @@ export default function AdminProductsPage() {
     setForm(emptyForm);
   };
 
+  const handleImageSelect = async (e: ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? []);
+    e.target.value = ''; // let the same file(s) be re-picked after a failure
+    if (files.length === 0) return;
+
+    const remainingSlots = MAX_IMAGES - form.imageUrls.length;
+    const selected = files.slice(0, remainingSlots);
+    // Checked client-side too so oversized files are rejected instantly.
+    const oversized = selected.filter((f) => f.size > MAX_UPLOAD_SIZE_BYTES);
+    const filesToUpload = selected.filter((f) => f.size <= MAX_UPLOAD_SIZE_BYTES);
+    setFormError(null);
+
+    // One at a time: keeps the "uploading" state accurate and avoids resizing
+    // several images concurrently on the small droplet.
+    for (const file of filesToUpload) {
+      try {
+        const { url } = await uploadImage.mutateAsync(file);
+        setForm((f) => ({ ...f, imageUrls: [...f.imageUrls, url] }));
+      } catch (err) {
+        const serverMessage =
+          isAxiosError<{ error?: string }>(err) && err.response?.data?.error;
+        setFormError(serverMessage || t('admin_image_upload_failed'));
+        return;
+      }
+    }
+
+    if (oversized.length > 0) {
+      setFormError(
+        t('admin_image_too_large', {
+          max: MAX_UPLOAD_SIZE_MB,
+          files: oversized.map((f) => f.name).join(', '),
+        }),
+      );
+    }
+  };
+
+  const handleImageRemove = (index: number) =>
+    setForm((f) => ({
+      ...f,
+      imageUrls: f.imageUrls.filter((_, i) => i !== index),
+    }));
+
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     setFormError(null);
 
     const price = parseFloat(form.price);
-    // A subcategory, when picked, is the more specific choice and wins
-    const categoryId = form.subcategoryId
-      ? parseInt(form.subcategoryId, 10)
-      : parseInt(form.categoryId, 10);
+    const categoryId = parseInt(form.categoryId, 10);
     const stockQuantity = form.stockQuantity ? parseInt(form.stockQuantity, 10) : 0;
     // Empty or 0 means the product has no discount
     const parsedDiscount = form.discountPrice ? parseFloat(form.discountPrice) : 0;
@@ -123,8 +165,9 @@ export default function AdminProductsPage() {
       price,
       discountPrice,
       categoryId,
-      imageUrl: form.imageUrl.trim() || undefined,
+      imageUrls: form.imageUrls,
       stockQuantity: Number.isFinite(stockQuantity) ? stockQuantity : 0,
+      isRental: form.isRental,
     };
 
     if (editingId !== null) {
@@ -240,48 +283,85 @@ export default function AdminProductsPage() {
           <select
             required
             value={form.categoryId}
-            onChange={handleCategoryChange}
+            onChange={handleChange('categoryId')}
             className={selectClasses}
           >
             <option value="">{t('admin_select_category')}</option>
-            {topLevelCategories?.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-              </option>
+            {categories?.map((parent) => (
+              <Fragment key={parent.id}>
+                <option value={parent.id}>{categoryLabel(parent)}</option>
+                {(parent.children ?? []).map((sub) => (
+                  <option key={sub.id} value={sub.id}>
+                    {`  ↳ ${categoryLabel(sub)}`}
+                  </option>
+                ))}
+              </Fragment>
             ))}
           </select>
         </div>
 
-        {subcategoryOptions && subcategoryOptions.length > 0 && (
-          <div>
-            <label className="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2 block">
-              {t('admin_subcategory_label')}
-            </label>
-            <select
-              value={form.subcategoryId}
-              onChange={handleChange('subcategoryId')}
-              className={selectClasses}
-            >
-              <option value="">{t('admin_no_subcategory_option')}</option>
-              {subcategoryOptions.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
-
-        <div>
-          <label className="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2 block">
-            {t('admin_image_url_label')}
-          </label>
+        <label className="md:col-span-2 flex items-center gap-3 text-sm font-body cursor-pointer">
           <input
-            type="text"
-            value={form.imageUrl}
-            onChange={handleChange('imageUrl')}
-            className={inputClasses}
+            type="checkbox"
+            checked={form.isRental}
+            onChange={(e) => setForm((f) => ({ ...f, isRental: e.target.checked }))}
+            className="h-4 w-4 accent-primary"
           />
+          <span>
+            <span className="font-semibold">{t('admin_rental_label')}</span>
+            <span className="block text-xs text-on-surface-variant">
+              {t('admin_rental_hint')}
+            </span>
+          </span>
+        </label>
+
+        <div className="md:col-span-2">
+          <label className="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2 block">
+            {t('admin_image_label')}
+          </label>
+          <div className="flex items-center gap-4">
+            {form.imageUrls.map((url, index) => (
+              <div key={url} className="relative w-20 h-20">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={url}
+                  alt=""
+                  className="w-20 h-20 object-cover rounded-sm border border-outline-variant"
+                />
+                <button
+                  type="button"
+                  onClick={() => handleImageRemove(index)}
+                  aria-label={t('admin_image_remove')}
+                  className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-primary text-on-primary text-xs flex items-center justify-center"
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+            {form.imageUrls.length < MAX_IMAGES && (
+              <label
+                aria-label={t('admin_image_choose')}
+                className={`w-20 h-20 rounded-sm border border-dashed border-outline-variant flex items-center justify-center text-on-surface-variant text-center text-[10px] leading-tight px-1 ${uploadImage.isPending ? 'cursor-wait' : 'cursor-pointer'}`}
+              >
+                {uploadImage.isPending ? (
+                  t('admin_image_uploading')
+                ) : (
+                  <span className="material-symbols-outlined">add_photo_alternate</span>
+                )}
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handleImageSelect}
+                  disabled={uploadImage.isPending}
+                  className="hidden"
+                />
+              </label>
+            )}
+          </div>
+          <p className="text-xs text-on-surface-variant mt-2">
+            {t('admin_image_hint', { count: form.imageUrls.length, max: MAX_IMAGES })}
+          </p>
         </div>
 
         {formError && (
@@ -348,12 +428,19 @@ export default function AdminProductsPage() {
               </thead>
               <tbody>
                 {products.map((p) => {
-                  const assignedCategory = categories?.find(
+                  const assignedCategory = allCategories.find(
                     (c) => c.id === p.categoryId,
                   );
-                  const categoryDisplay = assignedCategory?.parentName
-                    ? `${assignedCategory.parentName} / ${assignedCategory.name}`
-                    : (p.categoryName ?? p.categoryId);
+                  const parentCategory =
+                    assignedCategory?.parentId != null
+                      ? allCategories.find((c) => c.id === assignedCategory.parentId)
+                      : undefined;
+                  const categoryDisplay = assignedCategory
+                    ? parentCategory
+                      ? `${categoryLabel(parentCategory)} / ${categoryLabel(assignedCategory)}`
+                      : categoryLabel(assignedCategory)
+                    : (localizedText(p.categoryName, p.categoryNameKa, locale) ??
+                      p.categoryId);
 
                   return (
                     <tr
@@ -365,10 +452,17 @@ export default function AdminProductsPage() {
                       }
                     >
                       <td className="py-3 pr-4">{p.name}</td>
-                      <td className="py-3 pr-4">{categoryDisplay}</td>
+                      <td className="py-3 pr-4">
+                        {categoryDisplay}
+                        {p.isRental && (
+                          <span className="ml-2 text-xs uppercase tracking-widest text-primary">
+                            {t('admin_rental_label')}
+                          </span>
+                        )}
+                      </td>
                       <td className="py-3 pr-4">${p.price.toFixed(2)}</td>
                       <td className="py-3 pr-4">
-                        {p.discountPrice ? `${p.discountPrice.toFixed(2)}` : '—'}
+                        {p.discountPrice ? `$${p.discountPrice.toFixed(2)}` : '—'}
                       </td>
                       <td className="py-3 pr-4">{p.stockQuantity}</td>
                       <td className="py-3 flex gap-4">
