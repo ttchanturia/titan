@@ -93,6 +93,7 @@ export const translations = {
     filters_sort_price_asc: 'Price (Low to High)',
     filters_sort_price_desc: 'Price (High to Low)',
     filters_in_stock_only: 'In stock only',
+    filters_discounted_only: 'Discounted only',
 
     // Pagination
     pagination_prev: 'Previous page',
@@ -167,6 +168,9 @@ export const translations = {
     admin_description_ka_label: 'Description (Georgian)',
     admin_description_ka_placeholder: 'Optional — falls back to the English description if left blank',
     admin_price_label: 'Price',
+    admin_discount_price_label: 'Discount Price',
+    admin_discount_price_hint: 'Leave empty or 0 for no discount',
+    admin_discount_error: 'Discount price must be lower than the regular price.',
     admin_stock_label: 'Stock Quantity',
     admin_category_label: 'Category',
     admin_select_category: 'Select a category',
@@ -190,6 +194,7 @@ export const translations = {
     admin_table_name: 'Name',
     admin_table_category: 'Category',
     admin_table_price: 'Price',
+    admin_table_discount: 'Discount Price',
     admin_table_stock: 'Stock',
     admin_edit: 'Edit',
     admin_delete: 'Delete',
@@ -309,6 +314,7 @@ export const translations = {
     filters_sort_price_asc: 'ფასი (დაბლიდან მაღლა)',
     filters_sort_price_desc: 'ფასი (მაღლიდან დაბლა)',
     filters_in_stock_only: 'მხოლოდ მარაგში',
+    filters_discounted_only: 'მხოლოდ ფასდაკლებული',
 
     // Pagination
     pagination_prev: 'წინა გვერდი',
@@ -383,6 +389,9 @@ export const translations = {
     admin_description_ka_label: 'აღწერა (ქართულად)',
     admin_description_ka_placeholder: 'არასავალდებულო — თუ ცარიელია, გამოჩნდება ინგლისური აღწერა',
     admin_price_label: 'ფასი',
+    admin_discount_price_label: 'ფასდაკლებული ფასი',
+    admin_discount_price_hint: 'დატოვეთ ცარიელი ან 0, თუ ფასდაკლება არ არის',
+    admin_discount_error: 'ფასდაკლებული ფასი უნდა იყოს ჩვეულებრივ ფასზე ნაკლები.',
     admin_stock_label: 'მარაგის რაოდენობა',
     admin_category_label: 'კატეგორია',
     admin_select_category: 'აირჩიეთ კატეგორია',
@@ -406,6 +415,7 @@ export const translations = {
     admin_table_name: 'სახელი',
     admin_table_category: 'კატეგორია',
     admin_table_price: 'ფასი',
+    admin_table_discount: 'ფასდაკლებული ფასი',
     admin_table_stock: 'მარაგი',
     admin_edit: 'რედაქტირება',
     admin_delete: 'წაშლა',

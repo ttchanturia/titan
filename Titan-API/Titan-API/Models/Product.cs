@@ -9,6 +9,8 @@ public class Product
     /// <summary>Georgian description. Optional — not every product has been translated yet.</summary>
     public string? DescriptionKa { get; set; }
     public decimal Price { get; set; }
+    // Null when the product isn't on sale
+    public decimal? DiscountPrice { get; set; }
     public int CategoryId { get; set; }
     public string? CategoryName { get; set; }
     public string? CategoryNameKa { get; set; }

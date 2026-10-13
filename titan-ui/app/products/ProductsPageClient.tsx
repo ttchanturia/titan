@@ -9,6 +9,7 @@ import { ProductFilters, type SortOption } from '../components/ProductFilters';
 import { ProductGrid } from '../components/ProductGrid';
 import { Pagination } from '../components/Pagination';
 import { useTranslation } from '@/lib/i18n';
+import { effectivePrice, hasDiscount } from '@/lib/pricing';
 
 function parsePositiveInt(value: string | null, fallback: number): number {
   const n = value ? parseInt(value, 10) : NaN;
@@ -41,6 +42,7 @@ export function ProductsPageClient({ rental = false }: ProductsPageClientProps) 
 
   const category = searchParams.get('category') ?? '';
   const inStockOnly = searchParams.get('inStock') === '1';
+  const discountedOnly = searchParams.get('discount') === '1';
   const sort = (searchParams.get('sort') as SortOption | null) ?? '';
   const page = parsePositiveInt(searchParams.get('page'), 1);
 
@@ -102,13 +104,16 @@ export function ProductsPageClient({ rental = false }: ProductsPageClientProps) 
       result = result.filter((p) => p.name.toLowerCase().includes(q));
     }
     if (minPrice !== undefined) {
-      result = result.filter((p) => p.price >= minPrice);
+      result = result.filter((p) => effectivePrice(p) >= minPrice);
     }
     if (maxPrice !== undefined) {
-      result = result.filter((p) => p.price <= maxPrice);
+      result = result.filter((p) => effectivePrice(p) <= maxPrice);
     }
     if (inStockOnly) {
       result = result.filter((p) => p.stockQuantity > 0);
+    }
+    if (discountedOnly) {
+      result = result.filter(hasDiscount);
     }
     if (sort) {
       result = [...result].sort((a, b) => {
@@ -118,9 +123,9 @@ export function ProductsPageClient({ rental = false }: ProductsPageClientProps) 
           case 'name-desc':
             return b.name.localeCompare(a.name);
           case 'price-asc':
-            return a.price - b.price;
+            return effectivePrice(a) - effectivePrice(b);
           case 'price-desc':
-            return b.price - a.price;
+            return effectivePrice(b) - effectivePrice(a);
           default:
             return 0;
         }
@@ -128,7 +133,8 @@ export function ProductsPageClient({ rental = false }: ProductsPageClientProps) 
     }
 
     return result;
-  }, [products, categories, category, rental, searchInput, minPrice, maxPrice, inStockOnly, sort]);
+  }, [products, categories, category, rental, searchInput, minPrice, maxPrice, inStockOnly, discountedOnly, sort]);
+
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PRODUCTS_PAGE_SIZE));
   const safePage = Math.min(page, totalPages);
@@ -175,6 +181,8 @@ export function ProductsPageClient({ rental = false }: ProductsPageClientProps) 
         onMaxPriceChange={setMaxPriceInput}
         inStockOnly={inStockOnly}
         onInStockOnlyChange={(value) => setFilter({ inStock: value ? '1' : null })}
+        discountedOnly={discountedOnly}
+        onDiscountedOnlyChange={(value) => setFilter({ discount: value ? '1' : null })}
         sort={sort}
         onSortChange={(value) => setFilter({ sort: value || null })}
       />

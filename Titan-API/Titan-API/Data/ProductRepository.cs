@@ -20,7 +20,8 @@ public class ProductRepository
 
         var sql = """
             SELECT p.id, p.name, p.description, p.description_ka, p.price, p.category_id,
-                   c.name AS category_name, c.name_ka AS category_name_ka, p.image_url, p.stock_quantity, p.created_at, p.image_urls, p.is_rental
+                   c.name AS category_name, c.name_ka AS category_name_ka, p.image_url, p.stock_quantity, p.created_at, p.image_urls, p.is_rental, p.discount_price
+
             FROM products p
             LEFT JOIN categories c ON c.id = p.category_id
             ORDER BY p.id
@@ -42,7 +43,8 @@ public class ProductRepository
 
         var sql = """
             SELECT p.id, p.name, p.description, p.description_ka, p.price, p.category_id,
-                   c.name AS category_name, c.name_ka AS category_name_ka, p.image_url, p.stock_quantity, p.created_at, p.image_urls, p.is_rental
+                   c.name AS category_name, c.name_ka AS category_name_ka, p.image_url, p.stock_quantity, p.created_at, p.image_urls, p.is_rental, p.discount_price
+
             FROM products p
             LEFT JOIN categories c ON c.id = p.category_id
             WHERE p.id = @id
@@ -63,7 +65,8 @@ public class ProductRepository
 
         var sql = """
             SELECT p.id, p.name, p.description, p.description_ka, p.price, p.category_id,
-                   c.name AS category_name, c.name_ka AS category_name_ka, p.image_url, p.stock_quantity, p.created_at, p.image_urls, p.is_rental
+                   c.name AS category_name, c.name_ka AS category_name_ka, p.image_url, p.stock_quantity, p.created_at, p.image_urls, p.is_rental, p.discount_price
+
             FROM products p
             LEFT JOIN categories c ON c.id = p.category_id
             WHERE p.category_id = @categoryId
@@ -91,8 +94,9 @@ public class ProductRepository
         var primaryImageUrl = imageUrls.FirstOrDefault();
 
         var sql = """
-            INSERT INTO products (name, description, description_ka, price, category_id, image_url, image_urls, stock_quantity, is_rental)
-            VALUES (@name, @desc, @descKa, @price, @categoryId, @imageUrl, @imageUrls, @stock, @isRental)
+            INSERT INTO products (name, description, description_ka, price, discount_price, category_id, image_url, image_urls, stock_quantity, is_rental)
+            VALUES (@name, @desc, @descKa, @price, @discountPrice, @categoryId, @imageUrl, @imageUrls, @stock, @isRental)
+
             RETURNING id, created_at
             """;
 
@@ -101,6 +105,7 @@ public class ProductRepository
         cmd.Parameters.AddWithValue("desc", (object?)product.Description ?? DBNull.Value);
         cmd.Parameters.AddWithValue("descKa", (object?)product.DescriptionKa ?? DBNull.Value);
         cmd.Parameters.AddWithValue("price", product.Price);
+        cmd.Parameters.AddWithValue("discountPrice", (object?)product.DiscountPrice ?? DBNull.Value);
         cmd.Parameters.AddWithValue("categoryId", product.CategoryId);
         cmd.Parameters.AddWithValue("imageUrl", (object?)primaryImageUrl ?? DBNull.Value);
         cmd.Parameters.AddWithValue("imageUrls", imageUrls.ToArray());
@@ -128,7 +133,7 @@ public class ProductRepository
 
         var sql = """
             UPDATE products
-            SET name = @name, description = @desc, description_ka = @descKa, price = @price,
+SET name = @name, description = @desc, description_ka = @descKa, price = @price, discount_price = @discountPrice,
                 category_id = @categoryId, image_url = @imageUrl, image_urls = @imageUrls,
                 stock_quantity = @stock, is_rental = @isRental
             WHERE id = @id
@@ -140,6 +145,7 @@ public class ProductRepository
         cmd.Parameters.AddWithValue("desc", (object?)product.Description ?? DBNull.Value);
         cmd.Parameters.AddWithValue("descKa", (object?)product.DescriptionKa ?? DBNull.Value);
         cmd.Parameters.AddWithValue("price", product.Price);
+        cmd.Parameters.AddWithValue("discountPrice", (object?)product.DiscountPrice ?? DBNull.Value);
         cmd.Parameters.AddWithValue("categoryId", product.CategoryId);
         cmd.Parameters.AddWithValue("imageUrl", (object?)primaryImageUrl ?? DBNull.Value);
         cmd.Parameters.AddWithValue("imageUrls", imageUrls.ToArray());
@@ -187,7 +193,9 @@ public class ProductRepository
             ImageUrls = imageUrls,
             StockQuantity = reader.GetInt32(9),
             CreatedAt = reader.GetDateTime(10),
-            IsRental = reader.GetBoolean(12)
+            IsRental = reader.GetBoolean(12),
+            DiscountPrice = reader.IsDBNull(13) ? null : reader.GetDecimal(13)
+
         };
     }
 }

@@ -41,6 +41,8 @@ public class ProductsController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<Product>> Create(Product product)
     {
+        var discountError = NormalizeDiscount(product);
+        if (discountError is not null) return BadRequest(discountError);
         if (product.ImageUrls?.Count > MaxImages)
         {
             return BadRequest(new { error = $"A product can have at most {MaxImages} images." });
@@ -54,6 +56,8 @@ public class ProductsController : ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id, Product product)
     {
+        var discountError = NormalizeDiscount(product);
+        if (discountError is not null) return BadRequest(discountError);
         if (product.ImageUrls?.Count > MaxImages)
         {
             return BadRequest(new { error = $"A product can have at most {MaxImages} images." });
@@ -69,5 +73,18 @@ public class ProductsController : ControllerBase
     {
         var deleted = await _repo.DeleteAsync(id);
         return deleted ? NoContent() : NotFound();
+    }
+
+    // An empty or zero discount price means "no discount"; otherwise it must undercut the price.
+    private static string? NormalizeDiscount(Product product)
+    {
+        if (product.DiscountPrice is null or <= 0)
+        {
+            product.DiscountPrice = null;
+            return null;
+        }
+        return product.DiscountPrice >= product.Price
+            ? "Discount price must be lower than the regular price."
+            : null;
     }
 }

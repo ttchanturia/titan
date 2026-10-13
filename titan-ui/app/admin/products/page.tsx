@@ -22,6 +22,7 @@ const emptyForm = {
   name: '',
   description: '',
   price: '',
+  discountPrice: '',
   categoryId: '',
   imageUrls: [] as string[],
   stockQuantity: '',
@@ -75,12 +76,14 @@ export default function AdminProductsPage() {
       name: product.name,
       description: product.description ?? '',
       price: String(product.price),
+      discountPrice: product.discountPrice ? String(product.discountPrice) : '',
       categoryId: String(product.categoryId),
       imageUrls: product.imageUrls?.length
         ? product.imageUrls
         : product.imageUrl
           ? [product.imageUrl]
           : [],
+
       stockQuantity: String(product.stockQuantity),
       isRental: Boolean(product.isRental),
     });
@@ -141,9 +144,18 @@ export default function AdminProductsPage() {
     const price = parseFloat(form.price);
     const categoryId = parseInt(form.categoryId, 10);
     const stockQuantity = form.stockQuantity ? parseInt(form.stockQuantity, 10) : 0;
+    // Empty or 0 means the product has no discount
+    const parsedDiscount = form.discountPrice ? parseFloat(form.discountPrice) : 0;
+    const discountPrice =
+      Number.isFinite(parsedDiscount) && parsedDiscount > 0 ? parsedDiscount : null;
 
     if (!form.name.trim() || !Number.isFinite(price) || !Number.isFinite(categoryId)) {
       setFormError(t('admin_required_error'));
+      return;
+    }
+
+    if (discountPrice !== null && discountPrice >= price) {
+      setFormError(t('admin_discount_error'));
       return;
     }
 
@@ -151,6 +163,7 @@ export default function AdminProductsPage() {
       name: form.name.trim(),
       description: form.description.trim() || undefined,
       price,
+      discountPrice,
       categoryId,
       imageUrls: form.imageUrls,
       stockQuantity: Number.isFinite(stockQuantity) ? stockQuantity : 0,
@@ -231,6 +244,21 @@ export default function AdminProductsPage() {
             step="0.01"
             value={form.price}
             onChange={handleChange('price')}
+            className={inputClasses}
+          />
+        </div>
+
+        <div>
+          <label className="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2 block">
+            {t('admin_discount_price_label')}
+          </label>
+          <input
+            type="number"
+            min="0"
+            step="0.01"
+            value={form.discountPrice}
+            onChange={handleChange('discountPrice')}
+            placeholder={t('admin_discount_price_hint')}
             className={inputClasses}
           />
         </div>
@@ -393,6 +421,7 @@ export default function AdminProductsPage() {
                   <th className="py-3 pr-4">{t('admin_table_name')}</th>
                   <th className="py-3 pr-4">{t('admin_table_category')}</th>
                   <th className="py-3 pr-4">{t('admin_table_price')}</th>
+                  <th className="py-3 pr-4">{t('admin_table_discount')}</th>
                   <th className="py-3 pr-4">{t('admin_table_stock')}</th>
                   <th className="py-3"></th>
                 </tr>
@@ -432,6 +461,9 @@ export default function AdminProductsPage() {
                         )}
                       </td>
                       <td className="py-3 pr-4">${p.price.toFixed(2)}</td>
+                      <td className="py-3 pr-4">
+                        {p.discountPrice ? `$${p.discountPrice.toFixed(2)}` : '—'}
+                      </td>
                       <td className="py-3 pr-4">{p.stockQuantity}</td>
                       <td className="py-3 flex gap-4">
                         <button

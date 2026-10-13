@@ -9,6 +9,7 @@ import {
   type ReactNode,
 } from 'react';
 import type { Product } from './types';
+import { effectivePrice } from './pricing';
 
 export interface CartItem {
   productId: number;
@@ -72,7 +73,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         {
           productId: product.id,
           name: product.name,
-          price: product.price,
+          price: effectivePrice(product),
           imageUrl: product.imageUrl,
           quantity,
         },

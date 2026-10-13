@@ -81,6 +81,7 @@ public class DatabaseInitializer
                 description_ka TEXT
             );
 
+            ALTER TABLE products ADD COLUMN IF NOT EXISTS discount_price NUMERIC(10,2);
             -- Added when product galleries (up to 3 images) were introduced.
             -- CREATE TABLE IF NOT EXISTS above won't add columns to an already-existing
             -- table, so this ALTER runs every startup and backfills existing rows.

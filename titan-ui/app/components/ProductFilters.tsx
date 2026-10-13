@@ -18,6 +18,8 @@ interface ProductFiltersProps {
   onMaxPriceChange: (value: string) => void;
   inStockOnly: boolean;
   onInStockOnlyChange: (value: boolean) => void;
+  discountedOnly: boolean;
+  onDiscountedOnlyChange: (value: boolean) => void;
   sort: SortOption | '';
   onSortChange: (value: SortOption | '') => void;
 }
@@ -40,6 +42,8 @@ export function ProductFilters({
   onMaxPriceChange,
   inStockOnly,
   onInStockOnlyChange,
+  discountedOnly,
+  onDiscountedOnlyChange,
   sort,
   onSortChange,
 }: ProductFiltersProps) {
@@ -117,17 +121,30 @@ export function ProductFilters({
         </select>
       </div>
 
-      <label className="flex items-center gap-2 pb-3 cursor-pointer select-none">
-        <input
-          type="checkbox"
-          checked={inStockOnly}
-          onChange={(e) => onInStockOnlyChange(e.target.checked)}
-          className="w-4 h-4 accent-primary"
-        />
-        <span className="text-sm font-body text-on-surface-variant">
-          {t('filters_in_stock_only')}
-        </span>
-      </label>
+      <div className="flex flex-col gap-2 pb-3">
+        <label className="flex items-center gap-2 cursor-pointer select-none">
+          <input
+            type="checkbox"
+            checked={inStockOnly}
+            onChange={(e) => onInStockOnlyChange(e.target.checked)}
+            className="w-4 h-4 accent-primary"
+          />
+          <span className="text-sm font-body text-on-surface-variant">
+            {t('filters_in_stock_only')}
+          </span>
+        </label>
+        <label className="flex items-center gap-2 cursor-pointer select-none">
+          <input
+            type="checkbox"
+            checked={discountedOnly}
+            onChange={(e) => onDiscountedOnlyChange(e.target.checked)}
+            className="w-4 h-4 accent-primary"
+          />
+          <span className="text-sm font-body text-on-surface-variant">
+            {t('filters_discounted_only')}
+          </span>
+        </label>
+      </div>
     </div>
   );
 }
