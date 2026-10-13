@@ -492,9 +492,9 @@ export default function AdminProductsPage() {
                       <td className="py-3 pr-4">
                         {localizedText(p.brandName, p.brandNameKa, locale) ?? '—'}
                       </td>
-                      <td className="py-3 pr-4">${p.price.toFixed(2)}</td>
+                      <td className="py-3 pr-4">₾{p.price.toFixed(2)}</td>
                       <td className="py-3 pr-4">
-                        {p.discountPrice ? `$${p.discountPrice.toFixed(2)}` : '—'}
+                        {p.discountPrice ? `₾${p.discountPrice.toFixed(2)}` : '—'}
                       </td>
                       <td className="py-3 pr-4">{p.stockQuantity}</td>
                       <td className="py-3 flex gap-4">
