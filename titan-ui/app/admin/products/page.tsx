@@ -3,9 +3,11 @@
 import { Fragment, useState, type ChangeEvent, type FormEvent } from 'react';
 import { isAxiosError } from 'axios';
 import { AdminPageHeader } from '../../components/AdminPageHeader';
+import { SearchableSelect } from '../../components/SearchableSelect';
 import {
   useProducts,
   useCategories,
+  useBrands,
   useCreateProduct,
   useUpdateProduct,
   useDeleteProduct,
@@ -24,6 +26,7 @@ const emptyForm = {
   price: '',
   discountPrice: '',
   categoryId: '',
+  brandId: '',
   imageUrls: [] as string[],
   stockQuantity: '',
   isRental: false,
@@ -41,6 +44,7 @@ export default function AdminProductsPage() {
   const { t, locale } = useTranslation();
   const { data: products, isLoading, error } = useProducts();
   const { data: categories } = useCategories();
+  const { data: brands } = useBrands();
   const createProduct = useCreateProduct();
   const updateProduct = useUpdateProduct();
   const deleteProduct = useDeleteProduct();
@@ -60,6 +64,10 @@ export default function AdminProductsPage() {
   // when a category has no Georgian name yet.
   const categoryLabel = (c: { name: string; nameKa?: string }) =>
     localizedText(c.name, c.nameKa, locale) ?? c.name;
+  const brandOptions = (brands ?? []).map((b) => ({
+    value: String(b.id),
+    label: localizedText(b.name, b.nameKa, locale) ?? b.name,
+  }));
 
   const handleChange =
     (field: keyof FormState) =>
@@ -78,6 +86,7 @@ export default function AdminProductsPage() {
       price: String(product.price),
       discountPrice: product.discountPrice ? String(product.discountPrice) : '',
       categoryId: String(product.categoryId),
+      brandId: product.brandId != null ? String(product.brandId) : '',
       imageUrls: product.imageUrls?.length
         ? product.imageUrls
         : product.imageUrl
@@ -165,6 +174,7 @@ export default function AdminProductsPage() {
       price,
       discountPrice,
       categoryId,
+      brandId: form.brandId ? parseInt(form.brandId, 10) : null,
       imageUrls: form.imageUrls,
       stockQuantity: Number.isFinite(stockQuantity) ? stockQuantity : 0,
       isRental: form.isRental,
@@ -300,6 +310,24 @@ export default function AdminProductsPage() {
           </select>
         </div>
 
+        <div>
+          <label
+            htmlFor="product-brand"
+            className="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2 block"
+          >
+            {t('admin_brand_label')}
+          </label>
+          <SearchableSelect
+            id="product-brand"
+            options={brandOptions}
+            value={form.brandId}
+            onChange={(brandId) => setForm((f) => ({ ...f, brandId }))}
+            placeholder={t('admin_select_brand')}
+            noOptionsText={t('admin_no_brands_found')}
+            clearLabel={t('admin_clear_brand')}
+          />
+        </div>
+
         <label className="md:col-span-2 flex items-center gap-3 text-sm font-body cursor-pointer">
           <input
             type="checkbox"
@@ -420,6 +448,7 @@ export default function AdminProductsPage() {
                 <tr className="text-on-surface-variant border-b border-outline-variant text-xs uppercase tracking-widest">
                   <th className="py-3 pr-4">{t('admin_table_name')}</th>
                   <th className="py-3 pr-4">{t('admin_table_category')}</th>
+                  <th className="py-3 pr-4">{t('admin_table_brand')}</th>
                   <th className="py-3 pr-4">{t('admin_table_price')}</th>
                   <th className="py-3 pr-4">{t('admin_table_discount')}</th>
                   <th className="py-3 pr-4">{t('admin_table_stock')}</th>
@@ -459,6 +488,9 @@ export default function AdminProductsPage() {
                             {t('admin_rental_label')}
                           </span>
                         )}
+                      </td>
+                      <td className="py-3 pr-4">
+                        {localizedText(p.brandName, p.brandNameKa, locale) ?? '—'}
                       </td>
                       <td className="py-3 pr-4">${p.price.toFixed(2)}</td>
                       <td className="py-3 pr-4">
