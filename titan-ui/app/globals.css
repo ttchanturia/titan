@@ -95,8 +95,8 @@
   line-height: 1.2;
 }
 
-/* About Us page: equalizer bars that bounce from their baseline, and the
-   outlined display numerals. */
+/* About Us / Our Brands pages: equalizer bars that bounce from their
+   baseline, and the outlined "1996" numerals on About Us. */
 @keyframes eq-bounce {
   0%,
   100% {

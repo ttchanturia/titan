@@ -18,6 +18,7 @@ export const translations = {
     footer_shop_all: 'Shop All',
     footer_brand_heading: 'Brand',
     footer_about_us: 'About Us',
+    footer_our_brands: 'Our Brands',
     footer_connect_heading: 'Connect',
     footer_facebook_aria: 'Facebook',
     footer_email_aria: 'Email',
@@ -90,6 +91,22 @@ export const translations = {
     about_service_technical: 'Professional technical service',
     about_service_custom: 'Tailored solutions for events of every scale',
     about_closing: '🎵 Your music — our professionalism!',
+
+    // Our Brands page (brand names themselves are not translated)
+    brands_title: 'Our Brands',
+    brands_intro:
+      'It matters most to us that every product and every detail we offer our customers meets the highest standard.',
+    brands_partners_lead:
+      'That is why we are proud to work with brands that, over the years, have set the standard for quality, innovation and professionalism:',
+    brands_values:
+      'To us, these brands are more than names — they stand for reliability, experience, quality and professional performance.',
+    brands_value_reliability: 'Reliability',
+    brands_value_experience: 'Experience',
+    brands_value_quality: 'Quality',
+    brands_value_performance: 'Professional performance',
+    brands_goal:
+      'Our goal is that, on every project, customers receive not just a product but the best quality, reliability and results that live up to their trust.',
+    brands_thanks: '🤝 Thank you to our partners for their trust and cooperation.',
 
     // Product filters
     filters_search_label: 'Search',
@@ -247,6 +264,7 @@ export const translations = {
     footer_shop_all: 'ყველას ნახვა',
     footer_brand_heading: 'ბრენდი',
     footer_about_us: 'ჩვენს შესახებ',
+    footer_our_brands: 'ჩვენი ბრენდები',
     footer_connect_heading: 'კონტაქტი',
     footer_facebook_aria: 'ფეისბუქი',
     footer_email_aria: 'ელფოსტა',
@@ -319,6 +337,22 @@ export const translations = {
     about_service_technical: 'პროფესიონალურ ტექნიკურ მომსახურებას',
     about_service_custom: 'ინდივიდუალურ გადაწყვეტილებებს სხვადასხვა მასშტაბის ღონისძიებისთვის',
     about_closing: '🎵 თქვენი მუსიკა — ჩვენი პროფესიონალიზმი!',
+
+    // Our Brands page
+    brands_title: 'ჩვენი ბრენდები',
+    brands_intro:
+      'ჩვენთვის უმნიშვნელოვანესია, რომ თითოეული პროდუქტი და თითოეული დეტალი, რომელსაც ჩვენს მომხმარებლებს ვთავაზობთ, შეესაბამებოდეს უმაღლეს სტანდარტს.',
+    brands_partners_lead:
+      'სწორედ ამიტომ ვამაყობთ იმ ბრენდებთან თანამშრომლობით, რომლებიც წლების განმავლობაში ქმნიან ხარისხის, ინოვაციისა და პროფესიონალიზმის სტანდარტს:',
+    brands_values:
+      'ეს ბრენდები ჩვენთვის მხოლოდ სახელები არ არის — ისინი არის სანდოობა, გამოცდილება, ხარისხი და პროფესიონალური შესრულება.',
+    brands_value_reliability: 'სანდოობა',
+    brands_value_experience: 'გამოცდილება',
+    brands_value_quality: 'ხარისხი',
+    brands_value_performance: 'პროფესიონალური შესრულება',
+    brands_goal:
+      'ჩვენი მიზანია, თითოეული პროექტის ფარგლებში მომხმარებელს მივაწოდოთ არა უბრალოდ პროდუქტი, არამედ საუკეთესო ხარისხი, საიმედოობა და შედეგი, რომელსაც შეუძლია ნდობის გამართლება.',
+    brands_thanks: '🤝 მადლობა ჩვენს პარტნიორებს ნდობისა და თანამშრომლობისთვის.',
 
     // Product filters
     filters_search_label: 'ძებნა',

@@ -53,6 +53,14 @@ export default function Footer() {
                 {t('footer_about_us')}
               </Link>
             </li>
+            <li>
+              <Link
+                className="text-[#566067] hover:text-[#000000] underline underline-offset-4 transition-all"
+                href="/our-brands"
+              >
+                {t('footer_our_brands')}
+              </Link>
+            </li>
           </ul>
         </div>
         <div>
