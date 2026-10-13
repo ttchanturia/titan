@@ -2,7 +2,8 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Brand, Category, Product } from './types';
-import { productApi, categoryApi, brandApi } from './api';
+import { productApi, categoryApi, brandApi, uploadApi } from './api';
+
 
 /**
  * Hook for fetching all products
@@ -211,3 +212,14 @@ export function useDeleteBrand() {
     },
   });
 }
+
+/**
+ * Hook for uploading a product image
+ * Returns the stored image URL to save on the product
+ */
+export function useUploadImage() {
+  return useMutation({
+    mutationFn: (file: File) => uploadApi.uploadImage(file),
+  });
+}
+

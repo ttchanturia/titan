@@ -8,6 +8,7 @@ export const translations = {
     // Nav
     nav_home: 'Home',
     nav_products: 'Products',
+    nav_rental: 'Rental',
     nav_search_placeholder: 'Search products...',
 
     // Footer
@@ -25,13 +26,13 @@ export const translations = {
     footer_email_aria: 'Email',
     footer_location_aria: 'Location',
     footer_call_aria: 'Call',
-    footer_copyright: '© 2024 Titan. Precision in Sound.',
+    footer_copyright: '© {year} Titan. Precision in Sound.',
     footer_cookies: 'Cookies',
     footer_terms: 'Terms',
     footer_accessibility: 'Accessibility',
 
     // Home
-    home_collection_badge: 'The 2024 Collection',
+    home_collection_badge: 'The {year} Collection',
     home_hero_title_line1: 'The Soul of',
     home_hero_title_line2: 'Precision.',
     home_hero_subtitle:
@@ -52,7 +53,7 @@ export const translations = {
     home_bento_feature_title: 'Carbon Studio Monit-X',
     home_bento_learn_more: 'Learn More',
     home_bento_pedalboard_title: 'Pedalboard Precision',
-    home_bento_pedalboard_subtitle: 'The 2024 Analog Series',
+    home_bento_pedalboard_subtitle: 'The {year} Analog Series',
     home_bento_artist_title: 'Artist Collaborations',
     home_bento_artist_desc:
       'Limited edition artifacts designed with world-class engineers.',
@@ -70,6 +71,12 @@ export const translations = {
     products_subtitle:
       'From solid-body electrics to studio monitors and beyond, explore the complete Titan catalogue, engineered for precision at every price point.',
     products_load_error: 'Failed to load products:',
+
+    // Rental listing page (same layout as products; shows products flagged as rentals)
+    rental_badge: 'Rent Instead of Buy',
+    rental_heading: 'Rental',
+    rental_subtitle:
+      'Instruments available to rent. Pick one, check the details, and get in touch to arrange your rental.',
 
     // Product filters
     filters_search_label: 'Search',
@@ -147,6 +154,8 @@ export const translations = {
     admin_nav_products: 'Manage Products',
     admin_nav_categories: 'Manage Categories',
     admin_nav_brands: 'Manage Brands',
+    admin_rental_label: 'Rental',
+    admin_rental_hint: 'List on the Rental page instead of Products',
 
     // Admin page
     admin_badge: 'Admin',
@@ -157,6 +166,8 @@ export const translations = {
     admin_add_product: 'Add Product',
     admin_name_label: 'Name',
     admin_description_label: 'Description',
+    admin_description_ka_label: 'Description (Georgian)',
+    admin_description_ka_placeholder: 'Optional — falls back to the English description if left blank',
     admin_price_label: 'Price',
     admin_discount_price_label: 'Discount Price',
     admin_discount_price_hint: 'Leave empty or 0 for no discount',
@@ -164,9 +175,14 @@ export const translations = {
     admin_stock_label: 'Stock Quantity',
     admin_category_label: 'Category',
     admin_select_category: 'Select a category',
-    admin_subcategory_label: 'Subcategory',
-    admin_no_subcategory_option: 'No subcategory',
     admin_image_url_label: 'Image URL',
+    admin_image_label: 'Images',
+    admin_image_choose: 'Choose image',
+    admin_image_uploading: 'Uploading…',
+    admin_image_remove: 'Remove',
+    admin_image_upload_failed: 'Image upload failed. Please try again.',
+    admin_image_too_large: 'Skipped (over {max} MB): {files}',
+    admin_image_hint: '{count} of {max} images',
     admin_required_error: 'Name, price, and category are required.',
     admin_saving: 'Saving…',
     admin_adding: 'Adding…',
@@ -228,6 +244,7 @@ export const translations = {
     // Nav
     nav_home: 'მთავარი',
     nav_products: 'პროდუქტები',
+    nav_rental: 'გაქირავება',
     nav_search_placeholder: 'მოძებნეთ პროდუქტი...',
 
     // Footer
@@ -245,13 +262,13 @@ export const translations = {
     footer_email_aria: 'ელფოსტა',
     footer_location_aria: 'მდებარეობა',
     footer_call_aria: 'დარეკვა',
-    footer_copyright: '© 2024 Titan. სიზუსტე ბგერაში.',
+    footer_copyright: '© {year} Titan. სიზუსტე ბგერაში.',
     footer_cookies: 'ქუქიები',
     footer_terms: 'წესები და პირობები',
     footer_accessibility: 'ხელმისაწვდომობა',
 
     // Home
-    home_collection_badge: '2024 წლის კოლექცია',
+    home_collection_badge: '{year} წლის კოლექცია',
     home_hero_title_line1: 'ბგერის სული',
     home_hero_title_line2: 'სიზუსტეში.',
     home_hero_subtitle:
@@ -272,7 +289,7 @@ export const translations = {
     home_bento_feature_title: 'Carbon Studio Monit-X',
     home_bento_learn_more: 'გაიგე მეტი',
     home_bento_pedalboard_title: 'პედალბორდის სიზუსტე',
-    home_bento_pedalboard_subtitle: '2024 წლის ანალოგური სერია',
+    home_bento_pedalboard_subtitle: '{year} წლის ანალოგური სერია',
     home_bento_artist_title: 'თანამშრომლობა შემსრულებლებთან',
     home_bento_artist_desc:
       'შეზღუდული გამოშვების ნაკეთობები, შექმნილი მსოფლიო დონის ინჟინრებთან ერთად.',
@@ -290,6 +307,12 @@ export const translations = {
     products_subtitle:
       'სოლიდ-ბოდი ელექტროგიტარებიდან სტუდიურ მონიტორებამდე — გაეცანით Titan-ის სრულ კატალოგს, შექმნილს სიზუსტისთვის ნებისმიერ ფასად.',
     products_load_error: 'პროდუქტების ჩატვირთვა ვერ მოხერხდა:',
+
+    // Rental listing page
+    rental_badge: 'ქირაობა ყიდვის ნაცვლად',
+    rental_heading: 'გაქირავება',
+    rental_subtitle:
+      'ინსტრუმენტები ქირაობისთვის. აირჩიეთ სასურველი ინსტრუმენტი, გაეცანით დეტალებს და დაგვიკავშირდით ქირაობის გასაფორმებლად.',
 
     // Product filters
     filters_search_label: 'ძებნა',
@@ -367,6 +390,8 @@ export const translations = {
     admin_nav_products: 'პროდუქტების მართვა',
     admin_nav_categories: 'კატეგორიების მართვა',
     admin_nav_brands: 'ბრენდების მართვა',
+    admin_rental_label: 'გაქირავება',
+    admin_rental_hint: 'გამოჩნდეს გაქირავების გვერდზე პროდუქტების ნაცვლად',
 
     // Admin page
     admin_badge: 'ადმინი',
@@ -377,6 +402,8 @@ export const translations = {
     admin_add_product: 'პროდუქტის დამატება',
     admin_name_label: 'სახელი',
     admin_description_label: 'აღწერა',
+    admin_description_ka_label: 'აღწერა (ქართულად)',
+    admin_description_ka_placeholder: 'არასავალდებულო — თუ ცარიელია, გამოჩნდება ინგლისური აღწერა',
     admin_price_label: 'ფასი',
     admin_discount_price_label: 'ფასდაკლებული ფასი',
     admin_discount_price_hint: 'დატოვეთ ცარიელი ან 0, თუ ფასდაკლება არ არის',
@@ -384,9 +411,14 @@ export const translations = {
     admin_stock_label: 'მარაგის რაოდენობა',
     admin_category_label: 'კატეგორია',
     admin_select_category: 'აირჩიეთ კატეგორია',
-    admin_subcategory_label: 'ქვეკატეგორია',
-    admin_no_subcategory_option: 'ქვეკატეგორიის გარეშე',
     admin_image_url_label: 'სურათის URL',
+    admin_image_label: 'სურათები',
+    admin_image_choose: 'აირჩიეთ სურათი',
+    admin_image_uploading: 'იტვირთება…',
+    admin_image_remove: 'წაშლა',
+    admin_image_upload_failed: 'სურათის ატვირთვა ვერ მოხერხდა. გაიმეორეთ.',
+    admin_image_too_large: 'გამოტოვებულია ({max} MB-ზე მეტი): {files}',
+    admin_image_hint: '{count} სურათი {max}-დან',
     admin_required_error: 'სახელი, ფასი და კატეგორია სავალდებულოა.',
     admin_saving: 'ინახება...',
     admin_adding: 'მატულობს...',

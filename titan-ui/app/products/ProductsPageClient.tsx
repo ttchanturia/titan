@@ -21,8 +21,14 @@ function parseNonNegativeFloat(value: string): number | undefined {
   return Number.isFinite(n) && n >= 0 ? n : undefined;
 }
 
-export function ProductsPageClient() {
+interface ProductsPageClientProps {
+  /** false: products for sale (/products). true: products listed for rent (/rental). */
+  rental?: boolean;
+}
+
+export function ProductsPageClient({ rental = false }: ProductsPageClientProps) {
   const router = useRouter();
+  const basePath = rental ? '/rental' : '/products';
   const searchParams = useSearchParams();
   const { data: products, isLoading, error } = useProducts();
   const { data: categories } = useCategories();
@@ -47,9 +53,9 @@ export function ProductsPageClient() {
         if (value === null || value === '') params.delete(key);
         else params.set(key, value);
       }
-      router.replace(`/products?${params.toString()}`, { scroll: false });
+      router.replace(`${basePath}?${params.toString()}`, { scroll: false });
     },
-    [router, searchParams],
+    [router, searchParams, basePath],
   );
 
   const setFilter = useCallback(
@@ -77,10 +83,21 @@ export function ProductsPageClient() {
 
   const filtered = useMemo(() => {
     if (!products) return [];
-    let result: Product[] = products;
+    // Each product is listed in exactly one place: rentals on /rental, the rest on /products.
+    let result: Product[] = products.filter((p) => Boolean(p.isRental) === rental);
 
     if (category) {
-      result = result.filter((p) => String(p.categoryId) === category);
+      // Selecting a subcategory filters by its own real id (exact match below).
+      // Selecting a top-level category must still include its subcategories'
+      // products too — otherwise a direct link to a parent category (e.g. the
+      // footer's quick links) would show nothing once products live on
+      // subcategories rather than directly on the parent.
+      const selectedId = Number(category);
+      const selectedParent = categories?.find((c) => c.id === selectedId);
+      const matchingIds = selectedParent
+        ? [selectedParent.id, ...(selectedParent.children ?? []).map((c) => c.id)]
+        : [selectedId];
+      result = result.filter((p) => matchingIds.includes(p.categoryId));
     }
     if (searchInput.trim()) {
       const q = searchInput.trim().toLowerCase();
@@ -116,7 +133,8 @@ export function ProductsPageClient() {
     }
 
     return result;
-  }, [products, category, searchInput, minPrice, maxPrice, inStockOnly, discountedOnly, sort]);
+  }, [products, categories, category, rental, searchInput, minPrice, maxPrice, inStockOnly, discountedOnly, sort]);
+
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PRODUCTS_PAGE_SIZE));
   const safePage = Math.min(page, totalPages);

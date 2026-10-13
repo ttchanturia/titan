@@ -25,7 +25,7 @@ export default function HomePage() {
           <div className="max-w-screen-2xl mx-auto px-8 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center w-full">
             <div className="lg:col-span-5 z-10">
               <span className="inline-block text-xs font-bold tracking-[0.3em] uppercase mb-6 text-on-surface-variant">
-                {t('home_collection_badge')}
+                {t('home_collection_badge', { year: new Date().getFullYear() })}
               </span>
               <h1 className="text-5xl sm:text-6xl md:text-8xl font-headline font-extrabold tracking-tighter leading-[0.9] mb-8">
                 {t('home_hero_title_line1')} <br />
@@ -57,7 +57,7 @@ export default function HomePage() {
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   alt={latestProduct?.name ?? 'Featured instrument'}
-                  className="w-full h-full object-cover grayscale contrast-125"
+                  className="w-full h-full object-cover contrast-125"
                   src={latestProduct?.imageUrl || DEFAULT_PRODUCT_IMAGE}
                 />
                 <div className="absolute bottom-10 -left-5 bg-primary text-on-primary px-8 py-4 -rotate-90 origin-left text-[10px] tracking-[0.5em] font-bold uppercase">
@@ -181,12 +181,12 @@ export default function HomePage() {
                       {t('home_bento_pedalboard_title')}
                     </h4>
                     <p className="text-sm text-on-surface-variant">
-                      {t('home_bento_pedalboard_subtitle')}
+                      {t('home_bento_pedalboard_subtitle', { year: new Date().getFullYear() })}
                     </p>
                   </div>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    className="w-full h-32 object-contain grayscale"
+                    className="w-full h-32 object-contain"
                     alt="Minimalist silver guitar pedal"
                     src="https://lh3.googleusercontent.com/aida-public/AB6AXuDOE4mNHpCaCGJ0BVeXd1eIjgpwSk0Cmg4nYSHhLAxfvUTZ3oPR-5qz71v9ElOhLNLLim_9rdm0ZA2mhJDALsKcR6FoUSTcMoJg-6y30W7amvvTfGMsxycTpHKr0WXygENTcfjdomj9WOao9tOjrNzyK6hz7yQANy_EKomSYqxqSvPcIMhZjrqeTupJRGurvmNNZUBzC3_3bNi3lTIQOTvD5uHzoDY0HwFdB64zrZ2d9PbJ1X-M4mjEy-_hgoGFl1tuzHiI3CDEMg4"
                   />
