@@ -20,10 +20,12 @@ public class ProductRepository
 
         var sql = """
             SELECT p.id, p.name, p.description, p.description_ka, p.price, p.category_id,
-                   c.name AS category_name, c.name_ka AS category_name_ka, p.image_url, p.stock_quantity, p.created_at, p.image_urls, p.is_rental, p.discount_price
+                   c.name AS category_name, c.name_ka AS category_name_ka, p.image_url, p.stock_quantity, p.created_at, p.image_urls, p.is_rental, p.discount_price,
+                   p.brand_id, b.name AS brand_name, b.name_ka AS brand_name_ka
 
             FROM products p
             LEFT JOIN categories c ON c.id = p.category_id
+            LEFT JOIN brands b ON b.id = p.brand_id
             ORDER BY p.id
             """;
 
@@ -43,10 +45,12 @@ public class ProductRepository
 
         var sql = """
             SELECT p.id, p.name, p.description, p.description_ka, p.price, p.category_id,
-                   c.name AS category_name, c.name_ka AS category_name_ka, p.image_url, p.stock_quantity, p.created_at, p.image_urls, p.is_rental, p.discount_price
+                   c.name AS category_name, c.name_ka AS category_name_ka, p.image_url, p.stock_quantity, p.created_at, p.image_urls, p.is_rental, p.discount_price,
+                   p.brand_id, b.name AS brand_name, b.name_ka AS brand_name_ka
 
             FROM products p
             LEFT JOIN categories c ON c.id = p.category_id
+            LEFT JOIN brands b ON b.id = p.brand_id
             WHERE p.id = @id
             """;
 
@@ -65,10 +69,12 @@ public class ProductRepository
 
         var sql = """
             SELECT p.id, p.name, p.description, p.description_ka, p.price, p.category_id,
-                   c.name AS category_name, c.name_ka AS category_name_ka, p.image_url, p.stock_quantity, p.created_at, p.image_urls, p.is_rental, p.discount_price
+                   c.name AS category_name, c.name_ka AS category_name_ka, p.image_url, p.stock_quantity, p.created_at, p.image_urls, p.is_rental, p.discount_price,
+                   p.brand_id, b.name AS brand_name, b.name_ka AS brand_name_ka
 
             FROM products p
             LEFT JOIN categories c ON c.id = p.category_id
+            LEFT JOIN brands b ON b.id = p.brand_id
             WHERE p.category_id = @categoryId
             ORDER BY p.id
             """;
@@ -94,8 +100,8 @@ public class ProductRepository
         var primaryImageUrl = imageUrls.FirstOrDefault();
 
         var sql = """
-            INSERT INTO products (name, description, description_ka, price, discount_price, category_id, image_url, image_urls, stock_quantity, is_rental)
-            VALUES (@name, @desc, @descKa, @price, @discountPrice, @categoryId, @imageUrl, @imageUrls, @stock, @isRental)
+            INSERT INTO products (name, description, description_ka, price, discount_price, category_id, brand_id, image_url, image_urls, stock_quantity, is_rental)
+            VALUES (@name, @desc, @descKa, @price, @discountPrice, @categoryId, @brandId, @imageUrl, @imageUrls, @stock, @isRental)
 
             RETURNING id, created_at
             """;
@@ -107,6 +113,7 @@ public class ProductRepository
         cmd.Parameters.AddWithValue("price", product.Price);
         cmd.Parameters.AddWithValue("discountPrice", (object?)product.DiscountPrice ?? DBNull.Value);
         cmd.Parameters.AddWithValue("categoryId", product.CategoryId);
+        cmd.Parameters.AddWithValue("brandId", (object?)product.BrandId ?? DBNull.Value);
         cmd.Parameters.AddWithValue("imageUrl", (object?)primaryImageUrl ?? DBNull.Value);
         cmd.Parameters.AddWithValue("imageUrls", imageUrls.ToArray());
         cmd.Parameters.AddWithValue("stock", product.StockQuantity);
@@ -133,8 +140,8 @@ public class ProductRepository
 
         var sql = """
             UPDATE products
-SET name = @name, description = @desc, description_ka = @descKa, price = @price, discount_price = @discountPrice,
-                category_id = @categoryId, image_url = @imageUrl, image_urls = @imageUrls,
+            SET name = @name, description = @desc, description_ka = @descKa, price = @price, discount_price = @discountPrice,
+                category_id = @categoryId, brand_id = @brandId, image_url = @imageUrl, image_urls = @imageUrls,
                 stock_quantity = @stock, is_rental = @isRental
             WHERE id = @id
             """;
@@ -147,6 +154,7 @@ SET name = @name, description = @desc, description_ka = @descKa, price = @price,
         cmd.Parameters.AddWithValue("price", product.Price);
         cmd.Parameters.AddWithValue("discountPrice", (object?)product.DiscountPrice ?? DBNull.Value);
         cmd.Parameters.AddWithValue("categoryId", product.CategoryId);
+        cmd.Parameters.AddWithValue("brandId", (object?)product.BrandId ?? DBNull.Value);
         cmd.Parameters.AddWithValue("imageUrl", (object?)primaryImageUrl ?? DBNull.Value);
         cmd.Parameters.AddWithValue("imageUrls", imageUrls.ToArray());
         cmd.Parameters.AddWithValue("stock", product.StockQuantity);
@@ -169,7 +177,8 @@ SET name = @name, description = @desc, description_ka = @descKa, price = @price,
     // Column order must match the SELECT lists above exactly:
     // 0 id, 1 name, 2 description, 3 description_ka, 4 price, 5 category_id,
     // 6 category_name, 7 category_name_ka, 8 image_url, 9 stock_quantity,
-    // 10 created_at, 11 image_urls, 12 is_rental
+    // 10 created_at, 11 image_urls, 12 is_rental, 13 discount_price,
+    // 14 brand_id, 15 brand_name, 16 brand_name_ka
     private static Product MapProduct(NpgsqlDataReader reader)
     {
         var imageUrl = reader.IsDBNull(8) ? null : reader.GetString(8);
@@ -194,7 +203,10 @@ SET name = @name, description = @desc, description_ka = @descKa, price = @price,
             StockQuantity = reader.GetInt32(9),
             CreatedAt = reader.GetDateTime(10),
             IsRental = reader.GetBoolean(12),
-            DiscountPrice = reader.IsDBNull(13) ? null : reader.GetDecimal(13)
+            DiscountPrice = reader.IsDBNull(13) ? null : reader.GetDecimal(13),
+            BrandId = reader.IsDBNull(14) ? null : reader.GetInt32(14),
+            BrandName = reader.IsDBNull(15) ? null : reader.GetString(15),
+            BrandNameKa = reader.IsDBNull(16) ? null : reader.GetString(16)
 
         };
     }
