@@ -1,8 +1,9 @@
 'use client';
 
-import type { Category } from '@/lib/types';
-import { useTranslation } from '@/lib/i18n';
+import type { Brand, Category } from '@/lib/types';
+import { useTranslation, localizedText } from '@/lib/i18n';
 import { CategoryFilterDropdown } from './CategoryFilterDropdown';
+import { SearchableSelect } from './SearchableSelect';
 
 export type SortOption = 'name-asc' | 'name-desc' | 'price-asc' | 'price-desc';
 
@@ -10,6 +11,9 @@ interface ProductFiltersProps {
   categories: Category[] | undefined;
   category: string;
   onCategoryChange: (category: string) => void;
+  brands: Brand[] | undefined;
+  brand: string;
+  onBrandChange: (brand: string) => void;
   searchInput: string;
   onSearchInputChange: (value: string) => void;
   minPrice: string;
@@ -34,6 +38,9 @@ export function ProductFilters({
   categories,
   category,
   onCategoryChange,
+  brands,
+  brand,
+  onBrandChange,
   searchInput,
   onSearchInputChange,
   minPrice,
@@ -47,10 +54,14 @@ export function ProductFilters({
   sort,
   onSortChange,
 }: ProductFiltersProps) {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
+  const brandOptions = (brands ?? []).map((b) => ({
+    value: String(b.id),
+    label: localizedText(b.name, b.nameKa, locale) ?? b.name,
+  }));
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6 mb-16 items-end">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-6 mb-16 items-end">
       <div className="lg:col-span-2">
         <label className="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2 block">
           {t('filters_search_label')}
@@ -72,6 +83,24 @@ export function ProductFilters({
           categories={categories}
           value={category}
           onChange={onCategoryChange}
+        />
+      </div>
+
+      <div>
+        <label
+          htmlFor="filter-brand"
+          className="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2 block"
+        >
+          {t('filters_brand_label')}
+        </label>
+        <SearchableSelect
+          id="filter-brand"
+          options={brandOptions}
+          value={brand}
+          onChange={onBrandChange}
+          placeholder={t('filters_all_brands')}
+          noOptionsText={t('admin_no_brands_found')}
+          clearLabel={t('admin_clear_brand')}
         />
       </div>
 
