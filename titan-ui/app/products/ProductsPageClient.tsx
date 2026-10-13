@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useCategories, useProducts } from '@/lib/hooks';
+import { useBrands, useCategories, useProducts } from '@/lib/hooks';
 import { PRODUCTS_PAGE_SIZE } from '@/lib/constants';
 import type { Product } from '@/lib/types';
 import { ProductFilters, type SortOption } from '../components/ProductFilters';
@@ -32,6 +32,7 @@ export function ProductsPageClient({ rental = false }: ProductsPageClientProps) 
   const searchParams = useSearchParams();
   const { data: products, isLoading, error } = useProducts();
   const { data: categories } = useCategories();
+  const { data: brands } = useBrands();
   const { t } = useTranslation();
 
   // Instant local state for typing-driven inputs; synced to the URL on a
@@ -41,6 +42,7 @@ export function ProductsPageClient({ rental = false }: ProductsPageClientProps) 
   const [maxPriceInput, setMaxPriceInput] = useState(searchParams.get('max') ?? '');
 
   const category = searchParams.get('category') ?? '';
+  const brand = searchParams.get('brand') ?? '';
   const inStockOnly = searchParams.get('inStock') === '1';
   const discountedOnly = searchParams.get('discount') === '1';
   const sort = (searchParams.get('sort') as SortOption | null) ?? '';
@@ -99,6 +101,9 @@ export function ProductsPageClient({ rental = false }: ProductsPageClientProps) 
         : [selectedId];
       result = result.filter((p) => matchingIds.includes(p.categoryId));
     }
+    if (brand) {
+      result = result.filter((p) => p.brandId === Number(brand));
+    }
     if (searchInput.trim()) {
       const q = searchInput.trim().toLowerCase();
       result = result.filter((p) => p.name.toLowerCase().includes(q));
@@ -133,7 +138,7 @@ export function ProductsPageClient({ rental = false }: ProductsPageClientProps) 
     }
 
     return result;
-  }, [products, categories, category, rental, searchInput, minPrice, maxPrice, inStockOnly, discountedOnly, sort]);
+  }, [products, categories, category, brand, rental, searchInput, minPrice, maxPrice, inStockOnly, discountedOnly, sort]);
 
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PRODUCTS_PAGE_SIZE));
@@ -173,6 +178,9 @@ export function ProductsPageClient({ rental = false }: ProductsPageClientProps) 
         categories={categories}
         category={category}
         onCategoryChange={(value) => setFilter({ category: value || null })}
+        brands={brands}
+        brand={brand}
+        onBrandChange={(value) => setFilter({ brand: value || null })}
         searchInput={searchInput}
         onSearchInputChange={setSearchInput}
         minPrice={minPriceInput}
