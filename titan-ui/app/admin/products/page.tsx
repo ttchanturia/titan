@@ -1,9 +1,11 @@
 'use client';
 
-import { Fragment, useState, type ChangeEvent, type FormEvent } from 'react';
+import { Fragment, useMemo, useState, type ChangeEvent, type FormEvent } from 'react';
 import { isAxiosError } from 'axios';
 import { AdminPageHeader } from '../../components/AdminPageHeader';
 import { SearchableSelect } from '../../components/SearchableSelect';
+import { PriceTag } from '../../components/PriceTag';
+import { Pagination } from '../../components/Pagination';
 import {
   useProducts,
   useCategories,
@@ -19,6 +21,10 @@ import { useTranslation, localizedText } from '@/lib/i18n';
 import { MAX_UPLOAD_SIZE_BYTES, MAX_UPLOAD_SIZE_MB } from '@/lib/constants';
 
 const MAX_IMAGES = 3;
+// Keeps the existing-products table to a manageable page even once the
+// catalogue is in the hundreds, so finding one to edit doesn't mean scrolling
+// through all of them.
+const TABLE_PAGE_SIZE = 15;
 
 const emptyForm = {
   name: '',
@@ -53,6 +59,8 @@ export default function AdminProductsPage() {
   const [form, setForm] = useState<FormState>(emptyForm);
   const [formError, setFormError] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [tableSearch, setTableSearch] = useState('');
+  const [tablePage, setTablePage] = useState(1);
 
   const isSaving = createProduct.isPending || updateProduct.isPending;
 
@@ -68,6 +76,43 @@ export default function AdminProductsPage() {
     value: String(b.id),
     label: localizedText(b.name, b.nameKa, locale) ?? b.name,
   }));
+
+  // Resolve each product's category/brand display text once, so the table and
+  // the search below don't each repeat the lookup.
+  const decoratedProducts = useMemo(() => {
+    return (products ?? []).map((p) => {
+      const assignedCategory = allCategories.find((c) => c.id === p.categoryId);
+      const parentCategory =
+        assignedCategory?.parentId != null
+          ? allCategories.find((c) => c.id === assignedCategory.parentId)
+          : undefined;
+      const categoryDisplay = assignedCategory
+        ? parentCategory
+          ? `${categoryLabel(parentCategory)} / ${categoryLabel(assignedCategory)}`
+          : categoryLabel(assignedCategory)
+        : (localizedText(p.categoryName, p.categoryNameKa, locale) ?? String(p.categoryId));
+      const brandDisplay = localizedText(p.brandName, p.brandNameKa, locale) ?? '';
+
+      return {
+        product: p,
+        categoryDisplay,
+        brandDisplay,
+        searchText: `${p.name} ${categoryDisplay} ${brandDisplay}`.toLowerCase(),
+      };
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [products, allCategories, locale]);
+
+  const query = tableSearch.trim().toLowerCase();
+  const filteredProducts = query
+    ? decoratedProducts.filter((row) => row.searchText.includes(query))
+    : decoratedProducts;
+  const totalTablePages = Math.max(1, Math.ceil(filteredProducts.length / TABLE_PAGE_SIZE));
+  const safeTablePage = Math.min(tablePage, totalTablePages);
+  const pagedProducts = filteredProducts.slice(
+    (safeTablePage - 1) * TABLE_PAGE_SIZE,
+    safeTablePage * TABLE_PAGE_SIZE,
+  );
 
   const handleChange =
     (field: keyof FormState) =>
@@ -423,9 +468,26 @@ export default function AdminProductsPage() {
       </form>
 
       <section>
-        <h2 className="font-headline text-xl font-bold mb-6">
-          {t('admin_existing_products')}
-        </h2>
+        <div className="flex flex-wrap items-end justify-between gap-4 mb-6">
+          <h2 className="font-headline text-xl font-bold">{t('admin_existing_products')}</h2>
+          {products && products.length > 0 && (
+            <div className="w-full sm:w-72">
+              <input
+                type="search"
+                value={tableSearch}
+                onChange={(e) => {
+                  setTableSearch(e.target.value);
+                  setTablePage(1);
+                }}
+                placeholder={t('admin_product_search_placeholder')}
+                className={inputClasses}
+              />
+              <p className="text-xs text-on-surface-variant mt-1">
+                {t('admin_product_count', { count: filteredProducts.length })}
+              </p>
+            </div>
+          )}
+        </div>
 
         {isLoading && (
           <p className="text-on-surface-variant text-sm">{t('admin_loading')}</p>
@@ -441,37 +503,28 @@ export default function AdminProductsPage() {
           <p className="text-on-surface-variant text-sm">{t('admin_no_products')}</p>
         )}
 
-        {products && products.length > 0 && (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm text-left">
-              <thead>
-                <tr className="text-on-surface-variant border-b border-outline-variant text-xs uppercase tracking-widest">
-                  <th className="py-3 pr-4">{t('admin_table_name')}</th>
-                  <th className="py-3 pr-4">{t('admin_table_category')}</th>
-                  <th className="py-3 pr-4">{t('admin_table_brand')}</th>
-                  <th className="py-3 pr-4">{t('admin_table_price')}</th>
-                  <th className="py-3 pr-4">{t('admin_table_discount')}</th>
-                  <th className="py-3 pr-4">{t('admin_table_stock')}</th>
-                  <th className="py-3"></th>
-                </tr>
-              </thead>
-              <tbody>
-                {products.map((p) => {
-                  const assignedCategory = allCategories.find(
-                    (c) => c.id === p.categoryId,
-                  );
-                  const parentCategory =
-                    assignedCategory?.parentId != null
-                      ? allCategories.find((c) => c.id === assignedCategory.parentId)
-                      : undefined;
-                  const categoryDisplay = assignedCategory
-                    ? parentCategory
-                      ? `${categoryLabel(parentCategory)} / ${categoryLabel(assignedCategory)}`
-                      : categoryLabel(assignedCategory)
-                    : (localizedText(p.categoryName, p.categoryNameKa, locale) ??
-                      p.categoryId);
+        {products && products.length > 0 && filteredProducts.length === 0 && (
+          <p className="text-on-surface-variant text-sm">
+            {t('admin_no_products_match', { query: tableSearch.trim() })}
+          </p>
+        )}
 
-                  return (
+        {filteredProducts.length > 0 && (
+          <>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm text-left table-fixed">
+                <thead>
+                  <tr className="text-on-surface-variant border-b border-outline-variant text-xs uppercase tracking-widest">
+                    <th className="py-3 pr-4 w-[26%]">{t('admin_table_name')}</th>
+                    <th className="py-3 pr-4 w-[22%]">{t('admin_table_category')}</th>
+                    <th className="py-3 pr-4 w-[16%]">{t('admin_table_brand')}</th>
+                    <th className="py-3 pr-4 w-[16%]">{t('admin_table_price')}</th>
+                    <th className="py-3 pr-4 w-[8%]">{t('admin_table_stock')}</th>
+                    <th className="py-3 w-[12%]"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {pagedProducts.map(({ product: p, categoryDisplay, brandDisplay }) => (
                     <tr
                       key={p.id}
                       className={
@@ -480,8 +533,8 @@ export default function AdminProductsPage() {
                           : 'border-b border-outline-variant/50'
                       }
                     >
-                      <td className="py-3 pr-4">{p.name}</td>
-                      <td className="py-3 pr-4">
+                      <td className="py-3 pr-4 wrap-break-word">{p.name}</td>
+                      <td className="py-3 pr-4 wrap-break-word">
                         {categoryDisplay}
                         {p.isRental && (
                           <span className="ml-2 text-xs uppercase tracking-widest text-primary">
@@ -489,12 +542,9 @@ export default function AdminProductsPage() {
                           </span>
                         )}
                       </td>
+                      <td className="py-3 pr-4 wrap-break-word">{brandDisplay || '—'}</td>
                       <td className="py-3 pr-4">
-                        {localizedText(p.brandName, p.brandNameKa, locale) ?? '—'}
-                      </td>
-                      <td className="py-3 pr-4">₾{p.price.toFixed(2)}</td>
-                      <td className="py-3 pr-4">
-                        {p.discountPrice ? `₾${p.discountPrice.toFixed(2)}` : '—'}
+                        <PriceTag product={p} />
                       </td>
                       <td className="py-3 pr-4">{p.stockQuantity}</td>
                       <td className="py-3 flex gap-4">
@@ -515,11 +565,16 @@ export default function AdminProductsPage() {
                         </button>
                       </td>
                     </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <Pagination
+              page={safeTablePage}
+              totalPages={totalTablePages}
+              onPageChange={setTablePage}
+            />
+          </>
         )}
       </section>
     </>
