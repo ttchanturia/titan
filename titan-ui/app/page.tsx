@@ -27,7 +27,7 @@ export default function HomePage() {
               <span className="inline-block text-xs font-bold tracking-[0.3em] uppercase mb-6 text-on-surface-variant">
                 {t('home_collection_badge', { year: new Date().getFullYear() })}
               </span>
-              <h1 className="text-5xl sm:text-6xl md:text-8xl font-headline font-extrabold tracking-tighter leading-[0.9] mb-8">
+              <h1 className="home-hero-title text-5xl sm:text-6xl md:text-8xl font-headline font-extrabold tracking-tighter leading-[0.9] mb-8">
                 {t('home_hero_title_line1')} <br />
                 <span className="text-outline">{t('home_hero_title_line2')}</span>
               </h1>
