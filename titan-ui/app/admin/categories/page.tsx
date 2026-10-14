@@ -10,6 +10,7 @@ import {
 } from '@/lib/hooks';
 import type { Category } from '@/lib/types';
 import { flattenCategories } from '@/lib/categories';
+import { IconAction } from '../../components/IconAction';
 import { useTranslation, localizedText } from '@/lib/i18n';
 
 const emptyForm = {
@@ -346,31 +347,24 @@ function CategoryRow({
       <td className="py-3 pr-4">
         {parentLabel ?? t('admin_no_parent_value')}
       </td>
-      <td className="py-3 flex gap-4">
-        {!isChild && (
-          <button
-            type="button"
-            onClick={() => onAddSubcategory(category)}
-            className="text-primary hover:underline"
-          >
-            {t('admin_add_subcategory')}
-          </button>
-        )}
-        <button
-          type="button"
-          onClick={() => onEdit(category)}
-          className="text-primary hover:underline"
-        >
-          {t('admin_edit')}
-        </button>
-        <button
-          type="button"
-          onClick={() => onDelete(category.id, category.name)}
-          disabled={deletePending}
-          className="text-red-600 hover:underline disabled:opacity-50"
-        >
-          {t('admin_delete')}
-        </button>
+      <td className="py-3">
+        <div className="flex items-center gap-3">
+          {!isChild && (
+            <IconAction
+              icon="add"
+              label={t('admin_add_subcategory')}
+              onClick={() => onAddSubcategory(category)}
+            />
+          )}
+          <IconAction icon="edit" label={t('admin_edit')} onClick={() => onEdit(category)} />
+          <IconAction
+            icon="delete"
+            label={t('admin_delete')}
+            onClick={() => onDelete(category.id, category.name)}
+            disabled={deletePending}
+            variant="danger"
+          />
+        </div>
       </td>
     </tr>
   );

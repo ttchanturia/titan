@@ -6,6 +6,7 @@ import { AdminPageHeader } from '../../components/AdminPageHeader';
 import { SearchableSelect } from '../../components/SearchableSelect';
 import { PriceTag } from '../../components/PriceTag';
 import { Pagination } from '../../components/Pagination';
+import { IconAction } from '../../components/IconAction';
 import {
   useProducts,
   useCategories,
@@ -515,12 +516,12 @@ export default function AdminProductsPage() {
               <table className="w-full text-sm text-left table-fixed">
                 <thead>
                   <tr className="text-on-surface-variant border-b border-outline-variant text-xs uppercase tracking-widest">
-                    <th className="py-3 pr-4 w-[24%]">{t('admin_table_name')}</th>
-                    <th className="py-3 pr-4 w-[20%]">{t('admin_table_category')}</th>
+                    <th className="py-3 pr-4 w-[28%]">{t('admin_table_name')}</th>
+                    <th className="py-3 pr-4 w-[22%]">{t('admin_table_category')}</th>
                     <th className="py-3 pr-4 w-[14%]">{t('admin_table_brand')}</th>
                     <th className="py-3 pr-4 w-[16%]">{t('admin_table_price')}</th>
-                    <th className="py-3 pr-4 w-[8%]">{t('admin_table_stock')}</th>
-                    <th className="py-3 w-[18%]"></th>
+                    <th className="py-3 pr-4 w-[10%]">{t('admin_table_stock')}</th>
+                    <th className="py-3 w-[10%]"></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -548,25 +549,19 @@ export default function AdminProductsPage() {
                       </td>
                       <td className="py-3 pr-4">{p.stockQuantity}</td>
                       <td className="py-3">
-                        {/* Stacked, not side-by-side: at this column's width, two
-                            words in a non-wrapping row (the old layout) could run
-                            past the table and force the whole thing to scroll. */}
-                        <div className="flex flex-col items-start gap-1 wrap-break-word">
-                          <button
-                            type="button"
+                        <div className="flex items-center gap-3">
+                          <IconAction
+                            icon="edit"
+                            label={t('admin_edit')}
                             onClick={() => handleEditClick(p)}
-                            className="text-primary hover:underline"
-                          >
-                            {t('admin_edit')}
-                          </button>
-                          <button
-                            type="button"
+                          />
+                          <IconAction
+                            icon="delete"
+                            label={t('admin_delete')}
                             onClick={() => handleDelete(p.id, p.name)}
                             disabled={deleteProduct.isPending}
-                            className="text-red-600 hover:underline disabled:opacity-50"
-                          >
-                            {t('admin_delete')}
-                          </button>
+                            variant="danger"
+                          />
                         </div>
                       </td>
                     </tr>
