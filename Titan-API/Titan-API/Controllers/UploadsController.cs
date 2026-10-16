@@ -2,8 +2,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Webp;
+using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using Titan_API.Models;
+using Titan_API.Services;
 
 namespace Titan_API.Controllers;
 
@@ -55,7 +57,10 @@ public class UploadsController : ControllerBase
             await using var input = file.OpenReadStream();
             // Image.LoadAsync sniffs the actual bytes, so a mislabeled file is
             // rejected here rather than trusting the Content-Type above.
-            using var image = await Image.LoadAsync(input);
+            // Loaded as Rgba32 specifically (rather than the format-agnostic
+            // Image) so the background-transparency pass below has an alpha
+            // channel to write into.
+            using var image = await Image.LoadAsync<Rgba32>(input);
 
             if (image.Width > _settings.MaxDimension || image.Height > _settings.MaxDimension)
             {
@@ -65,6 +70,13 @@ public class UploadsController : ControllerBase
                     Size = new Size(_settings.MaxDimension, _settings.MaxDimension),
                 }));
             }
+
+            // Most product photos are shot on a seamless white backdrop; turn
+            // that into transparency so it matches whatever background color
+            // the product sits on across the site instead of showing as a
+            // stark white box. A no-op for photos that aren't on white already.
+            BackgroundTransparency.MakeWhiteBackgroundTransparent(
+                image, _settings.BackgroundFullWhiteMin, _settings.BackgroundPartialWhiteMin);
 
             var fileName = $"{Guid.NewGuid():N}.webp";
             var fullPath = Path.Combine(_settings.Directory, fileName);
