@@ -61,6 +61,11 @@ export function ProductGrid({ products }: ProductGridProps) {
                 </span>
               </div>
             </div>
+            {product.brandName && (
+              <p className="font-label text-xs font-bold uppercase tracking-widest text-primary mb-1">
+                {localizedText(product.brandName, product.brandNameKa, locale)}
+              </p>
+            )}
             <h3 className="font-headline text-lg font-semibold text-on-surface group-hover:text-primary transition-colors">
               {product.name}
             </h3>

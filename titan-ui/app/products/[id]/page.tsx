@@ -192,6 +192,11 @@ export default function ProductPage() {
 
               {/* Info */}
               <div className="flex flex-col justify-start">
+                {product.brandName && (
+                  <p className="text-sm font-bold uppercase tracking-widest text-primary mb-1">
+                    {localizedText(product.brandName, product.brandNameKa, locale)}
+                  </p>
+                )}
                 {product.categoryName && (
                   <p className="text-sm text-on-surface-variant mb-2 uppercase font-semibold tracking-wide">
                     {localizedText(product.categoryName, product.categoryNameKa, locale)}
