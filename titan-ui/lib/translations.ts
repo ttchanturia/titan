@@ -124,8 +124,8 @@ export const translations = {
     filters_sort_name_desc: 'Name (Z-A)',
     filters_sort_price_asc: 'Price (Low to High)',
     filters_sort_price_desc: 'Price (High to Low)',
-    filters_in_stock_only: 'In stock only',
-    filters_discounted_only: 'Discounted only',
+    filters_in_stock_only: 'In stock',
+    filters_discounted_only: 'Discounted',
 
     // Pagination
     pagination_prev: 'Previous page',
@@ -400,8 +400,8 @@ export const translations = {
     filters_sort_name_desc: 'სახელი (ჰ-ა)',
     filters_sort_price_asc: 'ფასი (დაბლიდან მაღლა)',
     filters_sort_price_desc: 'ფასი (მაღლიდან დაბლა)',
-    filters_in_stock_only: 'მხოლოდ მარაგში',
-    filters_discounted_only: 'მხოლოდ ფასდაკლებული',
+    filters_in_stock_only: 'მარაგში',
+    filters_discounted_only: 'ფასდაკლებული',
 
     // Pagination
     pagination_prev: 'წინა გვერდი',
