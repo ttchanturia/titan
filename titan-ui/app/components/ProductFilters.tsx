@@ -61,7 +61,7 @@ export function ProductFilters({
   }));
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-6 mb-16 items-end">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-6 items-end">
       <div className="lg:col-span-2">
         <label className="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2 block">
           {t('filters_search_label')}

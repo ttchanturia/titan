@@ -133,6 +133,7 @@ export const translations = {
 
     // Product grid / stock status
     grid_no_results: 'No products match your filters.',
+    grid_loading_more: 'Loading more…',
     stock_available: 'Available',
     stock_low: 'Low Stock',
     stock_out: 'Out of Stock',
@@ -408,6 +409,7 @@ export const translations = {
 
     // Product grid / stock status
     grid_no_results: 'თქვენს ფილტრებს პროდუქტი არ ემთხვევა.',
+    grid_loading_more: 'იტვირთება მეტი…',
     stock_available: 'ხელმისაწვდომია',
     stock_low: 'მცირე მარაგი',
     stock_out: 'არ არის მარაგში',
