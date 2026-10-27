@@ -1,20 +1,14 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useCategories, useProducts } from '@/lib/hooks';
+import { useBrands, useCategories, useProducts } from '@/lib/hooks';
 import { PRODUCTS_PAGE_SIZE } from '@/lib/constants';
 import type { Product } from '@/lib/types';
 import { ProductFilters, type SortOption } from '../components/ProductFilters';
 import { ProductGrid } from '../components/ProductGrid';
-import { Pagination } from '../components/Pagination';
 import { useTranslation } from '@/lib/i18n';
 import { effectivePrice, hasDiscount } from '@/lib/pricing';
-
-function parsePositiveInt(value: string | null, fallback: number): number {
-  const n = value ? parseInt(value, 10) : NaN;
-  return Number.isFinite(n) && n > 0 ? n : fallback;
-}
 
 function parseNonNegativeFloat(value: string): number | undefined {
   const n = value ? parseFloat(value) : NaN;
@@ -32,6 +26,7 @@ export function ProductsPageClient({ rental = false }: ProductsPageClientProps) 
   const searchParams = useSearchParams();
   const { data: products, isLoading, error } = useProducts();
   const { data: categories } = useCategories();
+  const { data: brands } = useBrands();
   const { t } = useTranslation();
 
   // Instant local state for typing-driven inputs; synced to the URL on a
@@ -41,12 +36,12 @@ export function ProductsPageClient({ rental = false }: ProductsPageClientProps) 
   const [maxPriceInput, setMaxPriceInput] = useState(searchParams.get('max') ?? '');
 
   const category = searchParams.get('category') ?? '';
+  const brand = searchParams.get('brand') ?? '';
   const inStockOnly = searchParams.get('inStock') === '1';
   const discountedOnly = searchParams.get('discount') === '1';
   const sort = (searchParams.get('sort') as SortOption | null) ?? '';
-  const page = parsePositiveInt(searchParams.get('page'), 1);
 
-  const updateParams = useCallback(
+  const setFilter = useCallback(
     (patch: Record<string, string | null>) => {
       const params = new URLSearchParams(searchParams.toString());
       for (const [key, value] of Object.entries(patch)) {
@@ -56,13 +51,6 @@ export function ProductsPageClient({ rental = false }: ProductsPageClientProps) 
       router.replace(`${basePath}?${params.toString()}`, { scroll: false });
     },
     [router, searchParams, basePath],
-  );
-
-  const setFilter = useCallback(
-    (patch: Record<string, string | null>) => {
-      updateParams({ ...patch, page: null });
-    },
-    [updateParams],
   );
 
   // Debounce: sync typed inputs into the URL without spamming router.replace.
@@ -99,6 +87,9 @@ export function ProductsPageClient({ rental = false }: ProductsPageClientProps) 
         : [selectedId];
       result = result.filter((p) => matchingIds.includes(p.categoryId));
     }
+    if (brand) {
+      result = result.filter((p) => p.brandId === Number(brand));
+    }
     if (searchInput.trim()) {
       const q = searchInput.trim().toLowerCase();
       result = result.filter((p) => p.name.toLowerCase().includes(q));
@@ -133,15 +124,53 @@ export function ProductsPageClient({ rental = false }: ProductsPageClientProps) 
     }
 
     return result;
-  }, [products, categories, category, rental, searchInput, minPrice, maxPrice, inStockOnly, discountedOnly, sort]);
+  }, [products, categories, category, brand, rental, searchInput, minPrice, maxPrice, inStockOnly, discountedOnly, sort]);
 
+  // Infinite scroll: reveal already-fetched results in chunks instead of paging.
+  // Resetting to the first chunk whenever the filters change is done here, during
+  // render, rather than in an effect (avoids the extra render pass that calling
+  // setState from an effect would cause).
+  const filterKey = JSON.stringify([
+    category,
+    brand,
+    rental,
+    searchInput,
+    minPrice,
+    maxPrice,
+    inStockOnly,
+    discountedOnly,
+    sort,
+  ]);
+  const [visibleCount, setVisibleCount] = useState(PRODUCTS_PAGE_SIZE);
+  const [lastFilterKey, setLastFilterKey] = useState(filterKey);
+  if (filterKey !== lastFilterKey) {
+    setLastFilterKey(filterKey);
+    setVisibleCount(PRODUCTS_PAGE_SIZE);
+  }
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PRODUCTS_PAGE_SIZE));
-  const safePage = Math.min(page, totalPages);
-  const paged = filtered.slice(
-    (safePage - 1) * PRODUCTS_PAGE_SIZE,
-    safePage * PRODUCTS_PAGE_SIZE,
-  );
+  const visibleProducts = filtered.slice(0, visibleCount);
+  const hasMore = visibleCount < filtered.length;
+
+  // Subscribes to the sentinel entering the viewport and loads the next chunk -
+  // the one case an effect is the right tool, since it's syncing with the
+  // browser's IntersectionObserver rather than mirroring component state.
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (!hasMore) return;
+    const node = sentinelRef.current;
+    if (!node) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          setVisibleCount((count) => Math.min(count + PRODUCTS_PAGE_SIZE, filtered.length));
+        }
+      },
+      { rootMargin: '600px 0px' },
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [hasMore, filtered.length]);
 
   if (isLoading) {
     return (
@@ -169,29 +198,38 @@ export function ProductsPageClient({ rental = false }: ProductsPageClientProps) 
 
   return (
     <>
-      <ProductFilters
-        categories={categories}
-        category={category}
-        onCategoryChange={(value) => setFilter({ category: value || null })}
-        searchInput={searchInput}
-        onSearchInputChange={setSearchInput}
-        minPrice={minPriceInput}
-        onMinPriceChange={setMinPriceInput}
-        maxPrice={maxPriceInput}
-        onMaxPriceChange={setMaxPriceInput}
-        inStockOnly={inStockOnly}
-        onInStockOnlyChange={(value) => setFilter({ inStock: value ? '1' : null })}
-        discountedOnly={discountedOnly}
-        onDiscountedOnlyChange={(value) => setFilter({ discount: value ? '1' : null })}
-        sort={sort}
-        onSortChange={(value) => setFilter({ sort: value || null })}
-      />
-      <ProductGrid products={paged} />
-      <Pagination
-        page={safePage}
-        totalPages={totalPages}
-        onPageChange={(p) => updateParams({ page: p > 1 ? String(p) : null })}
-      />
+      {/* Pinned from tablet width up, right under the fixed nav, so the filters
+          stay reachable no matter how far down the grid you've scrolled. Left
+          un-pinned on mobile, where the filter form stacks tall enough that
+          pinning it would eat most of the screen. */}
+      <div className="static md:sticky md:top-22 md:z-30 bg-surface py-4 mb-10 border-b border-outline-variant/20">
+        <ProductFilters
+          categories={categories}
+          category={category}
+          onCategoryChange={(value) => setFilter({ category: value || null })}
+          brands={brands}
+          brand={brand}
+          onBrandChange={(value) => setFilter({ brand: value || null })}
+          searchInput={searchInput}
+          onSearchInputChange={setSearchInput}
+          minPrice={minPriceInput}
+          onMinPriceChange={setMinPriceInput}
+          maxPrice={maxPriceInput}
+          onMaxPriceChange={setMaxPriceInput}
+          inStockOnly={inStockOnly}
+          onInStockOnlyChange={(value) => setFilter({ inStock: value ? '1' : null })}
+          discountedOnly={discountedOnly}
+          onDiscountedOnlyChange={(value) => setFilter({ discount: value ? '1' : null })}
+          sort={sort}
+          onSortChange={(value) => setFilter({ sort: value || null })}
+        />
+      </div>
+      <ProductGrid products={visibleProducts} />
+      {hasMore && (
+        <div ref={sentinelRef} className="text-center text-sm text-on-surface-variant py-12">
+          {t('grid_loading_more')}
+        </div>
+      )}
     </>
   );
 }

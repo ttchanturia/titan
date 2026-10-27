@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    One-off maintenance tool: reprocesses every image already sitting in the
+    uploads directory with BackgroundTransparency, the same code the live
+    UploadsController runs on new uploads. Not part of the web app and not
+    deployed as a service - built, copied over, run once, then done with.
+  -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>Titan_API.Tools</RootNamespace>
+    <InvariantGlobalization>true</InvariantGlobalization>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Linked, not copied: this is the exact file the live API compiles,
+         so there is no risk of the batch tool drifting from upload-time behavior. -->
+    <Compile Include="..\Titan-API\Services\BackgroundTransparency.cs" Link="BackgroundTransparency.cs" />
+  </ItemGroup>
+
+</Project>

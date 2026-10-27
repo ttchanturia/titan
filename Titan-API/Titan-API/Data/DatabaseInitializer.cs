@@ -100,6 +100,9 @@ public class DatabaseInitializer
             -- appear on the Rental page instead of the Products page.
             ALTER TABLE products ADD COLUMN IF NOT EXISTS is_rental BOOLEAN NOT NULL DEFAULT FALSE;
 
+            -- Added when brands were introduced. Optional; deleting a brand unassigns it.
+            ALTER TABLE products ADD COLUMN IF NOT EXISTS brand_id INT REFERENCES brands(id) ON DELETE SET NULL;
+
             -- Idempotent upgrade path for databases created before these columns existed
             ALTER TABLE categories ADD COLUMN IF NOT EXISTS name_ka VARCHAR(100);
             ALTER TABLE products ADD COLUMN IF NOT EXISTS description_ka TEXT;

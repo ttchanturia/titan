@@ -95,6 +95,23 @@
   line-height: 1.2;
 }
 
+/* Georgian letterforms run wider/taller than Latin at the same font-size, so
+   the homepage hero title (English: text-5xl/6xl/8xl) is scaled down one
+   Tailwind step per breakpoint to stop it from overflowing/wrapping badly. */
+:lang(ka) .home-hero-title {
+  font-size: 2.25rem; /* text-4xl */
+}
+@media (min-width: 640px) {
+  :lang(ka) .home-hero-title {
+    font-size: 3rem; /* text-5xl */
+  }
+}
+@media (min-width: 768px) {
+  :lang(ka) .home-hero-title {
+    font-size: 3.75rem; /* text-6xl */
+  }
+}
+
 /* About Us / Our Brands pages: equalizer bars that bounce from their
    baseline, and the outlined "1996" numerals on About Us. */
 @keyframes eq-bounce {

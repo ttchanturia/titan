@@ -11,6 +11,10 @@ export interface Product {
   categoryId: number;
   categoryName?: string;
   categoryNameKa?: string;
+  /** Null/absent when no brand is assigned */
+  brandId?: number | null;
+  brandName?: string;
+  brandNameKa?: string;
   imageUrl?: string;
   imageUrls?: string[];
   stockQuantity: number;

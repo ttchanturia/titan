@@ -195,6 +195,8 @@ export function useUpdateBrand() {
       brandApi.update(id, brand),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['brands'] });
+      // Brand names are joined into product rows, so refresh those too
+      queryClient.invalidateQueries({ queryKey: ['products'] });
     },
   });
 }
@@ -209,6 +211,8 @@ export function useDeleteBrand() {
     mutationFn: (id: number) => brandApi.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['brands'] });
+      // Brand names are joined into product rows, so refresh those too
+      queryClient.invalidateQueries({ queryKey: ['products'] });
     },
   });
 }

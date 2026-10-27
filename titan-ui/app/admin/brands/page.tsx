@@ -10,6 +10,7 @@ import {
 } from '@/lib/hooks';
 import type { Brand } from '@/lib/types';
 import { useTranslation } from '@/lib/i18n';
+import { IconAction } from '../../components/IconAction';
 
 const emptyForm = {
   name: '',
@@ -201,22 +202,21 @@ export default function AdminBrandsPage() {
                     <td className="py-3 pr-4">
                       {brand.nameKa || t('admin_no_parent_value')}
                     </td>
-                    <td className="py-3 flex gap-4">
-                      <button
-                        type="button"
-                        onClick={() => handleEditClick(brand)}
-                        className="text-primary hover:underline"
-                      >
-                        {t('admin_edit')}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleDelete(brand.id, brand.name)}
-                        disabled={deleteBrand.isPending}
-                        className="text-red-600 hover:underline disabled:opacity-50"
-                      >
-                        {t('admin_delete')}
-                      </button>
+                    <td className="py-3">
+                      <div className="flex items-center gap-3">
+                        <IconAction
+                          icon="edit"
+                          label={t('admin_edit')}
+                          onClick={() => handleEditClick(brand)}
+                        />
+                        <IconAction
+                          icon="delete"
+                          label={t('admin_delete')}
+                          onClick={() => handleDelete(brand.id, brand.name)}
+                          disabled={deleteBrand.isPending}
+                          variant="danger"
+                        />
+                      </div>
                     </td>
                   </tr>
                 ))}

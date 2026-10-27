@@ -14,6 +14,11 @@ public class Product
     public int CategoryId { get; set; }
     public string? CategoryName { get; set; }
     public string? CategoryNameKa { get; set; }
+
+    // Null when no brand is assigned
+    public int? BrandId { get; set; }
+    public string? BrandName { get; set; }
+    public string? BrandNameKa { get; set; }
     public string? ImageUrl { get; set; }
 
     /// <summary>Up to 3 image URLs, in display order. ImageUrl mirrors the first entry for back-compat.</summary>

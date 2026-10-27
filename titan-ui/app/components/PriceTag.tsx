@@ -16,10 +16,10 @@ export function PriceTag({ product, className = '' }: PriceTagProps) {
 
   return (
     <p className="flex items-baseline gap-3 flex-wrap">
-      <span className={className}>${effectivePrice(product).toFixed(2)}</span>
+      <span className={className}>₾{effectivePrice(product).toFixed(2)}</span>
       {discounted && (
         <span className="text-on-surface-variant line-through decoration-red-500 text-base">
-          ${product.price.toFixed(2)}
+          ₾{product.price.toFixed(2)}
         </span>
       )}
     </p>
