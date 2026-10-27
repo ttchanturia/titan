@@ -37,3 +37,14 @@ export interface Brand {
   name: string;
   nameKa?: string;
 }
+
+/**
+ * One customized homepage field. `value` is the English text (or the URL for
+ * image fields); `valueKa` is the Georgian text. Fields with no entry use the
+ * built-in defaults (see lib/homepage.ts).
+ */
+export interface HomepageContentEntry {
+  key: string;
+  value?: string | null;
+  valueKa?: string | null;
+}

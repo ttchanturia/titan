@@ -87,6 +87,7 @@ builder.Services.AddSingleton<DatabaseInitializer>();
 builder.Services.AddScoped<ProductRepository>();
 builder.Services.AddScoped<CategoryRepository>();
 builder.Services.AddScoped<BrandRepository>();
+builder.Services.AddScoped<HomepageContentRepository>();
 
 var app = builder.Build();
 

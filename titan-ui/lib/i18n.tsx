@@ -19,7 +19,7 @@ interface I18nContextValue {
 
 const I18nContext = createContext<I18nContextValue | null>(null);
 
-function interpolate(template: string, vars?: Record<string, string | number>) {
+export function interpolate(template: string, vars?: Record<string, string | number>) {
   if (!vars) return template;
   return Object.entries(vars).reduce(
     (result, [key, value]) => result.replaceAll(`{${key}}`, String(value)),

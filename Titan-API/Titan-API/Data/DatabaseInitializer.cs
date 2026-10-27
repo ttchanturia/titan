@@ -107,6 +107,16 @@ public class DatabaseInitializer
             -- Added when subcategories (parent_id self-reference) were introduced.
             ALTER TABLE categories ADD COLUMN IF NOT EXISTS parent_id INT REFERENCES categories(id);
             CREATE INDEX IF NOT EXISTS idx_categories_parent_id ON categories(parent_id);
+
+            -- Admin-configurable homepage texts and images. One row per customized
+            -- field; fields without a row use the frontend's built-in defaults.
+            -- value = English text or image URL, value_ka = Georgian text.
+            CREATE TABLE IF NOT EXISTS homepage_content (
+                key VARCHAR(100) PRIMARY KEY,
+                value TEXT,
+                value_ka TEXT,
+                updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+            );
             """;
 
         await using var cmd = new NpgsqlCommand(sql, conn);

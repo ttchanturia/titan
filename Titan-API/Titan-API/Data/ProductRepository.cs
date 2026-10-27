@@ -133,7 +133,7 @@ public class ProductRepository
 
         var sql = """
             UPDATE products
-SET name = @name, description = @desc, description_ka = @descKa, price = @price, discount_price = @discountPrice,
+            SET name = @name, description = @desc, description_ka = @descKa, price = @price, discount_price = @discountPrice,
                 category_id = @categoryId, image_url = @imageUrl, image_urls = @imageUrls,
                 stock_quantity = @stock, is_rental = @isRental
             WHERE id = @id

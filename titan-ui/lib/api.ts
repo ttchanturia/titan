@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Product, Category, Brand } from './types';
+import { Product, Category, Brand, HomepageContentEntry } from './types';
 import { getStoredAuthHeader } from './auth';
 
 // Configure base URL - adjust based on your backend URL
@@ -108,6 +108,20 @@ export const brandApi = {
 
   delete: async (id: number): Promise<boolean> => {
     const response = await axiosInstance.delete(`/brands/${id}`);
+    return response.status === 204 || response.status === 200;
+  },
+};
+
+// Homepage content API calls
+export const homepageApi = {
+  getAll: async (): Promise<HomepageContentEntry[]> => {
+    const response = await axiosInstance.get<HomepageContentEntry[]>('/homepage');
+    return response.data;
+  },
+
+  /** Replaces the full configuration; omitted fields revert to their defaults. */
+  replaceAll: async (entries: HomepageContentEntry[]): Promise<boolean> => {
+    const response = await axiosInstance.put('/homepage', entries);
     return response.status === 204 || response.status === 200;
   },
 };
