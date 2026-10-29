@@ -1,8 +1,8 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Brand, Category, Product } from './types';
-import { productApi, categoryApi, brandApi, uploadApi } from './api';
+import { Brand, Category, HomepageContentEntry, Product } from './types';
+import { productApi, categoryApi, brandApi, homepageApi, uploadApi } from './api';
 
 
 /**
@@ -213,6 +213,33 @@ export function useDeleteBrand() {
       queryClient.invalidateQueries({ queryKey: ['brands'] });
       // Brand names are joined into product rows, so refresh those too
       queryClient.invalidateQueries({ queryKey: ['products'] });
+    },
+  });
+}
+
+/**
+ * Hook for fetching the admin-configured homepage content.
+ * Retries only once so the homepage falls back to its defaults quickly when
+ * the API is unreachable.
+ */
+export function useHomepageContent() {
+  return useQuery({
+    queryKey: ['homepage'],
+    queryFn: () => homepageApi.getAll(),
+    retry: 1,
+  });
+}
+
+/**
+ * Hook for saving the full homepage configuration
+ */
+export function useUpdateHomepageContent() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (entries: HomepageContentEntry[]) => homepageApi.replaceAll(entries),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['homepage'] });
     },
   });
 }
