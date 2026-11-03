@@ -75,7 +75,7 @@ export default function HomePage() {
         {/* Featured Instruments */}
         <section className="bg-surface-container-low py-32 overflow-hidden">
           <div className="max-w-screen-2xl mx-auto px-8 mb-20">
-            <div className="flex justify-between items-end">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
               <div>
                 <h2 className="text-4xl font-headline font-bold tracking-tight">
                   {content.text('home_featured_heading')}
