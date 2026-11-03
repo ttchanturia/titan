@@ -20,7 +20,7 @@ export default function RentalPage() {
               <span className="font-label text-xs uppercase tracking-[0.3em] text-on-surface-variant mb-4 block">
                 {t('rental_badge')}
               </span>
-              <h1 className="font-headline text-5xl md:text-7xl font-bold tracking-tighter leading-none text-primary">
+              <h1 className="page-hero-heading font-headline text-5xl md:text-7xl font-bold tracking-tighter leading-none text-primary">
                 {t('rental_heading')}
               </h1>
               <p className="mt-6 text-lg text-on-surface-variant font-light leading-relaxed">

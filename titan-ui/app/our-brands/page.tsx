@@ -32,7 +32,7 @@ export default function OurBrandsPage() {
             <Equalizer className="h-3 text-primary" />
             Titan
           </span>
-          <h1 className="font-headline text-5xl md:text-7xl font-bold tracking-tighter leading-none text-primary">
+          <h1 className="page-hero-heading font-headline text-5xl md:text-7xl font-bold tracking-tighter leading-none text-primary">
             {t('brands_title')}
           </h1>
           <p className="mt-8 max-w-3xl font-headline text-xl md:text-2xl font-medium leading-snug">
