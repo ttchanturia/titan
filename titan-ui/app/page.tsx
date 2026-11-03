@@ -155,7 +155,7 @@ export default function HomePage() {
               <span className="text-[10px] font-bold tracking-[0.4em] uppercase text-outline mb-4 block">
                 {content.text('home_new_arrivals_badge')}
               </span>
-              <h2 className="text-5xl font-headline font-extrabold tracking-tighter">
+              <h2 className="home-bento-heading text-5xl font-headline font-extrabold tracking-tighter wrap-break-word">
                 {content.text('home_new_arrivals_heading')}
               </h2>
             </div>
