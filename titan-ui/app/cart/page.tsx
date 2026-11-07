@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Nav from '../components/Nav';
 import Footer from '../components/Footer';
 import { useCart } from '@/lib/cart-context';
-import { DEFAULT_PRODUCT_IMAGE } from '@/lib/constants';
+import { FALLBACK_IMAGE_SVG } from '@/lib/constants';
 import { useTranslation } from '@/lib/i18n';
 
 const SHIPPING = 45;
@@ -55,7 +55,7 @@ export default function CartPage() {
                     <img
                       alt={item.name}
                       className="w-full h-full object-cover"
-                      src={item.imageUrl || DEFAULT_PRODUCT_IMAGE}
+                      src={item.imageUrl || FALLBACK_IMAGE_SVG}
                     />
                   </div>
                   <div className="grow flex flex-col justify-between py-2">

@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { DEFAULT_PRODUCT_IMAGE } from '@/lib/constants';
+import { FALLBACK_IMAGE_SVG } from '@/lib/constants';
 import type { Product } from '@/lib/types';
 import { useTranslation, localizedText } from '@/lib/i18n';
 import { discountPercent, hasDiscount } from '@/lib/pricing';
@@ -42,7 +42,7 @@ export function ProductGrid({ products }: ProductGridProps) {
             <div className="relative overflow-hidden bg-surface-container-high aspect-square mb-6">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={product.imageUrl || DEFAULT_PRODUCT_IMAGE}
+                src={product.imageUrl || FALLBACK_IMAGE_SVG}
                 alt={product.name}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
               />

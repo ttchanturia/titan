@@ -5,11 +5,11 @@ import Nav from './components/Nav';
 import Footer from './components/Footer';
 import NewsletterForm from './components/NewsletterForm';
 import { useProducts } from '@/lib/hooks';
-import { DEFAULT_PRODUCT_IMAGE } from '@/lib/constants';
+import { FALLBACK_IMAGE_SVG } from '@/lib/constants';
 import { useHomepage } from '@/lib/homepage';
 
 export default function HomePage() {
-  const { data: products } = useProducts();
+  const { data: products, isLoading: productsLoading } = useProducts();
   const content = useHomepage();
   const latestProduct = products?.reduce<(typeof products)[number] | undefined>(
     (latest, p) => (!latest || p.id > latest.id ? p : latest),
@@ -17,6 +17,9 @@ export default function HomePage() {
   );
   // An admin-set hero photo wins; otherwise feature the newest product
   const heroImage = content.image('home_hero_image');
+  // Nothing to show yet while products are still in flight and there's no
+  // admin override - skeleton rather than flashing the generic fallback photo.
+  const showHeroSkeleton = !heroImage && productsLoading;
 
   return (
     <>
@@ -58,15 +61,21 @@ export default function HomePage() {
             </div>
             <div className="lg:col-span-7 relative">
               <div className="aspect-4/5 bg-surface-container-low relative overflow-hidden">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  alt={heroImage ? 'Featured instrument' : (latestProduct?.name ?? 'Featured instrument')}
-                  className="w-full h-full object-cover contrast-125"
-                  src={heroImage || latestProduct?.imageUrl || DEFAULT_PRODUCT_IMAGE}
-                />
-                <div className="absolute bottom-10 -left-5 bg-primary text-on-primary px-8 py-4 -rotate-90 origin-left text-[10px] tracking-[0.5em] font-bold uppercase">
-                  {content.text('home_handcrafted_badge')}
-                </div>
+                {showHeroSkeleton ? (
+                  <div className="w-full h-full animate-pulse bg-surface-container-high" />
+                ) : (
+                  <>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      alt={heroImage ? 'Featured instrument' : (latestProduct?.name ?? 'Featured instrument')}
+                      className="w-full h-full object-cover contrast-125"
+                      src={heroImage || latestProduct?.imageUrl || FALLBACK_IMAGE_SVG}
+                    />
+                    <div className="absolute bottom-10 -left-5 bg-primary text-on-primary px-8 py-4 -rotate-90 origin-left text-[10px] tracking-[0.5em] font-bold uppercase">
+                      {content.text('home_handcrafted_badge')}
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </div>

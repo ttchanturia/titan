@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useProduct } from '@/lib/hooks';
-import { DEFAULT_PRODUCT_IMAGE } from '@/lib/constants';
+import { FALLBACK_IMAGE_SVG } from '@/lib/constants';
 import { useParams } from 'next/navigation';
 import Nav from '@/app/components/Nav';
 import Footer from '@/app/components/Footer';
@@ -122,7 +122,7 @@ export default function ProductPage() {
     : product.imageUrl
       ? [product.imageUrl]
       : [];
-  const mainImage = images[activeImageIndex] ?? images[0] ?? DEFAULT_PRODUCT_IMAGE;
+  const mainImage = images[activeImageIndex] ?? images[0] ?? FALLBACK_IMAGE_SVG;
 
   return (
     <>
