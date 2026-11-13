@@ -57,10 +57,10 @@ export const translations = {
     products_load_error: 'Failed to load products:',
 
     // Rental listing page (same layout as products; shows products flagged as rentals)
-    rental_badge: 'Rent Instead of Buy',
-    rental_heading: 'Rental',
+    rental_badge: 'Rental Service',
+    rental_heading: 'For Events & Occasions',
     rental_subtitle:
-      'Instruments available to rent. Pick one, check the details, and get in touch to arrange your rental.',
+      'Choose the gear your event needs, check the details, and get in touch to rent it.',
 
     // Contact page
     contact_badge: 'Get in Touch',
@@ -356,10 +356,10 @@ export const translations = {
     products_load_error: 'პროდუქტების ჩატვირთვა ვერ მოხერხდა:',
 
     // Rental listing page
-    rental_badge: 'ქირაობა ყიდვის ნაცვლად',
-    rental_heading: 'გაქირავება',
+    rental_badge: 'გაქირავების სერვისი',
+    rental_heading: 'ივენთებისა და ღონისძიებებისთვის',
     rental_subtitle:
-      'ინსტრუმენტები ქირაობისთვის. აირჩიეთ სასურველი ინსტრუმენტი, გაეცანით დეტალებს და დაგვიკავშირდით ქირაობის გასაფორმებლად.',
+      'შეარჩიეთ თქვენი ღონისძიებისთვის საჭირო ატრიბუტი, გაეცანით დეტალებს და დასაქირავებლად დაგვიკავშირდით.',
 
     // Contact page
     contact_badge: 'დაგვიკავშირდით',
