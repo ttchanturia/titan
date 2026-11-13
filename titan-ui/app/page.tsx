@@ -13,7 +13,7 @@ export default function HomePage() {
   const { data: products, isLoading: productsLoading } = useProducts();
   const { data: categories } = useCategories();
   const content = useHomepage();
-  const { t, locale } = useTranslation();
+  const { locale } = useTranslation();
   const latestProduct = products?.reduce<(typeof products)[number] | undefined>(
     (latest, p) => (!latest || p.id > latest.id ? p : latest),
     undefined,
@@ -24,15 +24,28 @@ export default function HomePage() {
   // admin override - skeleton rather than flashing the generic fallback photo.
   const showHeroSkeleton = !heroImage && productsLoading;
 
+  type CategoryWithChildren = NonNullable<typeof categories>[number];
+
+  // Skips a category (checking itself and its subcategories) that has no
+  // non-rental products - rentals live on a separate page from the regular
+  // catalogue, so a category made up entirely of rental items would send
+  // someone from this tile straight to an empty /products list. Doesn't hide
+  // anything while products are still loading, so the grid doesn't flash empty.
+  const hasShoppableProduct = (category: CategoryWithChildren): boolean => {
+    if (!products) return true;
+    const matchingIds = [category.id, ...(category.children ?? []).map((c) => c.id)];
+    return products.some((p) => matchingIds.includes(p.categoryId) && !p.isRental);
+  };
+
   // Top-level categories only (GET /api/categories already returns just those,
   // with subcategories nested in `children`), capped at 6 for the homepage tile.
-  const topCategories = categories?.slice(0, 6) ?? [];
+  const topCategories = (categories?.filter(hasShoppableProduct) ?? []).slice(0, 6);
 
   // Represents a category with its most recently added product's photo
   // (checking the category itself and its subcategories) rather than a
   // generic stock photo - it's real inventory, and keeps itself up to date
   // as products are added, with no separate image to curate.
-  const latestImageForCategory = (category: (typeof topCategories)[number]) => {
+  const latestImageForCategory = (category: CategoryWithChildren) => {
     if (!products) return undefined;
     const matchingIds = [category.id, ...(category.children ?? []).map((c) => c.id)];
     const latest = products
@@ -103,7 +116,7 @@ export default function HomePage() {
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-16">
               <div>
                 <h2 className="text-4xl font-headline font-bold tracking-tight">
-                  {t('home_categories_heading')}
+                  {content.text('home_categories_heading')}
                 </h2>
                 <div className="w-12 h-1 bg-primary mt-4"></div>
               </div>
@@ -111,7 +124,7 @@ export default function HomePage() {
                 href="/products"
                 className="text-sm font-semibold underline underline-offset-8 decoration-1"
               >
-                {t('home_view_all_categories')}
+                {content.text('home_view_all_categories')}
               </Link>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
@@ -170,7 +183,7 @@ export default function HomePage() {
                 href="/products"
                 className="inline-block bg-primary text-on-primary px-10 py-5 text-sm font-bold uppercase tracking-widest hover:bg-primary-container active:scale-95 transition-all duration-200"
               >
-                {t('home_view_all_products')}
+                {content.text('home_view_all_products')}
               </Link>
             </div>
           </div>

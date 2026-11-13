@@ -51,10 +51,18 @@ export const HOMEPAGE_SECTIONS: HomepageSection[] = [
     ],
   },
   {
+    title: 'admin_homepage_section_categories',
+    fields: [
+      { kind: 'text', key: 'home_categories_heading', label: 'admin_homepage_field_heading' },
+      { kind: 'text', key: 'home_view_all_categories', label: 'admin_homepage_field_link' },
+    ],
+  },
+  {
     title: 'admin_homepage_section_new_arrivals',
     fields: [
       { kind: 'text', key: 'home_new_arrivals_badge', label: 'admin_homepage_field_badge' },
       { kind: 'text', key: 'home_new_arrivals_heading', label: 'admin_homepage_field_heading' },
+      { kind: 'text', key: 'home_view_all_products', label: 'admin_homepage_field_primary_button' },
     ],
   },
   {
