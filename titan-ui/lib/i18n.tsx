@@ -42,6 +42,26 @@ export function localizedText(
   return text ?? undefined;
 }
 
+// Mkhedruli (the regular Georgian letters, U+10D0-U+10FF) and Mtavruli (its
+// "capital" form, U+1C90-U+1CBF, added in Unicode 11) are separate codepoints
+// a fixed distance apart - not upper/lower forms of each other that
+// text-transform: uppercase understands, so that CSS property has no effect
+// on Georgian. Mtavruli is also where Georgian's uniform letter height (no
+// descenders) actually comes from, which is the usual reason to want it.
+const MKHEDRULI_TO_MTAVRULI_OFFSET = 0x1c90 - 0x10d0;
+
+/** Converts Mkhedruli text to Mtavruli; anything outside that range (Latin, digits, punctuation) is untouched. */
+export function toMtavruli(text: string): string {
+  return Array.from(text)
+    .map((ch) => {
+      const code = ch.codePointAt(0);
+      return code !== undefined && code >= 0x10d0 && code <= 0x10ff
+        ? String.fromCodePoint(code + MKHEDRULI_TO_MTAVRULI_OFFSET)
+        : ch;
+    })
+    .join('');
+}
+
 export function I18nProvider({ children }: { children: ReactNode }) {
   const [locale, setLocaleState] = useState<Locale>('en');
 

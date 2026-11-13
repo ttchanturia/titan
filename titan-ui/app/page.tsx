@@ -7,7 +7,7 @@ import NewsletterForm from './components/NewsletterForm';
 import { useCategories, useProducts } from '@/lib/hooks';
 import { FALLBACK_IMAGE_SVG } from '@/lib/constants';
 import { useHomepage } from '@/lib/homepage';
-import { useTranslation, localizedText } from '@/lib/i18n';
+import { useTranslation, localizedText, toMtavruli } from '@/lib/i18n';
 
 export default function HomePage() {
   const { data: products, isLoading: productsLoading } = useProducts();
@@ -70,9 +70,19 @@ export default function HomePage() {
         <section className="relative min-h-screen flex items-center pt-20 overflow-hidden bg-surface">
           <div className="max-w-screen-2xl mx-auto px-8 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center w-full">
             <div className="lg:col-span-5 z-10">
+              {/* uppercase only affects the English text - Georgian has no
+                  letter case, so it's converted to Mtavruli instead, which is
+                  genuinely where that uniform letter height comes from. */}
               <h1 className="uppercase text-5xl sm:text-6xl md:text-8xl font-headline font-extrabold tracking-tighter leading-[0.9] mb-8">
-                {content.text('home_hero_title_line1')} <br />
-                <span className="text-outline">{content.text('home_hero_title_line2')}</span>
+                {locale === 'ka'
+                  ? toMtavruli(content.text('home_hero_title_line1'))
+                  : content.text('home_hero_title_line1')}{' '}
+                <br />
+                <span className="text-outline">
+                  {locale === 'ka'
+                    ? toMtavruli(content.text('home_hero_title_line2'))
+                    : content.text('home_hero_title_line2')}
+                </span>
               </h1>
               <p className="text-lg text-on-surface-variant max-w-md mb-12 font-light leading-relaxed">
                 {content.text('home_hero_subtitle')}
@@ -87,9 +97,10 @@ export default function HomePage() {
               </div>
             </div>
             <div className="lg:col-span-7 relative flex justify-center lg:justify-end">
-              {/* Capped at max-w-md - a smaller, fixed-size frame rather than
-                  growing to fill the remaining grid width. */}
-              <div className="w-full max-w-md aspect-4/5 bg-surface-container-low relative overflow-hidden">
+              {/* Capped at max-w-2xl - a fixed-size frame rather than growing
+                  to fill the remaining grid width, but large enough to not
+                  look lost in that space on a wide screen. */}
+              <div className="w-full max-w-2xl aspect-4/5 bg-surface-container-low relative overflow-hidden">
                 {showHeroSkeleton ? (
                   <div className="w-full h-full animate-pulse bg-surface-container-high" />
                 ) : (
