@@ -92,7 +92,27 @@ export function ProductsPageClient({ rental = false }: ProductsPageClientProps) 
     }
     if (searchInput.trim()) {
       const q = searchInput.trim().toLowerCase();
-      result = result.filter((p) => p.name.toLowerCase().includes(q));
+      // Search by everything, not just the product name - the parent
+      // category (not only the product's own, possibly-subcategory, one) so
+      // typing a parent category name still finds its subcategories' products.
+      result = result.filter((p) => {
+        const parent = categories?.find((c) => c.children?.some((child) => child.id === p.categoryId));
+        const haystack = [
+          p.name,
+          p.categoryName,
+          p.categoryNameKa,
+          parent?.name,
+          parent?.nameKa,
+          p.brandName,
+          p.brandNameKa,
+          p.description,
+          p.descriptionKa,
+        ]
+          .filter(Boolean)
+          .join(' ')
+          .toLowerCase();
+        return haystack.includes(q);
+      });
     }
     if (minPrice !== undefined) {
       result = result.filter((p) => effectivePrice(p) >= minPrice);

@@ -3,7 +3,6 @@
 import { useState, type FormEvent } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useCart } from '@/lib/cart-context';
 import { useTranslation } from '@/lib/i18n';
 import { LanguageToggle } from './LanguageToggle';
 
@@ -12,7 +11,6 @@ export default function Nav() {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState('');
   const [menuOpen, setMenuOpen] = useState(false);
-  const { count } = useCart();
   const { t } = useTranslation();
 
   const navLinks = [
@@ -87,17 +85,6 @@ export default function Nav() {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </form>
-          <Link
-            href="/cart"
-            className="relative hover:opacity-80 transition-opacity duration-300"
-          >
-            <span className="material-symbols-outlined">shopping_bag</span>
-            {count > 0 && (
-              <span className="absolute -top-2 -right-2 bg-primary text-on-primary text-[10px] font-bold rounded-full min-w-4.5 h-4.5 flex items-center justify-center px-1">
-                {count}
-              </span>
-            )}
-          </Link>
           <button className="hidden sm:inline-flex hover:opacity-80 transition-opacity duration-300">
             <span className="material-symbols-outlined">person</span>
           </button>

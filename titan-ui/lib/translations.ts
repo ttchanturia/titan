@@ -50,10 +50,10 @@ export const translations = {
     newsletter_subscribe: 'Subscribe',
 
     // Products listing page
-    products_badge: 'The Full Collection',
+    products_badge: 'Wide Selection',
     products_heading: 'All Instruments',
     products_subtitle:
-      'From solid-body electrics to studio monitors and beyond, explore the complete Titan catalogue, engineered for precision at every price point.',
+      'Browse our products, pick the one you like, and get in touch with us to purchase.',
     products_load_error: 'Failed to load products:',
 
     // Rental listing page (same layout as products; shows products flagged as rentals)
@@ -161,9 +161,8 @@ export const translations = {
     product_stock_quantity_label: 'Stock Quantity:',
     product_units: 'units',
     product_added_on: 'Added on:',
-    product_add_to_cart: 'Add to Cart',
-    product_added: 'Added ✓',
-    product_continue_shopping: 'Continue Shopping',
+    product_call_to_buy: 'Call Us to Purchase',
+    product_message_whatsapp: 'Message Us on WhatsApp',
     product_info_heading: 'Product Information',
     product_id_label: 'Product ID:',
     product_category_label: 'Category:',
@@ -351,10 +350,9 @@ export const translations = {
     newsletter_subscribe: 'გამოწერა',
 
     // Products listing page
-    products_badge: 'სრული კოლექცია',
+    products_badge: 'ფართო არჩევანი',
     products_heading: 'ყველა ინსტრუმენტი',
-    products_subtitle:
-      'სოლიდ-ბოდი ელექტროგიტარებიდან სტუდიურ მონიტორებამდე — გაეცანით Titan-ის სრულ კატალოგს, შექმნილს სიზუსტისთვის ნებისმიერ ფასად.',
+    products_subtitle: 'დაათვალიერეთ პროდუქტები, შეარჩიეთ და შესაძენად დაგვიკავშირდით.',
     products_load_error: 'პროდუქტების ჩატვირთვა ვერ მოხერხდა:',
 
     // Rental listing page
@@ -462,9 +460,8 @@ export const translations = {
     product_stock_quantity_label: 'მარაგის რაოდენობა:',
     product_units: 'ერთეული',
     product_added_on: 'დამატების თარიღი:',
-    product_add_to_cart: 'კალათაში დამატება',
-    product_added: 'დაემატა ✓',
-    product_continue_shopping: 'შოპინგის გაგრძელება',
+    product_call_to_buy: 'შესაძენად დაგვირეკეთ',
+    product_message_whatsapp: 'მოგვწერეთ WhatsApp-ზე',
     product_info_heading: 'პროდუქტის ინფორმაცია',
     product_id_label: 'პროდუქტის ID:',
     product_category_label: 'კატეგორია:',

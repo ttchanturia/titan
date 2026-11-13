@@ -7,8 +7,8 @@ import { FALLBACK_IMAGE_SVG } from '@/lib/constants';
 import { useParams } from 'next/navigation';
 import Nav from '@/app/components/Nav';
 import Footer from '@/app/components/Footer';
-import { useCart } from '@/lib/cart-context';
 import { useTranslation, localizedText, headingText } from '@/lib/i18n';
+import { WHATSAPP_URL, PHONE_TEL_HREF } from '@/lib/constants';
 import { effectivePrice } from '@/lib/pricing';
 import { PriceTag } from '@/app/components/PriceTag';
 
@@ -18,8 +18,6 @@ export default function ProductPage() {
   const id = parseInt(params.id as string, 10);
 
   const { data: product, isLoading, error } = useProduct(id);
-  const { addItem } = useCart();
-  const [added, setAdded] = useState(false);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const { t, locale } = useTranslation();
 
@@ -27,13 +25,6 @@ export default function ProductPage() {
   useEffect(() => {
     setActiveImageIndex(0);
   }, [id]);
-
-  const handleAddToCart = () => {
-    if (!product) return;
-    addItem(product, 1);
-    setAdded(true);
-    setTimeout(() => setAdded(false), 1500);
-  };
 
   if (isLoading) {
     return (
@@ -246,29 +237,25 @@ export default function ProductPage() {
                   )}
                 </div>
 
-                {/* CTA Buttons */}
+                {/* CTA Buttons: no self-checkout - purchases go through a direct
+                    call or WhatsApp message instead. */}
                 <div className="flex flex-col sm:flex-row gap-4">
-                  <button
-                    onClick={handleAddToCart}
-                    className={`flex-1 px-8 py-4 font-semibold rounded text-center transition-colors ${
-                      product.stockQuantity > 0
-                        ? 'bg-primary text-on-primary hover:bg-primary/90'
-                        : 'bg-surface-container-high text-on-surface-variant cursor-not-allowed'
-                    }`}
-                    disabled={product.stockQuantity === 0}
+                  <a
+                    href={WHATSAPP_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 px-8 py-4 font-semibold rounded text-center bg-primary text-on-primary hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
                   >
-                    {product.stockQuantity === 0
-                      ? t('product_stock_out')
-                      : added
-                        ? t('product_added')
-                        : t('product_add_to_cart')}
-                  </button>
-                  <Link
-                    href="/products"
-                    className="px-8 py-4 font-semibold rounded text-center border border-outline text-on-surface hover:bg-surface-container transition-colors"
+                    <span className="material-symbols-outlined text-xl">chat</span>
+                    {t('product_message_whatsapp')}
+                  </a>
+                  <a
+                    href={PHONE_TEL_HREF}
+                    className="flex-1 px-8 py-4 font-semibold rounded text-center border border-outline text-on-surface hover:bg-surface-container transition-colors flex items-center justify-center gap-2"
                   >
-                    {t('product_continue_shopping')}
-                  </Link>
+                    <span className="material-symbols-outlined text-xl">call</span>
+                    {t('product_call_to_buy')}
+                  </a>
                 </div>
               </div>
             </div>

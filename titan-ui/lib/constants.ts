@@ -10,3 +10,8 @@ export const PRODUCTS_PAGE_SIZE = 9;
 // Must match Uploads:MaxSizeBytes in the API's appsettings.json
 export const MAX_UPLOAD_SIZE_MB = 8;
 export const MAX_UPLOAD_SIZE_BYTES = MAX_UPLOAD_SIZE_MB * 1024 * 1024;
+
+// Same mobile number already shown on the Contact page / footer, reused here
+// for the "call or message to purchase" flow (no self-checkout).
+export const PHONE_TEL_HREF = 'tel:+995555377117';
+export const WHATSAPP_URL = 'https://wa.me/995555377117';
