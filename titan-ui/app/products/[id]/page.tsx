@@ -8,7 +8,7 @@ import { useParams } from 'next/navigation';
 import Nav from '@/app/components/Nav';
 import Footer from '@/app/components/Footer';
 import { useCart } from '@/lib/cart-context';
-import { useTranslation, localizedText } from '@/lib/i18n';
+import { useTranslation, localizedText, headingText } from '@/lib/i18n';
 import { effectivePrice } from '@/lib/pricing';
 import { PriceTag } from '@/app/components/PriceTag';
 
@@ -67,7 +67,7 @@ export default function ProductPage() {
           <div className="py-16 px-4">
             <div className="max-w-screen-2xl mx-auto text-center">
               <h1 className="text-2xl font-bold text-on-surface mb-4">
-                {t('product_not_found')}
+                {headingText(t('product_not_found'), locale)}
               </h1>
               <p className="text-on-surface-variant mb-8">
                 {t('product_load_failed')} {error.message}
@@ -94,7 +94,7 @@ export default function ProductPage() {
           <div className="py-16 px-4">
             <div className="max-w-screen-2xl mx-auto text-center">
               <h1 className="text-2xl font-bold text-on-surface mb-4">
-                {t('product_not_found')}
+                {headingText(t('product_not_found'), locale)}
               </h1>
               <Link
                 href="/products"
@@ -204,7 +204,7 @@ export default function ProductPage() {
                 )}
 
                 <h1 className="text-4xl md:text-5xl font-headline font-bold text-on-surface mb-6">
-                  {product.name}
+                  {headingText(product.name, locale)}
                 </h1>
 
                 <div className="mb-8">

@@ -7,7 +7,7 @@ import NewsletterForm from './components/NewsletterForm';
 import { useCategories, useProducts } from '@/lib/hooks';
 import { FALLBACK_IMAGE_SVG } from '@/lib/constants';
 import { useHomepage } from '@/lib/homepage';
-import { useTranslation, localizedText, toMtavruli } from '@/lib/i18n';
+import { useTranslation, localizedText, headingText } from '@/lib/i18n';
 
 export default function HomePage() {
   const { data: products, isLoading: productsLoading } = useProducts();
@@ -74,14 +74,9 @@ export default function HomePage() {
                   letter case, so it's converted to Mtavruli instead, which is
                   genuinely where that uniform letter height comes from. */}
               <h1 className="uppercase text-5xl sm:text-6xl md:text-8xl font-headline font-extrabold tracking-tighter leading-[0.9] mb-8">
-                {locale === 'ka'
-                  ? toMtavruli(content.text('home_hero_title_line1'))
-                  : content.text('home_hero_title_line1')}{' '}
-                <br />
+                {headingText(content.text('home_hero_title_line1'), locale)} <br />
                 <span className="text-outline">
-                  {locale === 'ka'
-                    ? toMtavruli(content.text('home_hero_title_line2'))
-                    : content.text('home_hero_title_line2')}
+                  {headingText(content.text('home_hero_title_line2'), locale)}
                 </span>
               </h1>
               <p className="text-lg text-on-surface-variant max-w-md mb-12 font-light leading-relaxed">
@@ -92,7 +87,7 @@ export default function HomePage() {
                   href="/products"
                   className="bg-primary text-on-primary px-10 py-5 text-sm font-bold uppercase tracking-widest hover:bg-primary-container active:scale-95 transition-all duration-200"
                 >
-                  {content.text('home_explore_series')}
+                  {headingText(content.text('home_explore_series'), locale)}
                 </Link>
               </div>
             </div>
@@ -127,7 +122,7 @@ export default function HomePage() {
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-16">
               <div>
                 <h2 className="text-4xl font-headline font-bold tracking-tight">
-                  {content.text('home_categories_heading')}
+                  {headingText(content.text('home_categories_heading'), locale)}
                 </h2>
                 <div className="w-12 h-1 bg-primary mt-4"></div>
               </div>
@@ -135,28 +130,31 @@ export default function HomePage() {
                 href="/products"
                 className="text-sm font-semibold underline underline-offset-8 decoration-1"
               >
-                {content.text('home_view_all_categories')}
+                {headingText(content.text('home_view_all_categories'), locale)}
               </Link>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-              {topCategories.map((category) => (
-                <Link
-                  key={category.id}
-                  href={`/products?category=${category.id}`}
-                  className="group relative aspect-square overflow-hidden block"
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={latestImageForCategory(category) || FALLBACK_IMAGE_SVG}
-                    alt={localizedText(category.name, category.nameKa, locale) ?? category.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/10 to-transparent" />
-                  <span className="absolute bottom-0 left-0 right-0 p-5 font-headline text-base md:text-xl font-bold text-white leading-tight wrap-break-word">
-                    {localizedText(category.name, category.nameKa, locale)}
-                  </span>
-                </Link>
-              ))}
+              {topCategories.map((category) => {
+                const categoryName = localizedText(category.name, category.nameKa, locale) ?? category.name;
+                return (
+                  <Link
+                    key={category.id}
+                    href={`/products?category=${category.id}`}
+                    className="group relative aspect-square overflow-hidden block"
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={latestImageForCategory(category) || FALLBACK_IMAGE_SVG}
+                      alt={categoryName}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/10 to-transparent" />
+                    <span className="absolute bottom-0 left-0 right-0 p-5 font-headline text-base md:text-xl font-bold text-white leading-tight wrap-break-word">
+                      {headingText(categoryName, locale)}
+                    </span>
+                  </Link>
+                );
+              })}
             </div>
           </div>
         </section>
@@ -169,7 +167,7 @@ export default function HomePage() {
                 {content.text('home_new_arrivals_badge')}
               </span>
               <h2 className="home-bento-heading text-5xl font-headline font-extrabold tracking-tighter wrap-break-word">
-                {content.text('home_new_arrivals_heading')}
+                {headingText(content.text('home_new_arrivals_heading'), locale)}
               </h2>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
@@ -184,7 +182,7 @@ export default function HomePage() {
                     />
                   </div>
                   <h3 className="text-sm md:text-base font-headline font-semibold">
-                    {product.name}
+                    {headingText(product.name, locale)}
                   </h3>
                 </Link>
               ))}
@@ -194,7 +192,7 @@ export default function HomePage() {
                 href="/products"
                 className="inline-block bg-primary text-on-primary px-10 py-5 text-sm font-bold uppercase tracking-widest hover:bg-primary-container active:scale-95 transition-all duration-200"
               >
-                {content.text('home_view_all_products')}
+                {headingText(content.text('home_view_all_products'), locale)}
               </Link>
             </div>
           </div>
@@ -204,7 +202,7 @@ export default function HomePage() {
         <section className="py-32 bg-surface-container-low border-t border-outline-variant/10">
           <div className="max-w-screen-2xl mx-auto px-8 text-center">
             <h2 className="text-3xl font-headline font-bold mb-8">
-              {content.text('home_newsletter_heading')}
+              {headingText(content.text('home_newsletter_heading'), locale)}
             </h2>
             <p className="text-on-surface-variant max-w-xl mx-auto mb-12 font-light">
               {content.text('home_newsletter_subtitle')}

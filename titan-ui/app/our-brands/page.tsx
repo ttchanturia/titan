@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Nav from '../components/Nav';
 import Footer from '../components/Footer';
 import { Equalizer, Soundwave } from '../components/AudioDecor';
-import { useTranslation } from '@/lib/i18n';
+import { useTranslation, headingText } from '@/lib/i18n';
 import type { TranslationKey } from '@/lib/translations';
 
 const BRANDS = ['FBT', 'PROEL', 'NEUTRIK', 'K&M', 'STAGG', 'ITC', 'CLAYPAKY'];
@@ -20,7 +20,7 @@ const VALUES: { key: TranslationKey; icon: string }[] = [
 const SCREW_POSITIONS = ['top-3 left-3', 'top-3 right-3', 'bottom-3 left-3', 'bottom-3 right-3'];
 
 export default function OurBrandsPage() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
 
   return (
     <>
@@ -33,7 +33,7 @@ export default function OurBrandsPage() {
             Titan
           </span>
           <h1 className="page-hero-heading font-headline text-5xl md:text-7xl font-bold tracking-tighter leading-none text-primary">
-            {t('brands_title')}
+            {headingText(t('brands_title'), locale)}
           </h1>
           <p className="mt-8 max-w-3xl font-headline text-xl md:text-2xl font-medium leading-snug">
             {t('brands_intro')}

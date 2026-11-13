@@ -4,10 +4,10 @@ import { Suspense } from 'react';
 import Nav from '../components/Nav';
 import Footer from '../components/Footer';
 import { ProductsPageClient } from './ProductsPageClient';
-import { useTranslation } from '@/lib/i18n';
+import { useTranslation, headingText } from '@/lib/i18n';
 
 export default function ProductsPage() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
 
   return (
     <>
@@ -21,7 +21,7 @@ export default function ProductsPage() {
                 {t('products_badge')}
               </span>
               <h1 className="page-hero-heading font-headline text-5xl md:text-7xl font-bold tracking-tighter leading-none text-primary">
-                {t('products_heading')}
+                {headingText(t('products_heading'), locale)}
               </h1>
               <p className="mt-6 text-lg text-on-surface-variant font-light leading-relaxed">
                 {t('products_subtitle')}

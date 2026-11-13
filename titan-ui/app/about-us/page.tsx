@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Nav from '../components/Nav';
 import Footer from '../components/Footer';
 import { Equalizer, Soundwave } from '../components/AudioDecor';
-import { useTranslation } from '@/lib/i18n';
+import { useTranslation, headingText } from '@/lib/i18n';
 import type { TranslationKey } from '@/lib/translations';
 
 const SERVICES: { key: TranslationKey; icon: string; href?: string }[] = [
@@ -49,7 +49,7 @@ function VinylRecord() {
 }
 
 export default function AboutUsPage() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
 
   return (
     <>
@@ -64,7 +64,7 @@ export default function AboutUsPage() {
                 Titan
               </span>
               <h1 className="page-hero-heading font-headline text-5xl md:text-7xl font-bold tracking-tighter leading-none text-primary">
-                {t('about_title')}
+                {headingText(t('about_title'), locale)}
               </h1>
               <p className="mt-8 max-w-xl font-headline text-xl md:text-2xl font-medium leading-snug">
                 {t('about_lead')}
@@ -101,7 +101,7 @@ export default function AboutUsPage() {
             <div className="flex items-end justify-between gap-8 mb-16">
               <div>
                 <h2 className="font-headline text-3xl md:text-5xl font-bold tracking-tight">
-                  {t('about_services_heading')}
+                  {headingText(t('about_services_heading'), locale)}
                 </h2>
                 <div className="w-12 h-1 bg-primary mt-4"></div>
               </div>

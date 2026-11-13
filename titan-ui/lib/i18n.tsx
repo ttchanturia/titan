@@ -62,6 +62,17 @@ export function toMtavruli(text: string): string {
     .join('');
 }
 
+/**
+ * For prominent headings and primary buttons/links - the same places a site
+ * would otherwise just use text-transform: uppercase - converts to Mtavruli
+ * in Georgian and leaves other locales untouched. Not meant for body copy,
+ * form labels or other small UI chrome, where an all-caps-equivalent
+ * treatment would look out of place rather than like a heading style.
+ */
+export function headingText(text: string, locale: Locale): string {
+  return locale === 'ka' ? toMtavruli(text) : text;
+}
+
 export function I18nProvider({ children }: { children: ReactNode }) {
   const [locale, setLocaleState] = useState<Locale>('en');
 

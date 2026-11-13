@@ -4,10 +4,10 @@ import Link from 'next/link';
 import Nav from '../components/Nav';
 import Footer from '../components/Footer';
 import { Equalizer } from '../components/AudioDecor';
-import { useTranslation } from '@/lib/i18n';
+import { useTranslation, headingText } from '@/lib/i18n';
 
 export default function ContactPage() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
 
   return (
     <>
@@ -20,7 +20,7 @@ export default function ContactPage() {
             Titan
           </span>
           <h1 className="page-hero-heading font-headline text-5xl md:text-7xl font-bold tracking-tighter leading-none text-primary">
-            {t('contact_heading')}
+            {headingText(t('contact_heading'), locale)}
           </h1>
           <p className="mt-6 max-w-xl text-lg text-on-surface-variant font-light leading-relaxed">
             {t('contact_subtitle')}

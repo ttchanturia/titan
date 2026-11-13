@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { FALLBACK_IMAGE_SVG } from '@/lib/constants';
 import type { Product } from '@/lib/types';
-import { useTranslation, localizedText } from '@/lib/i18n';
+import { useTranslation, localizedText, headingText } from '@/lib/i18n';
 import { discountPercent, hasDiscount } from '@/lib/pricing';
 import { PriceTag } from './PriceTag';
 
@@ -67,7 +67,7 @@ export function ProductGrid({ products }: ProductGridProps) {
               </p>
             )}
             <h3 className="font-headline text-lg font-semibold text-on-surface group-hover:text-primary transition-colors">
-              {product.name}
+              {headingText(product.name, locale)}
             </h3>
             {product.categoryName && (
               <p className="text-sm text-on-surface-variant mb-2">

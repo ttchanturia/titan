@@ -5,14 +5,14 @@ import Nav from '../components/Nav';
 import Footer from '../components/Footer';
 import { useCart } from '@/lib/cart-context';
 import { FALLBACK_IMAGE_SVG } from '@/lib/constants';
-import { useTranslation } from '@/lib/i18n';
+import { useTranslation, headingText } from '@/lib/i18n';
 
 const SHIPPING = 45;
 const TAX_RATE = 0.08;
 
 export default function CartPage() {
   const { items, updateQuantity, removeItem, subtotal } = useCart();
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
 
   const shipping = items.length > 0 ? SHIPPING : 0;
   const tax = subtotal * TAX_RATE;
@@ -27,7 +27,7 @@ export default function CartPage() {
             {t('cart_tagline')}
           </p>
           <h1 className="font-headline text-5xl md:text-6xl font-extrabold tracking-tighter">
-            {t('cart_heading')}
+            {headingText(t('cart_heading'), locale)}
           </h1>
         </div>
 
@@ -62,7 +62,7 @@ export default function CartPage() {
                     <div>
                       <div className="flex justify-between items-start mb-2">
                         <h3 className="font-headline text-2xl font-bold tracking-tight">
-                          {item.name}
+                          {headingText(item.name, locale)}
                         </h3>
                         <p className="font-headline text-xl font-medium">
                           ₾{(item.price * item.quantity).toFixed(2)}
@@ -119,7 +119,7 @@ export default function CartPage() {
             <div className="lg:col-span-4 sticky top-32">
               <div className="bg-surface-container-low p-10 space-y-8">
                 <h2 className="font-headline text-xl font-bold tracking-tight uppercase">
-                  {t('cart_order_summary')}
+                  {headingText(t('cart_order_summary'), locale)}
                 </h2>
                 <div className="space-y-4">
                   <div className="flex justify-between text-sm">
