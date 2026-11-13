@@ -91,6 +91,19 @@
   letter-spacing: normal;
 }
 
+/* Georgian headings/buttons are already converted to real Mtavruli
+   characters in JS (headingText/toMtavruli in lib/i18n.tsx) - the uniform,
+   no-descenders letterforms that text-transform: uppercase exists to fake
+   for Latin. Applying that transform on top doesn't just do nothing: the
+   browser visually re-derives glyphs from its own Georgian case-folding and
+   renders the already-Mtavruli text back in Mkhedruli's lowercase shapes
+   (confirmed directly - removing the class on an already-Mtavruli heading
+   fixes the rendering immediately, with no change to the underlying text
+   node). Switched off wherever both are in play. */
+:lang(ka) .uppercase {
+  text-transform: none;
+}
+
 :lang(ka) .leading-\[0\.9\] {
   line-height: 1.2;
 }
