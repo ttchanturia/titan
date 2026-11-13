@@ -28,6 +28,22 @@ export default function HomePage() {
   // with subcategories nested in `children`), capped at 6 for the homepage tile.
   const topCategories = categories?.slice(0, 6) ?? [];
 
+  // Represents a category with its most recently added product's photo
+  // (checking the category itself and its subcategories) rather than a
+  // generic stock photo - it's real inventory, and keeps itself up to date
+  // as products are added, with no separate image to curate.
+  const latestImageForCategory = (category: (typeof topCategories)[number]) => {
+    if (!products) return undefined;
+    const matchingIds = [category.id, ...(category.children ?? []).map((c) => c.id)];
+    const latest = products
+      .filter((p) => matchingIds.includes(p.categoryId))
+      .reduce<(typeof products)[number] | undefined>(
+        (best, p) => (!best || p.id > best.id ? p : best),
+        undefined,
+      );
+    return latest?.imageUrl;
+  };
+
   // Most recently added products, newest first (id is insertion order).
   const latestProducts = products ? [...products].sort((a, b) => b.id - a.id).slice(0, 4) : [];
 
@@ -103,12 +119,16 @@ export default function HomePage() {
                 <Link
                   key={category.id}
                   href={`/products?category=${category.id}`}
-                  className="group relative bg-surface aspect-square p-8 flex flex-col justify-between overflow-hidden hover:bg-primary hover:text-on-primary transition-colors duration-300"
+                  className="group relative aspect-square overflow-hidden block"
                 >
-                  <span className="material-symbols-outlined text-3xl opacity-20 group-hover:opacity-40 transition-opacity">
-                    category
-                  </span>
-                  <span className="font-headline text-lg md:text-xl font-bold leading-tight">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={latestImageForCategory(category) || FALLBACK_IMAGE_SVG}
+                    alt={localizedText(category.name, category.nameKa, locale) ?? category.name}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/10 to-transparent" />
+                  <span className="absolute bottom-0 left-0 right-0 p-5 font-headline text-base md:text-xl font-bold text-white leading-tight wrap-break-word">
                     {localizedText(category.name, category.nameKa, locale)}
                   </span>
                 </Link>
