@@ -9,11 +9,11 @@ export const translations = {
     nav_home: 'Home',
     nav_products: 'Products',
     nav_rental: 'Rental',
+    nav_contact: 'Contact',
     nav_search_placeholder: 'Search products...',
 
     // Footer
-    footer_tagline:
-      'Defining the future of sound through meticulous craftsmanship and acoustic innovation.',
+    footer_tagline: 'Everything you need for music, right here.',
     footer_products_heading: 'Products',
     footer_shop_all: 'Shop All',
     footer_brand_heading: 'Brand',
@@ -30,31 +30,17 @@ export const translations = {
     footer_accessibility: 'Accessibility',
 
     // Home
-    home_collection_badge: 'The {year} Collection',
     home_hero_title_line1: 'The Soul of',
     home_hero_title_line2: 'Precision.',
     home_hero_subtitle:
       'Experience the resonant depth of the MK-II Signature Series. Crafted for those who hear the difference between a note and a story.',
     home_explore_series: 'Explore Series',
-    home_technical_specs: 'Technical Specs',
     home_handcrafted_badge: 'Handcrafted in London',
-    home_featured_heading: 'Featured Instruments',
-    home_view_gallery: 'View Entire Gallery',
-    home_card1_title: 'Dreadnought Series',
-    home_card1_subtitle: 'Acoustic Engineering',
-    home_card2_title: 'Deep Resonance Bass',
-    home_card2_subtitle: 'Precision Low-End',
-    home_card3_title: 'Grand Concert Series',
-    home_card3_subtitle: 'Studio Keys',
+    home_categories_heading: 'Categories',
+    home_view_all_categories: 'View All Categories',
     home_new_arrivals_badge: 'New Arrivals',
     home_new_arrivals_heading: 'Engineered for the Uncompromising.',
-    home_bento_feature_title: 'Carbon Studio Monit-X',
-    home_bento_learn_more: 'Learn More',
-    home_bento_pedalboard_title: 'Pedalboard Precision',
-    home_bento_pedalboard_subtitle: 'The {year} Analog Series',
-    home_bento_artist_title: 'Artist Collaborations',
-    home_bento_artist_desc:
-      'Limited edition artifacts designed with world-class engineers.',
+    home_view_all_products: 'View All Products',
     home_newsletter_heading: 'Join the Sonic Circle.',
     home_newsletter_subtitle:
       'Gain exclusive access to limited instrument drops, technical masterclasses, and gallery events.',
@@ -75,6 +61,17 @@ export const translations = {
     rental_heading: 'Rental',
     rental_subtitle:
       'Instruments available to rent. Pick one, check the details, and get in touch to arrange your rental.',
+
+    // Contact page
+    contact_badge: 'Get in Touch',
+    contact_heading: 'Contact',
+    contact_subtitle:
+      'Questions about an order, a rental, or anything else? Reach us directly.',
+    contact_phone_heading: 'Phone',
+    contact_email_heading: 'Email',
+    contact_address_heading: 'Address',
+    contact_view_map: 'View on Map',
+    contact_social_heading: 'Social',
 
     // About Us page
     about_title: 'About Us',
@@ -292,28 +289,16 @@ export const translations = {
     admin_homepage_hero_image_hint: 'Leave empty to show the newest product photo.',
     admin_homepage_no_image: 'No image',
     admin_homepage_section_hero: 'Hero',
-    admin_homepage_section_featured: 'Featured Instruments',
-    admin_homepage_section_card1: 'Featured Card 1',
-    admin_homepage_section_card2: 'Featured Card 2',
-    admin_homepage_section_card3: 'Featured Card 3',
     admin_homepage_section_new_arrivals: 'New Arrivals',
-    admin_homepage_section_bento_feature: 'New Arrivals — Large Tile',
-    admin_homepage_section_bento_pedalboard: 'New Arrivals — Top Tile',
-    admin_homepage_section_bento_artist: 'New Arrivals — Bottom Tile',
     admin_homepage_section_newsletter: 'Newsletter',
     admin_homepage_field_badge: 'Badge',
     admin_homepage_field_title_line1: 'Title (line 1)',
     admin_homepage_field_title_line2: 'Title (line 2, outlined)',
     admin_homepage_field_subtitle: 'Subtitle',
     admin_homepage_field_primary_button: 'Primary button',
-    admin_homepage_field_secondary_link: 'Secondary link',
     admin_homepage_field_image_badge: 'Image badge',
     admin_homepage_field_image: 'Image',
     admin_homepage_field_heading: 'Heading',
-    admin_homepage_field_link: 'Link label',
-    admin_homepage_field_title: 'Title',
-    admin_homepage_field_button: 'Button label',
-    admin_homepage_field_description: 'Description',
   },
   ka: {
     // Global
@@ -323,11 +308,11 @@ export const translations = {
     nav_home: 'მთავარი',
     nav_products: 'პროდუქტები',
     nav_rental: 'გაქირავება',
+    nav_contact: 'კონტაქტი',
     nav_search_placeholder: 'მოძებნეთ პროდუქტი...',
 
     // Footer
-    footer_tagline:
-      'ბგერის მომავლის განსაზღვრა ზედმიწევნითი ხელოსნობითა და აკუსტიკური ინოვაციებით.',
+    footer_tagline: 'აქ ყველაფერია, რაც მუსიკისთვის გჭირდება.',
     footer_products_heading: 'პროდუქტები',
     footer_shop_all: 'ყველას ნახვა',
     footer_brand_heading: 'ბრენდი',
@@ -344,31 +329,17 @@ export const translations = {
     footer_accessibility: 'ხელმისაწვდომობა',
 
     // Home
-    home_collection_badge: '{year} წლის კოლექცია',
     home_hero_title_line1: 'ბგერის სული',
     home_hero_title_line2: 'სიზუსტეში.',
     home_hero_subtitle:
       'გამოსცადეთ MK-II Signature სერიის ხმის სიღრმე. შექმნილია მათთვის, ვისაც ესმის განსხვავება ნოტასა და ისტორიას შორის.',
     home_explore_series: 'კოლექციის დათვალიერება',
-    home_technical_specs: 'ტექნიკური მახასიათებლები',
     home_handcrafted_badge: 'ხელნაკეთი ლონდონში',
-    home_featured_heading: 'გამორჩეული ინსტრუმენტები',
-    home_view_gallery: 'სრული გალერეის ნახვა',
-    home_card1_title: 'Dreadnought სერია',
-    home_card1_subtitle: 'აკუსტიკური ინჟინერია',
-    home_card2_title: 'ღრმა რეზონანსის ბასი',
-    home_card2_subtitle: 'ზუსტი დაბალი სიხშირეები',
-    home_card3_title: 'Grand Concert სერია',
-    home_card3_subtitle: 'სტუდიური კლავიშები',
+    home_categories_heading: 'კატეგორიები',
+    home_view_all_categories: 'ყველა კატეგორიის ნახვა',
     home_new_arrivals_badge: 'სიახლეები',
     home_new_arrivals_heading: 'შექმნილია ურყევებისთვის.',
-    home_bento_feature_title: 'Carbon Studio Monit-X',
-    home_bento_learn_more: 'გაიგე მეტი',
-    home_bento_pedalboard_title: 'პედალბორდის სიზუსტე',
-    home_bento_pedalboard_subtitle: '{year} წლის ანალოგური სერია',
-    home_bento_artist_title: 'თანამშრომლობა შემსრულებლებთან',
-    home_bento_artist_desc:
-      'შეზღუდული გამოშვების ნაკეთობები, შექმნილი მსოფლიო დონის ინჟინრებთან ერთად.',
+    home_view_all_products: 'ყველა პროდუქტის ნახვა',
     home_newsletter_heading: 'შემოგვიერთდი ხმის წრეს.',
     home_newsletter_subtitle:
       'მიიღეთ ექსკლუზიური წვდომა შეზღუდულ გამოშვებებზე, ტექნიკურ მასტერკლასებზე და გალერეის ღონისძიებებზე.',
@@ -389,6 +360,17 @@ export const translations = {
     rental_heading: 'გაქირავება',
     rental_subtitle:
       'ინსტრუმენტები ქირაობისთვის. აირჩიეთ სასურველი ინსტრუმენტი, გაეცანით დეტალებს და დაგვიკავშირდით ქირაობის გასაფორმებლად.',
+
+    // Contact page
+    contact_badge: 'დაგვიკავშირდით',
+    contact_heading: 'კონტაქტი',
+    contact_subtitle:
+      'შეკითხვები შეკვეთის, გაქირავების ან სხვა რამესთან დაკავშირებით? დაგვიკავშირდით პირდაპირ.',
+    contact_phone_heading: 'ტელეფონი',
+    contact_email_heading: 'ელ. ფოსტა',
+    contact_address_heading: 'მისამართი',
+    contact_view_map: 'რუკაზე ნახვა',
+    contact_social_heading: 'სოციალური ქსელები',
 
     // About Us page
     about_title: 'ჩვენს შესახებ',
@@ -606,28 +588,16 @@ export const translations = {
     admin_homepage_hero_image_hint: 'დატოვეთ ცარიელი უახლესი პროდუქტის ფოტოს საჩვენებლად.',
     admin_homepage_no_image: 'სურათი არ არის',
     admin_homepage_section_hero: 'მთავარი ბანერი',
-    admin_homepage_section_featured: 'გამორჩეული ინსტრუმენტები',
-    admin_homepage_section_card1: 'გამორჩეული ბარათი 1',
-    admin_homepage_section_card2: 'გამორჩეული ბარათი 2',
-    admin_homepage_section_card3: 'გამორჩეული ბარათი 3',
     admin_homepage_section_new_arrivals: 'სიახლეები',
-    admin_homepage_section_bento_feature: 'სიახლეები — დიდი ბლოკი',
-    admin_homepage_section_bento_pedalboard: 'სიახლეები — ზედა ბლოკი',
-    admin_homepage_section_bento_artist: 'სიახლეები — ქვედა ბლოკი',
     admin_homepage_section_newsletter: 'სიახლეების გამოწერა',
     admin_homepage_field_badge: 'ნიშანი',
     admin_homepage_field_title_line1: 'სათაური (ხაზი 1)',
     admin_homepage_field_title_line2: 'სათაური (ხაზი 2, კონტურით)',
     admin_homepage_field_subtitle: 'ქვესათაური',
     admin_homepage_field_primary_button: 'მთავარი ღილაკი',
-    admin_homepage_field_secondary_link: 'მეორადი ბმული',
     admin_homepage_field_image_badge: 'სურათის ნიშანი',
     admin_homepage_field_image: 'სურათი',
     admin_homepage_field_heading: 'სათაური',
-    admin_homepage_field_link: 'ბმულის ტექსტი',
-    admin_homepage_field_title: 'სათაური',
-    admin_homepage_field_button: 'ღილაკის ტექსტი',
-    admin_homepage_field_description: 'აღწერა',
   },
 } satisfies Record<Locale, Record<string, string>>;
 

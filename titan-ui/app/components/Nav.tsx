@@ -19,6 +19,7 @@ export default function Nav() {
     { href: '/', label: t('nav_home') },
     { href: '/products', label: t('nav_products') },
     { href: '/rental', label: t('nav_rental') },
+    { href: '/contact', label: t('nav_contact') },
   ];
 
   // Intentionally does not read useSearchParams(): Nav renders on every page

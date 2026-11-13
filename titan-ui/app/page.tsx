@@ -4,13 +4,16 @@ import Link from 'next/link';
 import Nav from './components/Nav';
 import Footer from './components/Footer';
 import NewsletterForm from './components/NewsletterForm';
-import { useProducts } from '@/lib/hooks';
+import { useCategories, useProducts } from '@/lib/hooks';
 import { FALLBACK_IMAGE_SVG } from '@/lib/constants';
 import { useHomepage } from '@/lib/homepage';
+import { useTranslation, localizedText } from '@/lib/i18n';
 
 export default function HomePage() {
   const { data: products, isLoading: productsLoading } = useProducts();
+  const { data: categories } = useCategories();
   const content = useHomepage();
+  const { t, locale } = useTranslation();
   const latestProduct = products?.reduce<(typeof products)[number] | undefined>(
     (latest, p) => (!latest || p.id > latest.id ? p : latest),
     undefined,
@@ -20,6 +23,13 @@ export default function HomePage() {
   // Nothing to show yet while products are still in flight and there's no
   // admin override - skeleton rather than flashing the generic fallback photo.
   const showHeroSkeleton = !heroImage && productsLoading;
+
+  // Top-level categories only (GET /api/categories already returns just those,
+  // with subcategories nested in `children`), capped at 6 for the homepage tile.
+  const topCategories = categories?.slice(0, 6) ?? [];
+
+  // Most recently added products, newest first (id is insertion order).
+  const latestProducts = products ? [...products].sort((a, b) => b.id - a.id).slice(0, 4) : [];
 
   return (
     <>
@@ -31,10 +41,7 @@ export default function HomePage() {
         <section className="relative min-h-screen flex items-center pt-20 overflow-hidden bg-surface">
           <div className="max-w-screen-2xl mx-auto px-8 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center w-full">
             <div className="lg:col-span-5 z-10">
-              <span className="inline-block text-xs font-bold tracking-[0.3em] uppercase mb-6 text-on-surface-variant">
-                {content.text('home_collection_badge', { year: new Date().getFullYear() })}
-              </span>
-              <h1 className="text-5xl sm:text-6xl md:text-8xl font-headline font-extrabold tracking-tighter leading-[0.9] mb-8">
+              <h1 className="uppercase text-5xl sm:text-6xl md:text-8xl font-headline font-extrabold tracking-tighter leading-[0.9] mb-8">
                 {content.text('home_hero_title_line1')} <br />
                 <span className="text-outline">{content.text('home_hero_title_line2')}</span>
               </h1>
@@ -48,19 +55,12 @@ export default function HomePage() {
                 >
                   {content.text('home_explore_series')}
                 </Link>
-                <Link
-                  href={latestProduct ? `/products/${latestProduct.id}` : '/products'}
-                  className="text-sm font-bold uppercase tracking-widest flex items-center group"
-                >
-                  {content.text('home_technical_specs')}
-                  <span className="material-symbols-outlined ml-2 group-hover:translate-x-1 transition-transform">
-                    arrow_forward
-                  </span>
-                </Link>
               </div>
             </div>
-            <div className="lg:col-span-7 relative">
-              <div className="aspect-4/5 bg-surface-container-low relative overflow-hidden">
+            <div className="lg:col-span-7 relative flex justify-center lg:justify-end">
+              {/* Capped at max-w-md - a smaller, fixed-size frame rather than
+                  growing to fill the remaining grid width. */}
+              <div className="w-full max-w-md aspect-4/5 bg-surface-container-low relative overflow-hidden">
                 {showHeroSkeleton ? (
                   <div className="w-full h-full animate-pulse bg-surface-container-high" />
                 ) : (
@@ -81,13 +81,13 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Featured Instruments */}
-        <section className="bg-surface-container-low py-32 overflow-hidden">
-          <div className="max-w-screen-2xl mx-auto px-8 mb-20">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+        {/* Categories */}
+        <section className="bg-surface-container-low py-32">
+          <div className="max-w-screen-2xl mx-auto px-8">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-16">
               <div>
                 <h2 className="text-4xl font-headline font-bold tracking-tight">
-                  {content.text('home_featured_heading')}
+                  {t('home_categories_heading')}
                 </h2>
                 <div className="w-12 h-1 bg-primary mt-4"></div>
               </div>
@@ -95,69 +95,29 @@ export default function HomePage() {
                 href="/products"
                 className="text-sm font-semibold underline underline-offset-8 decoration-1"
               >
-                {content.text('home_view_gallery')}
+                {t('home_view_all_categories')}
               </Link>
             </div>
-          </div>
-          <div className="flex gap-8 px-8 overflow-x-auto no-scrollbar snap-x snap-mandatory">
-            {/* Card 1 */}
-            <div className="flex-none w-75 md:w-112.5 snap-center">
-              <div className="aspect-3/4 bg-surface relative group mb-6 overflow-hidden">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                  alt="Vintage acoustic guitar against a minimal studio background"
-                  src={content.image('home_card1_image')}
-                />
-                <div className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-              </div>
-              <h3 className="text-lg font-headline font-bold mb-1">
-                {content.text('home_card1_title')}
-              </h3>
-              <p className="text-sm text-on-surface-variant font-medium">
-                {content.text('home_card1_subtitle')}
-              </p>
-            </div>
-            {/* Card 2 */}
-            <div className="flex-none w-75 md:w-112.5 snap-center">
-              <div className="aspect-3/4 bg-surface relative group mb-6 overflow-hidden">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                  alt="Modern electric bass guitar detail"
-                  src={content.image('home_card2_image')}
-                />
-                <div className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-              </div>
-              <h3 className="text-lg font-headline font-bold mb-1">
-                {content.text('home_card2_title')}
-              </h3>
-              <p className="text-sm text-on-surface-variant font-medium">
-                {content.text('home_card2_subtitle')}
-              </p>
-            </div>
-            {/* Card 3 */}
-            <div className="flex-none w-75 md:w-112.5 snap-center">
-              <div className="aspect-3/4 bg-surface relative group mb-6 overflow-hidden">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                  alt="Close up of a premium piano keyboard"
-                  src={content.image('home_card3_image')}
-                />
-                <div className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-              </div>
-              <h3 className="text-lg font-headline font-bold mb-1">
-                {content.text('home_card3_title')}
-              </h3>
-              <p className="text-sm text-on-surface-variant font-medium">
-                {content.text('home_card3_subtitle')}
-              </p>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+              {topCategories.map((category) => (
+                <Link
+                  key={category.id}
+                  href={`/products?category=${category.id}`}
+                  className="group relative bg-surface aspect-square p-8 flex flex-col justify-between overflow-hidden hover:bg-primary hover:text-on-primary transition-colors duration-300"
+                >
+                  <span className="material-symbols-outlined text-3xl opacity-20 group-hover:opacity-40 transition-opacity">
+                    category
+                  </span>
+                  <span className="font-headline text-lg md:text-xl font-bold leading-tight">
+                    {localizedText(category.name, category.nameKa, locale)}
+                  </span>
+                </Link>
+              ))}
             </div>
           </div>
         </section>
 
-        {/* New Arrivals Bento */}
+        {/* New Arrivals */}
         <section className="py-32 bg-surface">
           <div className="max-w-screen-2xl mx-auto px-8">
             <div className="mb-20 text-center max-w-2xl mx-auto">
@@ -168,62 +128,30 @@ export default function HomePage() {
                 {content.text('home_new_arrivals_heading')}
               </h2>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 h-auto md:h-200">
-              {/* Large Feature */}
-              <div className="md:col-span-7 bg-surface-container relative group overflow-hidden">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  className="w-full h-full object-cover"
-                  alt="Professional studio monitors on a minimalist desk"
-                  src={content.image('home_bento_feature_image')}
-                />
-                <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent flex flex-col justify-end p-12">
-                  <h3 className="text-3xl text-white font-headline font-bold mb-4">
-                    {content.text('home_bento_feature_title')}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+              {latestProducts.map((product) => (
+                <Link key={product.id} href={`/products/${product.id}`} className="group">
+                  <div className="aspect-square bg-surface-container-high relative overflow-hidden mb-4">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      alt={product.name}
+                      src={product.imageUrl || FALLBACK_IMAGE_SVG}
+                    />
+                  </div>
+                  <h3 className="text-sm md:text-base font-headline font-semibold">
+                    {product.name}
                   </h3>
-                  <button className="w-fit text-white text-xs font-bold uppercase tracking-widest border-b border-white pb-2">
-                    {content.text('home_bento_learn_more')}
-                  </button>
-                </div>
-              </div>
-              {/* Vertical Split */}
-              <div className="md:col-span-5 grid grid-rows-2 gap-6">
-                <div className="bg-surface-container-high p-12 flex flex-col justify-between">
-                  <div>
-                    <h4 className="text-xl font-bold mb-2">
-                      {content.text('home_bento_pedalboard_title')}
-                    </h4>
-                    <p className="text-sm text-on-surface-variant">
-                      {content.text('home_bento_pedalboard_subtitle', { year: new Date().getFullYear() })}
-                    </p>
-                  </div>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    className="w-full h-32 object-contain"
-                    alt="Minimalist silver guitar pedal"
-                    src={content.image('home_bento_pedalboard_image')}
-                  />
-                </div>
-                <div className="bg-primary text-white p-12 flex flex-col justify-between">
-                  <span
-                    className="material-symbols-outlined text-4xl"
-                    style={{
-                      fontVariationSettings:
-                        "'FILL' 1, 'wght' 300, 'GRAD' 0, 'opsz' 24",
-                    }}
-                  >
-                    star
-                  </span>
-                  <div>
-                    <h4 className="text-xl font-bold mb-2">
-                      {content.text('home_bento_artist_title')}
-                    </h4>
-                    <p className="text-sm text-surface-dim">
-                      {content.text('home_bento_artist_desc')}
-                    </p>
-                  </div>
-                </div>
-              </div>
+                </Link>
+              ))}
+            </div>
+            <div className="text-center mt-16">
+              <Link
+                href="/products"
+                className="inline-block bg-primary text-on-primary px-10 py-5 text-sm font-bold uppercase tracking-widest hover:bg-primary-container active:scale-95 transition-all duration-200"
+              >
+                {t('home_view_all_products')}
+              </Link>
             </div>
           </div>
         </section>
