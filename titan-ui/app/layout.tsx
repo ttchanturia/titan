@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { QueryProvider } from './providers';
+import FacebookPixel from './components/FacebookPixel';
 
 export const metadata: Metadata = {
   title: 'Titan',
@@ -32,6 +33,7 @@ export default function RootLayout({
       </head>
       <body className="bg-surface text-on-surface font-body antialiased">
         <QueryProvider>{children}</QueryProvider>
+        <FacebookPixel />
       </body>
     </html>
   );

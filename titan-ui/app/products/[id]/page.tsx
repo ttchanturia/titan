@@ -11,6 +11,7 @@ import { useTranslation, localizedText, headingText } from '@/lib/i18n';
 import { WHATSAPP_URL, PHONE_TEL_HREF } from '@/lib/constants';
 import { effectivePrice } from '@/lib/pricing';
 import { PriceTag } from '@/app/components/PriceTag';
+import { fbTrack } from '@/lib/fb-pixel';
 
 
 export default function ProductPage() {
@@ -25,6 +26,19 @@ export default function ProductPage() {
   useEffect(() => {
     setActiveImageIndex(0);
   }, [id]);
+
+  // Meta Pixel: record which product was viewed (used for ad reporting/retargeting).
+  useEffect(() => {
+    if (!product) return;
+    fbTrack('ViewContent', {
+      content_ids: [String(product.id)],
+      content_name: product.name,
+      content_category: product.categoryName,
+      content_type: 'product',
+      value: effectivePrice(product),
+      currency: 'GEL',
+    });
+  }, [product]);
 
   if (isLoading) {
     return (
